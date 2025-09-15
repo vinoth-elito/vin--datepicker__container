@@ -1029,10 +1029,6 @@ function showDateTimePicker($input) {
         const dateStr = $(this).data("date");
         selectedDate = new Date(dateStr + "T00:00:00");
         render();
-        const $timepicker = $popup.find(".vindatepicker--timepicker");
-        if ($timepicker.length) {
-            $timepicker.hide().removeClass("hidden").slideDown();
-        }
     });
     $popup.on("click", ".time-icon", function () {
         const $timepicker = $popup.find(".vindatepicker--timepicker");
