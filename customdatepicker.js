@@ -1199,4 +1199,6 @@ $("body").on("click", ".clear__selected__month", function () {
 });
 $("body").on("click", ".calendar-button", function () {
     $(this).parents('.vin--datepicker__container').find('input').click();
+    $(this).parents('.vin--datepicker__container').find('input.vindaterange--from__date').focus();
+    $(this).parents('.vin--datepicker__container').find('input.vindaterange--to__date').focus();
 });
