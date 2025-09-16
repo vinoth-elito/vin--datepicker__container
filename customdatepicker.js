@@ -1197,3 +1197,6 @@ $("body").on("click", ".clear__selected__month", function () {
     $(this).hide()
     $('.vindatepicker--dropdown__wrapp').remove();
 });
+$("body").on("click", ".calendar-button", function () {
+    $(this).parents('.vin--datepicker__container').find('input').click();
+});

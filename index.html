@@ -347,12 +347,12 @@
                             </div>
                             <div class="vin--datepicker__container vindaterangepicker vin--relative">
                                 <form>                                
-                                    <label for="from-range-picker" class="sr-only" style="display:none;">Select From Date</label>
-                                    <label for="to-range-picker" class="sr-only" style="display:none;">Select To Date</label>
+                                    <label for="vindaterange--from__date" class="sr-only" style="display:none;">Select From Date</label>
+                                    <label for="vindaterange--to__date" class="sr-only" style="display:none;">Select To Date</label>
                                     <div class="vindaterangepicker--from__todate">
-                                        <input type="text" id="from-range-picker" name="from-range-picker" aria-label="from-range-picker"
+                                        <input type="text" id="from-range-picker" class="vindaterange--from__date" name="from-range-picker" aria-label="from-range-picker"
                                             placeholder="Select From Date" autocomplete="off" readonly>
-                                        <input type="text" id="to-range-picker" name="to-range-picker" aria-label="to-range-picker"
+                                        <input type="text" id="to-range-picker" class="vindaterange--to__date" name="to-range-picker" aria-label="to-range-picker"
                                             placeholder="Select To Date" autocomplete="off" readonly>
                                     </div>
                                     <button type="button" class="calendar-button" aria-label="Open calendar">
@@ -379,7 +379,7 @@
                                 <form>                               
                                     <label for="date-range-picker" class="sr-only" style="display:none;">Select Date Range</label>
                                     <div class="vindaterangepicker--from__todate">
-                                        <input type="text" id="date-range-picker" name="date-range-picker" aria-label="date-range-picker"
+                                        <input type="text" id="date-range-picker" class="vindaterange--from__date" name="date-range-picker" aria-label="date-range-picker"
                                             placeholder="Select Date Range" autocomplete="off" readonly>
                                     </div>
                                     <button type="button" class="calendar-button" aria-label="Open calendar">
@@ -2152,7 +2152,7 @@ $(".vindaterange--from__date, .vindaterange--to__date").on("focus", function () 
                         $('.vindatepicker--dropdown__wrapp').remove();
                         });
                         $("body").on("click", ".calendar-button", function () {
-                        $(this).parent('.vin--datepicker__container').find('input').click();
+                        $(this).parents('.vin--datepicker__container').find('input').click();
                         });
                         
                 </textarea>
