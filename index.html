@@ -50,16 +50,19 @@
 
         #html-editor {
             background: #f2672e;
-            color: #fff;
+            color: #000;
+            font-weight: bold;
         }
 
         #css-editor {
             background: #30aadd;
-            color: #fff;
+            color: #000;
+            font-weight: bold;
         }
 
         #js-editor {
             background: #f2bf26;
+            font-weight: bold;
         }
 
         #html-editor::-webkit-scrollbar-track {
@@ -187,18 +190,20 @@
                                 <h2> Date Picker </h2>
                             </div>
                             <div class="vin--datepicker__container vindatepicker vin--relative">
-                                <label for="month-picker" class="sr-only" style="display:none;">Select Date</label>
-                                <input type="text" name="month" placeholder="Select Date" autocomplete="off" readonly aria-label="Date picker">
-                                <button type="button" class="calendar-button" aria-label="Open calendar">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
-                                        <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
-                                    </svg>
-                                </button>
-                                <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions" aria-label="Clear selected month" style="display:none;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
-                                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                                    </svg>
-                                </button>
+                                <form>
+                                    <label for="Date-picker" class="sr-only">Select Date</label>
+                                    <input type="text" id="Date-picker" name="date" placeholder="Select Date" aria-label="date" autocomplete="off" readonly>
+                                    <button type="button" class="calendar-button" aria-label="Open calendar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
+                                            <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions" aria-label="Clear selected month" style="display:none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
+                                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                         <!-- Div For Timepicker-->
@@ -207,19 +212,21 @@
                                 <h2> Time Picker </h2>
                             </div>
                             <div class="vin--datepicker__container vintimepicker vin--relative">
-                                <label for="month-picker" class="sr-only" style="display:none;">Select Time</label>
-                                <input type="text" name="month" placeholder="Select Time" autocomplete="off" readonly aria-label="Time picker">
-                                <button type="button" class="calendar-button" aria-label="Open calendar">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
-                                        <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
-                                    </svg>
-                                </button>
-                                <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
-                                    aria-label="Clear selected month" style="display:none;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
-                                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                                    </svg>
-                                </button>
+                                <form>
+                                    <label for="Time-picker" class="sr-only">Select Time</label>
+                                    <input type="text" id="Time-picker" name="time" aria-label="time" placeholder="Select Date" autocomplete="off" readonly>
+                                    <button type="button" class="calendar-button" aria-label="Open calendar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
+                                            <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
+                                        aria-label="Clear selected month" style="display:none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
+                                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                         <!-- Div For Timepicker(Arrow)-->
@@ -228,19 +235,21 @@
                                 <h2> Time Picker with Arrow</h2>
                             </div>
                             <div class="vin--datepicker__container vintimepicker vintimepicker--with__wrrow vin--relative">
-                                <label for="month-picker" class="sr-only" style="display:none;">Select Time</label>
-                                <input type="text" name="month" placeholder="Select Time" autocomplete="off" readonly aria-label="Time picker">
-                                <button type="button" class="calendar-button" aria-label="Open calendar">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
-                                        <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
-                                    </svg>
-                                </button>
-                                <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
-                                    aria-label="Clear selected month" style="display:none;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
-                                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                                    </svg>
-                                </button>
+                                <form>
+                                    <label for="Time-picker-arrow" class="sr-only">Select Time</label>
+                                    <input type="text" id="Time-picker-arrow" name="time-picker-arrow" aria-label="time-picker-arrow" placeholder="Select Date" autocomplete="off" readonly>
+                                    <button type="button" class="calendar-button" aria-label="Open calendar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
+                                            <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
+                                        aria-label="Clear selected month" style="display:none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
+                                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                         <!-- Div For Timepicker(Circle)-->
@@ -249,21 +258,24 @@
                                 <h2> Time Picker with Circle</h2>
                             </div>
                             <div class="vin--datepicker__container vintimepicker vintimepicker--with__circle vin--relative">
-                                <label for="month-picker" class="sr-only" style="display:none;">Select Time</label>
-                                <input type="text" name="month" placeholder="Select Time" autocomplete="off" readonly aria-label="Time picker">
-                                <button type="button" class="calendar-button" aria-label="Open calendar">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
-                                        <path
-                                            d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
-                                    </svg>
-                                </button>
-                                <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
-                                    aria-label="Clear selected month" style="display:none;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
-                                        <path
-                                            d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                                    </svg>
-                                </button>
+                                <form>
+                                    <label for="Time-picker-circle" class="sr-only">Select Time</label>
+                                    <input type="text" id="Time-picker-circle" name="time-picker-circle" aria-label="time-picker-arrow"
+                                        placeholder="Select Date" autocomplete="off" readonly>
+                                    <button type="button" class="calendar-button" aria-label="Open calendar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
+                                            <path
+                                                d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
+                                        aria-label="Clear selected month" style="display:none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
+                                            <path
+                                                d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                         <!-- Div For MonthYear picker-->
@@ -272,38 +284,44 @@
                                 <h2> Month Year Picker </h2>
                             </div>
                             <div class="vin--datepicker__container vinmonthyearpicker vin--relative">
-                                <label for="month-picker" class="sr-only" style="display:none;">Month Year Picker</label>
-                                <input type="text" name="month" placeholder="Month and Year Picker" autocomplete="off" readonly aria-label="Month Year Picker">
-                                <button type="button" class="calendar-button" aria-label="Open calendar">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
-                                        <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
-                                    </svg>
-                                </button>
-                                <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
-                                    aria-label="Clear selected month" style="display:none;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
-                                        <path
-                                            d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                                    </svg>
-                                </button>
+                                <form>
+                                    <label for="month-year-picker" class="sr-only">Select Time</label>
+                                    <input type="text" id="month-year-picker" name="month-year-picker" aria-label="month-year-picker"
+                                        placeholder="Select Month/Year" autocomplete="off" readonly>
+                                    <button type="button" class="calendar-button" aria-label="Open calendar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
+                                            <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
+                                        aria-label="Clear selected month" style="display:none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
+                                            <path
+                                                d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                         <!-- Div For DateTime picker-->
                         <div class="input__col">
                             <div class="head__tag"><h2> Date and Time Picker </h2></div>
                             <div class="vin--datepicker__container vindatetimepicker vin--relative">
-                                <label for="month-picker" class="sr-only" style="display:none;">Select Date and Time</label>
-                                <input type="text" name="month" placeholder="Select Date and Time" autocomplete="off" readonly aria-label="Date and Time picker">
-                                <button type="button" class="calendar-button" aria-label="Open calendar">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
-                                        <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
-                                    </svg>
-                                </button>
-                                <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions" aria-label="Clear selected month" style="display:none;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
-                                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                                    </svg>
-                                </button>
+                                <form>
+                                    <label for="Date-time-picker" class="sr-only">Select Time</label>
+                                    <input type="text" id="Date-time-picker" name="Date-time-picker" aria-label="Date-time-picker"
+                                        placeholder="Select Date/Time" autocomplete="off" readonly>
+                                    <button type="button" class="calendar-button" aria-label="Open calendar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
+                                            <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions" aria-label="Clear selected month" style="display:none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
+                                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -314,22 +332,27 @@
                                 <h2> Date Range Picker </h2>
                             </div>
                             <div class="vin--datepicker__container vindaterangepicker vin--relative">
-                                <label for="month-picker" class="sr-only" style="display:none;">Select Date Range</label>
-                                <div class="vindaterangepicker--from__todate">
-                                    <input type="text" class="vindaterange--from__date" value="" name="Date" placeholder="Select Date" autocomplete="off" readonly aria-label="Date Range Picker">
-                                    <input type="text" class="vindaterange--to__date" value="" name="Date" placeholder="Select Date" autocomplete="off" readonly aria-label="Date Range Picker">
-                                </div>
-                                <button type="button" class="calendar-button" aria-label="Open calendar">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
-                                        <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
-                                    </svg>
-                                </button>
-                                <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
-                                    aria-label="Clear selected month" style="display:none;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
-                                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                                    </svg>
-                                </button>
+                                <form>                                
+                                    <label for="from-range-picker" class="sr-only" style="display:none;">Select From Date</label>
+                                    <label for="to-range-picker" class="sr-only" style="display:none;">Select To Date</label>
+                                    <div class="vindaterangepicker--from__todate">
+                                        <input type="text" id="from-range-picker" name="from-range-picker" aria-label="from-range-picker"
+                                            placeholder="Select From Date" autocomplete="off" readonly>
+                                        <input type="text" id="to-range-picker" name="to-range-picker" aria-label="to-range-picker"
+                                            placeholder="Select To Date" autocomplete="off" readonly>
+                                    </div>
+                                    <button type="button" class="calendar-button" aria-label="Open calendar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
+                                            <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
+                                        aria-label="Clear selected month" style="display:none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
+                                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     
@@ -339,21 +362,24 @@
                                 <h2> Date Range Picker </h2>
                             </div>
                             <div class="vin--datepicker__container vindaterangepicker vindaterangepicker--single__input vin--relative">
-                                <label for="month-picker" class="sr-only" style="display:none;">Select Date Range</label>
-                                <div class="vindaterangepicker--from__todate">
-                                    <input type="text" class="vindaterange--from__date" value="" name="Date" placeholder="Select Date" autocomplete="off" readonly aria-label="Date Range Picker">
-                                </div>
-                                <button type="button" class="calendar-button" aria-label="Open calendar">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
-                                        <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
-                                    </svg>
-                                </button>
-                                <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
-                                    aria-label="Clear selected month" style="display:none;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
-                                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                                    </svg>
-                                </button>
+                                <form>                               
+                                    <label for="date-range-picker" class="sr-only" style="display:none;">Select Date Range</label>
+                                    <div class="vindaterangepicker--from__todate">
+                                        <input type="text" id="date-range-picker" name="date-range-picker" aria-label="date-range-picker"
+                                            placeholder="Select Date Range" autocomplete="off" readonly>
+                                    </div>
+                                    <button type="button" class="calendar-button" aria-label="Open calendar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
+                                            <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
+                                        aria-label="Clear selected month" style="display:none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
+                                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -390,6 +416,18 @@
                     }
                     .vintimepicker--circle__timeinputs input[type="number"] {
                     -moz-appearance: textfield;
+                    }
+
+                    .sr-only {
+                    position: absolute;
+                    width: 1px;
+                    height: 1px;
+                    padding: 0;
+                    margin: -1px;
+                    overflow: hidden;
+                    clip: rect(0, 0, 0, 0);
+                    white-space: nowrap;
+                    border: 0;
                     }
                     
                     .vintimepicker--circle__timeinputs input[type="number"]::-webkit-inner-spin-button,
@@ -2107,7 +2145,7 @@ $(".vindaterange--from__date, .vindaterange--to__date").on("focus", function () 
         <div class="resizer" id="resizer"></div>
         <div class="preview">
             <div class="editor-header">Live Preview</div>
-            <iframe id="live-preview"></iframe>
+            <iframe id="live-preview" title="Live preview of your HTML, CSS, and JS output"></iframe>
         </div>
     </div>
 
