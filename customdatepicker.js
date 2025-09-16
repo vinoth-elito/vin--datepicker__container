@@ -1033,6 +1033,7 @@ function showDateTimePicker($input) {
         if ($timepicker.length) {
             $timepicker.hide().removeClass("hidden").slideDown();
         }
+
     });
     $popup.on("click", ".time-icon", function () {
         const $timepicker = $popup.find(".vindatepicker--timepicker");
