@@ -174,6 +174,18 @@
             cursor: col-resize;
             background: #ccc;
         }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
     </style>
 </head>
 
@@ -182,6 +194,7 @@
         <div class="editors">
             <div class="editor-panel">
                 <div class="editor-header">HTML</div>
+                <label for="html-editor" class="sr-only">HTML Editor</label>
                 <textarea id="html-editor" spellcheck="false">
                     <div class="input__row">
                         <!-- Div For Datepicker-->
@@ -387,6 +400,7 @@
             </div>
             <div class="editor-panel">
                 <div class="editor-header">CSS</div>
+                <label for="css-editor" class="sr-only">CSS Editor</label>
                 <textarea id="css-editor" spellcheck="false">
                     :root {
                     --calendar__border: #ccc;
@@ -963,6 +977,7 @@
             </div>
             <div class="editor-panel">
                 <div class="editor-header">JS</div>
+                <label for="js-editor" class="sr-only">JavaScript Editor</label>
                 <textarea id="js-editor" spellcheck="false">
                     // Show DateTime picker Starts //
 
