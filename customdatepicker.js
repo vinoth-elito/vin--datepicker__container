@@ -591,7 +591,6 @@ function showTimePicker($input) {
                     if (angle < 0) angle += 360;
 
                     if (knobType === "hour") {
-                        // Snap to nearest hour
                         const hour = Math.round(angle / 30) % 12 || 12;
                         selectedHour = selectedAMPM === "PM" && hour !== 12
                             ? hour + 12
@@ -604,7 +603,6 @@ function showTimePicker($input) {
                             .addClass("vintimepicker--selected__hour");
                         $popup.find(".vintimepicker--timeinputs__hour").val(padHour(hour));
                     } else {
-                        // Snap to nearest minute (1 step) – change to *5 if you want snapping to 5-minutes only
                         const minute = Math.round(angle / 6) % 60;
                         selectedMinute = minute;
 
@@ -627,8 +625,6 @@ function showTimePicker($input) {
                 knob.addEventListener("pointerup", upHandler);
             });
         }
-
-        // Reattach after SVG render
         dragKnob("hour");
         dragKnob("minute");
 

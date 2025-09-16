@@ -1819,28 +1819,36 @@
                                     function dragKnob(knobType) {
                                     const knob = knobType === "hour" ? hourKnob : minuteKnob;
                                     const rCircle = knobType === "hour" ? radiusHours : radiusMinutes;
-                                    let dragging = false;
-                                    knob.addEventListener("mousedown", e => {
-                                    dragging = true;
+                                    
+                                    knob.style.pointerEvents = "all"; // ensure knob is draggable
+                                    
+                                    knob.addEventListener("pointerdown", e => {
                                     e.preventDefault();
-                                    });
-                                    $svg.addEventListener("mousemove", e => {
-                                    if (!dragging) return;
+                                    knob.setPointerCapture(e.pointerId);
+                                    
+                                    const moveHandler = ev => {
                                     const rect = $svg.getBoundingClientRect();
-                                    const x = e.clientX - rect.left;
-                                    const y = e.clientY - rect.top;
+                                    const x = ev.clientX - rect.left;
+                                    const y = ev.clientY - rect.top;
                                     let angle = getAngle(center, center, x, y);
-                                    if (angle < 0) angle +=360; if (knobType==="hour" ) { const hour=Math.round(angle / 30) % 12 || 12;
-                                        selectedHour=selectedAMPM==="PM" && hour !==12 ? hour + 12 : (selectedAMPM==="AM" && hour===12 ? 0 : hour);
-                                        updateIndicator("hour"); $popup.find(".circle-hour").removeClass("vintimepicker--selected__hour");
-                                        $popup.find(`.circle-hour[data-hour='${hour}' ]`).addClass("vintimepicker--selected__hour");
-                                        $popup.find(".vintimepicker--timeinputs__hour").val(padHour(hour)); } else { const minute=Math.round(angle / 6)
-                                        % 60; selectedMinute=minute; updateIndicator("minute");
-                                        $popup.find(".vintimepicker--circle__minute").removeClass("vintimepicker--selected__minute");
-                                        $popup.find(`.vintimepicker--circle__minute[data-minute='${Math.round(minute / 5) * 5}'
-                                        ]`).addClass("vintimepicker--selected__minute");
-                                        $popup.find(".vintimepicker--timeinputs__minute").val(pad(minute)); } }); document.addEventListener("mouseup",
-                                        ()=> dragging = false);
+                                    if (angle < 0) angle +=360; if (knobType==="hour" ) {const hour=Math.round(angle / 30) % 12 ||
+                                        12; selectedHour=selectedAMPM==="PM" && hour !==12 ? hour + 12 : (selectedAMPM==="AM" && hour===12 ? 0 : hour);
+                                        updateIndicator("hour"); $popup.find(".vintimepicker--circle__hour") .removeClass("vintimepicker--selected__hour");
+                                        $popup.find(`.vintimepicker--circle__hour[data-hour='${hour}' ]`) .addClass("vintimepicker--selected__hour");
+                                        $popup.find(".vintimepicker--timeinputs__hour").val(padHour(hour)); } else {const minute=Math.round(angle / 6) % 60; selectedMinute=minute;
+                                        updateIndicator("minute"); $popup.find(".vintimepicker--circle__minute")
+                                        .removeClass("vintimepicker--selected__minute");
+                                        $popup.find(`.vintimepicker--circle__minute[data-minute='${Math.round(minute / 5) * 5}' ]`)
+                                        .addClass("vintimepicker--selected__minute"); $popup.find(".vintimepicker--timeinputs__minute").val(pad(minute)); }
+                                        }; const upHandler=ev=> {
+                                        knob.releasePointerCapture(ev.pointerId);
+                                        knob.removeEventListener("pointermove", moveHandler);
+                                        knob.removeEventListener("pointerup", upHandler);
+                                        };
+                                    
+                                        knob.addEventListener("pointermove", moveHandler);
+                                        knob.addEventListener("pointerup", upHandler);
+                                        });
                                         }
                                         dragKnob("hour");
                                         dragKnob("minute");
