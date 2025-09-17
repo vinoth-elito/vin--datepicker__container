@@ -414,21 +414,6 @@ img {
     transition: var(--opacity__delay);
 }
 
-#vintimepicker--hour__knob,
-#vintimepicker--minute__knob {
-    opacity: 0;
-    -webkit-transition: var(--opacity__delay);
-    -moz-transition: var(--opacity__delay);
-    -ms-transition: var(--opacity__delay);
-    -o-transition: var(--opacity__delay);
-    transition: var(--opacity__delay);
-}
-
-#vintimepicker--hour__knob:hover,
-#vintimepicker--minute__knob:hover {
-    opacity: 1;
-}
-
 .vintimepicker--circle__hourbg,
 .vintimepicker--circle__minutebg {
     fill: var(--white__bgrcolor);

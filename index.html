@@ -971,21 +971,6 @@
                     transition: var(--opacity__delay);
                     }
                     
-                    #vintimepicker--hour__knob,
-                    #vintimepicker--minute__knob {
-                    opacity: 0;
-                    -webkit-transition: var(--opacity__delay);
-                    -moz-transition: var(--opacity__delay);
-                    -ms-transition: var(--opacity__delay);
-                    -o-transition: var(--opacity__delay);
-                    transition: var(--opacity__delay);
-                    }
-                    
-                    #vintimepicker--hour__knob:hover,
-                    #vintimepicker--minute__knob:hover {
-                    opacity: 1;
-                    }
-                    
                     .vintimepicker--circle__hourbg,
                     .vintimepicker--circle__minutebg {
                     fill: var(--white__bgrcolor);
@@ -1729,8 +1714,8 @@
                                                     <text text-anchor="middle" alignment-baseline="middle">${pad(i)}</text>
                                             </g>`;
                                             }
-                                            const hourIndicatorLength = radiusHours - 20;
-                                            const minuteIndicatorLength = radiusMinutes - 20;
+                                            const hourIndicatorLength = radiusHours - 40;
+                                            const minuteIndicatorLength = radiusMinutes - 40;
                                             const hourAngle = ((selectedHour % 12) / 12) * 360 - 90;
                                             const hourRad = (hourAngle * Math.PI) / 180;
                                             const hourX = center + hourIndicatorLength * Math.cos(hourRad);

@@ -491,8 +491,8 @@ function showTimePicker($input) {
                 <text text-anchor="middle" alignment-baseline="middle">${pad(i)}</text>
             </g>`;
         }
-        const hourIndicatorLength = radiusHours - 20;
-        const minuteIndicatorLength = radiusMinutes - 20;
+        const hourIndicatorLength = radiusHours - 40;
+        const minuteIndicatorLength = radiusMinutes - 40;
         const hourAngle = ((selectedHour % 12) / 12) * 360 - 90;
         const hourRad = (hourAngle * Math.PI) / 180;
         const hourX = center + hourIndicatorLength * Math.cos(hourRad);
@@ -518,9 +518,9 @@ function showTimePicker($input) {
         </svg>
 
         <div class="vintimepicker--circle__timeinputs" style="text-align:center; margin-top:10px;">
-            <input type="number" class="vintimepicker--timeinputs__hour" value="${padHour(selectedHour)}" min="1" max="12" style="width:40px; text-align:center;">
+            <input type="number" class="vintimepicker--timeinputs__hour" value="${padHour(selectedHour)}" min="1" max="12" readonly style="width:40px; text-align:center;">
             <span>:</span>
-            <input type="number" class="vintimepicker--timeinputs__minute" value="${pad(selectedMinute)}" min="0" max="59" style="width:40px; text-align:center;">
+            <input type="number" class="vintimepicker--timeinputs__minute" value="${pad(selectedMinute)}" min="0" max="59" readonly style="width:40px; text-align:center;">
         </div>
 
         <div class="vintimepicker--circle__ampm" style="text-align:center; margin-top:10px;">
