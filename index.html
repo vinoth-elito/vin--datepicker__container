@@ -11,6 +11,9 @@
         content="https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/images/og-image.png" />
     <meta property="og:url" content="https://yourwebsite.com/" />
     <meta property="og:type" content="website" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Vinoth's Pickers</title>
     <link rel="apple-touch-icon" sizes="180x180"
         href="https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/favicon_io/apple-touch-icon.png">
@@ -2280,11 +2283,12 @@
             `);
             doc.close();
             const faLink = doc.createElement('link');
+            const cacheBuster = Date.now();
             faLink.rel = 'stylesheet';
-            faLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css';
+            faLink.href = `https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css?v=${cacheBuster}`;
             doc.head.appendChild(faLink);
             const jq = doc.createElement('script');
-            jq.src = "https://code.jquery.com/jquery-3.7.1.min.js";
+            jq.src = `https://code.jquery.com/jquery-3.7.1.min.js?v=${cacheBuster}`;
             jq.onload = () => {
                 const script = doc.createElement('script');
                 script.textContent = jsEditor.value;
@@ -2321,26 +2325,19 @@
         });
         const tabButtons = document.querySelectorAll('.editor-sidebar button');
         const editorPanels = document.querySelectorAll('.editor-panel');
-
         tabButtons.forEach(button => {
             button.addEventListener('click', () => {
-                // Remove active from all tabs and panels
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 editorPanels.forEach(panel => panel.classList.remove('active'));
-
-                // Activate clicked tab + panel
                 button.classList.add('active');
                 const targetPanel = document.getElementById(button.dataset.editor);
                 if (targetPanel) targetPanel.classList.add('active');
             });
         });
-
-        // Show HTML editor first by default on mobile
         function activateFirstTabOnMobile() {
             if (window.innerWidth <= 1024) {
                 tabButtons[0].click();
             } else {
-                // Show all panels in desktop mode
                 editorPanels.forEach(panel => panel.classList.add('active'));
             }
         }
