@@ -548,7 +548,7 @@ function showTimePicker($input) {
             if (type === "hour") {
                 const rawHour = selectedHour % 12 === 0 ? 12 : selectedHour % 12;
                 angle = (rawHour / 12) * 360 - 90;
-                r = radiusHours - 20;
+                r = radiusHours - 40;
                 rad = (angle * Math.PI) / 180;
                 x = center + r * Math.cos(rad);
                 y = center + r * Math.sin(rad);
@@ -558,7 +558,7 @@ function showTimePicker($input) {
                 hourKnob.setAttribute("cy", y);
             } else {
                 angle = (selectedMinute / 60) * 360 - 90;
-                r = radiusMinutes - 20;
+                r = radiusMinutes - 40;
                 rad = (angle * Math.PI) / 180;
                 x = center + r * Math.cos(rad);
                 y = center + r * Math.sin(rad);
