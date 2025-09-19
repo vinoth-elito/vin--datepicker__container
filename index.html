@@ -305,8 +305,16 @@
     <div class="siteheader">
         <header>
             <div class="sitheader--logo">
-                <img src="https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/images/og-image.png"
-                    alt="Logo">
+                <picture>
+                    <source
+                        srcset="https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/images/og-image.avif"
+                        type="image/avif">
+                    <source
+                        srcset="https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/images/og-image.webp"
+                        type="image/webp">
+                    <img src="https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/images/og-image.png"
+                        alt="Logo" width="30" height="30" loading="lazy" decoding="async">
+                </picture>
             </div>
             <div class="siteheader--text">
                 <h1>Date/Time/Month/Year Pickers</h1>
