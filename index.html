@@ -60,62 +60,10 @@
             font-weight: bold;
         }
 
-        #html-editor::-webkit-scrollbar-track {
-            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            background-color: #fff;
-        }
-
-        #html-editor::-webkit-scrollbar {
-            width: 7px;
-            background-color: #fff;
-            height: 7px;
-        }
-
-        #html-editor::-webkit-scrollbar-thumb {
-            border-radius: 10px;
-            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
-            background-color: #ccc;
-        }
-
-
-
-        #css-editor::-webkit-scrollbar-track {
-            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            background-color: #fff;
-        }
-
-        #css-editor::-webkit-scrollbar {
-            width: 7px;
-            background-color: #fff;
-            height: 7px;
-        }
-
-        #css-editor::-webkit-scrollbar-thumb {
-            border-radius: 10px;
-            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
-            background-color: #ccc;
-        }
-
-
-
-        #js-editor::-webkit-scrollbar-track {
-            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            background-color: #fff;
-        }
-
+        #html-editor::-webkit-scrollbar,
+        #css-editor::-webkit-scrollbar,
         #js-editor::-webkit-scrollbar {
-            width: 7px;
-            background-color: #fff;
-            height: 7px;
-        }
-
-        #js-editor::-webkit-scrollbar-thumb {
-            border-radius: 10px;
-            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
-            background-color: #ccc;
+            display: none;
         }
 
         .editors {
@@ -148,7 +96,7 @@
         textarea {
             flex: 1;
             height: 100%;
-            resize: vertical;
+            resize: none;
             padding: 8px;
             font-family: monospace;
             font-size: 14px;
@@ -298,6 +246,16 @@
         .sitheader--logo img {
             width: 100%;
             height: 100%;
+        }
+
+        .panel-resizer {
+            background: #ddd;
+            cursor: row-resize;
+            transition: background 0.2s ease;
+        }
+
+        .panel-resizer:hover {
+            background: #bbb;
         }
     </style>
 </head>
@@ -559,10 +517,6 @@
 * {
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
   outline: none;
 }
 body{
@@ -665,10 +619,6 @@ div,
 img {
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
     outline: none;
 }
 
@@ -2477,6 +2427,24 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                                 '});'
                         },
                     };
+                    function highlightCopiedState(openContainer, pre) {
+                        const activeTab = openContainer.querySelector('.tab-btn.active');
+                        if (!activeTab) return;
+                        const originalTabHTML = activeTab.innerHTML;
+                        const originalTabBg = activeTab.style.background;
+                        const originalTabColor = activeTab.style.color;
+                        const originalPreBg = pre.style.background;
+                        activeTab.innerHTML = '<i class="fa fa-check" style="color:green;"></i> Copied!';
+                        activeTab.style.background = '#28a745';
+                        activeTab.style.color = '#fff';
+                        pre.style.background = '#d4edda';
+                        setTimeout(() => {
+                            activeTab.innerHTML = originalTabHTML;
+                            activeTab.style.background = originalTabBg;
+                            activeTab.style.color = originalTabColor;
+                            pre.style.background = originalPreBg;
+                        }, 1500);
+                    }
                     window.getFunctionText = window.getFunctionText || function(jsCode, funcName) {
                         const funcStart = jsCode.indexOf('function ' + funcName + '(');
                         if (funcStart === -1) return '';
@@ -2504,7 +2472,6 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                         }
                         return '';
                     };
-
                     document.addEventListener('click', function (e) {
                         const target = e.target.closest('[data-target]');
                         const allContainers = document.querySelectorAll('.view-code-container');
@@ -2606,6 +2573,8 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                                         if (tabName === 'CSS') codeToCopy = "/* CSS */\\n" + pre.textContent;
                                         if (tabName === 'JS') codeToCopy = "// JS\\n" + pre.textContent;
                                         navigator.clipboard.writeText(codeToCopy).then(() => {
+                                            const openContainer = copyBtn.closest('.view-code-container');
+                                            highlightCopiedState(openContainer, pre);
                                             const originalHTML = copyBtn.innerHTML;
                                             copyBtn.innerHTML = '<i class="fa fa-check" style="color:green;"></i> Copied!';
                                             copyBtn.style.cursor = 'not-allowed';
@@ -2684,19 +2653,33 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                         }
                     });
                     document.addEventListener('keydown', function (e) {
+                        const openContainer = document.querySelector('.view-code-container.show');
+                        if (!openContainer) return;
+                        const activeTab = openContainer.querySelector('.tab-btn.active');
+                        if (!activeTab) return;
+                        const pre = Array.from(openContainer.querySelectorAll('pre')).find(p => p.offsetParent !== null);
+                        if (!pre) return;
                         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
-                            const openContainer = document.querySelector('.view-code-container.show');
-                            if (openContainer) {
-                                e.preventDefault();
-                                const pre = openContainer.querySelector('div[style*="display: block"] pre');
-                                if (pre) {
-                                    const range = document.createRange();
-                                    range.selectNodeContents(pre);
-                                    const selection = window.getSelection();
-                                    selection.removeAllRanges();
-                                    selection.addRange(range);
-                                }
+                            const range = document.createRange();
+                            range.selectNodeContents(pre);
+                            const selection = window.getSelection();
+                            selection.removeAllRanges();
+                            selection.addRange(range);
+                            e.preventDefault();
+                        }
+                        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+                            const selectedText = window.getSelection().toString();
+                            let codeToCopy = selectedText;
+                            if (!codeToCopy.trim()) {
+                                codeToCopy = pre.textContent;
                             }
+                            const tabName = activeTab.textContent.trim();
+                            if (tabName === 'HTML') codeToCopy = "\\x3C!-- HTML --\\x3E\\n" + codeToCopy;
+                            else if (tabName === 'CSS') codeToCopy = "/* CSS */\\n" + codeToCopy;
+                            else if (tabName === 'JS') codeToCopy = "// JS\\n" + codeToCopy;
+                            navigator.clipboard.writeText(codeToCopy).then(() => {
+                                highlightCopiedState(openContainer, pre);
+                            });
                         }
                     });
                 `;
@@ -2710,22 +2693,141 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
         const resizer = document.getElementById('resizer');
         const editors = document.querySelector('.editors');
         const container = document.querySelector('.editor-container');
-        resizer.addEventListener('mousedown', e => {
-            e.preventDefault();
-            document.addEventListener('mousemove', resize);
-            document.addEventListener('mouseup', stopResize);
-        });
-        function resize(e) {
+        let activePointerId = null;
+        function stopCurrentResize() {
+            if (activePointerId === null) return;
+            try {
+                resizer.releasePointerCapture && resizer.releasePointerCapture(activePointerId);
+            } catch (err) { /* ignore */ }
+            activePointerId = null;
+            document.removeEventListener('pointermove', onPointerMove);
+            document.removeEventListener('pointerup', onPointerUp);
+            document.removeEventListener('pointercancel', onPointerUp);
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        }
+        function onPointerMove(e) {
+            if (activePointerId !== null && e.pointerId !== activePointerId) return;
             const containerRect = container.getBoundingClientRect();
             let newWidth = e.clientX - containerRect.left;
             if (newWidth < 200) newWidth = 200;
             if (newWidth > 800) newWidth = 800;
             editors.style.flex = '0 0 ' + newWidth + 'px';
         }
-        function stopResize() {
-            document.removeEventListener('mousemove', resize);
-            document.removeEventListener('mouseup', stopResize);
+        function onPointerUp(e) {
+            if (activePointerId !== null && e.pointerId !== activePointerId) return;
+            stopCurrentResize();
         }
+        function onPointerDown(e) {
+            e.preventDefault();
+            activePointerId = e.pointerId;
+            try { e.target.setPointerCapture(activePointerId); } catch (err) { /* ignore */ }
+            document.addEventListener('pointermove', onPointerMove);
+            document.addEventListener('pointerup', onPointerUp);
+            document.addEventListener('pointercancel', onPointerUp);
+            document.body.style.cursor = 'ew-resize';
+            document.body.style.userSelect = 'none';
+        }
+        let isMouseDown = false;
+        function onMouseMove(e) {
+            if (!isMouseDown) return;
+            const containerRect = container.getBoundingClientRect();
+            let newWidth = e.clientX - containerRect.left;
+            if (newWidth < 200) newWidth = 200;
+            if (newWidth > 800) newWidth = 800;
+            editors.style.flex = '0 0 ' + newWidth + 'px';
+        }
+        function onMouseUp() {
+            if (!isMouseDown) return;
+            isMouseDown = false;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        }
+        if (window.PointerEvent) {
+            resizer.addEventListener('pointerdown', onPointerDown);
+            window.addEventListener('blur', stopCurrentResize);
+            window.addEventListener('mouseout', (ev) => { if (!ev.relatedTarget) stopCurrentResize(); });
+        } else {
+            resizer.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                isMouseDown = true;
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+                document.body.style.cursor = 'ew-resize';
+                document.body.style.userSelect = 'none';
+            });
+            window.addEventListener('blur', () => {
+                if (isMouseDown) {
+                    isMouseDown = false;
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                }
+            });
+        }
+        function setupPanelResizers() {
+            const container = document.querySelector('.editors'); // parent flex column
+            const panels = Array.from(document.querySelectorAll('.editor-panel'));
+            if (panels.length < 2) return;
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.style.height = '100%';
+            panels.forEach((panel, index) => {
+                if (index === panels.length - 1) return;
+                const resizer = document.createElement('div');
+                resizer.className = 'panel-resizer';
+                Object.assign(resizer.style, {
+                    height: '3px',
+                    background: '#ccc',
+                    cursor: 'row-resize',
+                    userSelect: 'none',
+                });
+                panel.insertAdjacentElement('afterend', resizer);
+            });
+            let currentResizer = null;
+            let prevPanel = null;
+            let nextPanel = null;
+            let startY = 0;
+            let prevStartHeight = 0;
+            let nextStartHeight = 0;
+            function onPointerMove(e) {
+                if (!currentResizer) return;
+                const dy = e.clientY - startY;
+                const containerHeight = container.getBoundingClientRect().height;
+                let newPrevHeight = ((prevStartHeight + dy) / containerHeight) * 100;
+                let newNextHeight = ((nextStartHeight - dy) / containerHeight) * 100;
+                if (newPrevHeight < 10) newPrevHeight = 10;
+                if (newNextHeight < 10) newNextHeight = 10;
+                prevPanel.style.flex = `0 0 ${newPrevHeight}%`;
+                nextPanel.style.flex = `0 0 ${newNextHeight}%`;
+            }
+            function stopResize() {
+                document.removeEventListener('pointermove', onPointerMove);
+                document.removeEventListener('pointerup', stopResize);
+                document.body.style.cursor = '';
+                currentResizer = null;
+            }
+            document.querySelectorAll('.panel-resizer').forEach(resizer => {
+                resizer.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    currentResizer = resizer;
+                    prevPanel = resizer.previousElementSibling;
+                    nextPanel = resizer.nextElementSibling;
+                    startY = e.clientY;
+                    prevStartHeight = prevPanel.getBoundingClientRect().height;
+                    nextStartHeight = nextPanel.getBoundingClientRect().height;
+                    document.addEventListener('pointermove', onPointerMove);
+                    document.addEventListener('pointerup', stopResize);
+                    document.body.style.cursor = 'row-resize';
+                });
+            });
+        }
+        setupPanelResizers();
         window.addEventListener("beforeunload", function (e) {
             e.preventDefault();
             e.returnValue = "Changes could not update if page get refresh.";
