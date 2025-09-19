@@ -639,7 +639,7 @@ body{
     content: attr(data-tooltip);
     position: absolute;
     bottom: 0;
-    left: 50%;
+    left: -36px;
     transform: translateX(-50%);
     background: #333;
     color: #fff;
@@ -1203,6 +1203,7 @@ img {
 .view-code-container.show pre {
     max-height: 300px;
     overflow: auto;
+    margin-top:20px;
 }
 
 
@@ -2584,13 +2585,13 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                                     copyBtn.innerHTML = '<i class="fa fa-copy"></i> Copy Code';
                                     Object.assign(copyBtn.style, {
                                         position: 'absolute',
-                                        top: '10px',
+                                        top: '-13px',
                                         right: '30px',
                                         fontSize: '12px',
-                                        color:'#999999',
-                                        background:'transparent',
+                                        color:'#fff',
+                                        background:'#111',
                                         border: 'none',
-                                        padding: '3px 6px',
+                                        padding: '3px 15px',
                                         cursor: 'pointer',
                                         display: 'flex',
                                         alignItems: 'center',
