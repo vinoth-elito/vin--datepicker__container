@@ -414,6 +414,14 @@
             float: right;
             margin-left: auto;
             position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 {
+            font-size: 16px;
+            color: #fff;
         }
 
         .editors--switch button {
@@ -422,7 +430,32 @@
             padding: 7px;
             border-radius: 10px;
             cursor: pointer;
-            flex: 0 0 auto;
+            font-size: 0;
+        }
+
+
+
+        .editors--switch button.dropdown-btn {
+            border: 1px solid #ccc;
+            border-right: 0;
+            border-radius: 0px;
+            background: none;
+        }
+
+        /* .editors--switch button.dropdown-btn.active {
+            background: #ccc;
+        } */
+
+        .editors--switch button.dropdown-btn:first-of-type svg {
+            transform: rotate(-90deg);
+        }
+
+        .editors--switch button.dropdown-btn:last-of-type {
+            border-right: 1px solid #ccc;
+        }
+
+        .editors--switch button.dropdown-btn:last-of-type svg {
+            transform: rotate(90deg);
         }
 
         @keyframes dropdownFlipIn {
@@ -455,6 +488,12 @@
 
         .view-switcher-dropdown.dropdown-hide {
             animation: dropdownFlipOut 0.3s ease forwards;
+        }
+
+        .view-switcher-dropdown {
+            display: flex;
+            justify-content: space-between;
+            overflow: hidden;
         }
 
         #page-loader {
@@ -513,11 +552,6 @@
             opacity: 0;
             pointer-events: none;
         }
-
-        .view-switcher-dropdown {
-            display: flex;
-            justify-content: space-between;
-        }
     </style>
 </head>
 
@@ -547,6 +581,7 @@
                 <span>Alpha Devs</span>
             </div>
             <div class="editors--switch">
+                <h2>Change View</h2>
                 <button id="view-switcher-button" title="Change View" class="Button-module_root-xw+9D">
                     <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
                         class="EditorHeaderViewSwitcher_iconPen-jP26l">
@@ -3200,12 +3235,12 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
             dropdown.className = "view-switcher-dropdown dropdown-show";
             dropdown.style.position = "absolute";
             dropdown.style.top = "100%"
-            dropdown.style.left = "-120px"
+            dropdown.style.right = "0"
             dropdown.style.background = "#fff";
             dropdown.style.border = "1px solid #ccc";
             dropdown.style.borderRadius = "6px";
             dropdown.style.boxShadow = "0 2px 10px rgba(0,0,0,0.1)";
-            dropdown.style.padding = "5px 0";
+            dropdown.style.padding = "5px 30px";
             dropdown.style.zIndex = 999;
             dropdown.style.minWidth = "160px";
             dropdown.style.transformOrigin = "top center";
@@ -3213,40 +3248,36 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                 {
                     id: "editor-left",
                     label: "Editor Left",
-                    icon: `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
-                <path d="M0 9.002C0 8.45.455 8 .992 8h18.016c.548 0 .992.456.992 1.002v9.996c0 .553-.455 1.002-.992 1.002H.992C.444 20 0 19.544 0 18.998zm0-8C0 .45.451 0 .99 0h4.02A.99.99 0 0 1 6 1.003v4.994C6 6.551 5.549 7 5.01 7H.99A.99.99 0 0 1 0 5.997zm7 0C7 .45 7.451 0 7.99 0h4.02A.99.99 0 0 1 13 1.003v4.994C13 6.551 12.549 7 12.01 7H7.99A.99.99 0 0 1 7 5.997zm7 0C14 .45 14.451 0 14.99 0h4.02A.99.99 0 0 1 20 1.003v4.994C20 6.551 19.549 7 19.01 7h-4.02A.99.99 0 0 1 14 5.997z"></path>
-              </svg>`
+                    icon: `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" class="EditorHeaderViewSwitcherLayoutButtons-module_newPenLeftLayout-PhHzQ" width="20" height="20"><path d="M0 9.002C0 8.45.455 8 .992 8h18.016c.548 0 .992.456.992 1.002v9.996c0 .553-.455 1.002-.992 1.002H.992C.444 20 0 19.544 0 18.998zm0-8C0 .45.451 0 .99 0h4.02A.99.99 0 0 1 6 1.003v4.994C6 6.551 5.549 7 5.01 7H.99A.99.99 0 0 1 0 5.997zm7 0C7 .45 7.451 0 7.99 0h4.02A.99.99 0 0 1 13 1.003v4.994C13 6.551 12.549 7 12.01 7H7.99A.99.99 0 0 1 7 5.997zm7 0C14 .45 14.451 0 14.99 0h4.02A.99.99 0 0 1 20 1.003v4.994C20 6.551 19.549 7 19.01 7h-4.02A.99.99 0 0 1 14 5.997z"></path></svg>`
                 },
                 {
                     id: "editor-center",
                     label: "Editor Center",
-                    icon: `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
-                <path d="M0 9.002C0 8.45.455 8 .992 8h18.016c.548 0 .992.456.992 1.002v9.996c0 .553-.455 1.002-.992 1.002H.992C.444 20 0 19.544 0 18.998zm0-8C0 .45.451 0 .99 0h4.02A.99.99 0 0 1 6 1.003v4.994C6 6.551 5.549 7 5.01 7H.99A.99.99 0 0 1 0 5.997zm7 0C7 .45 7.451 0 7.99 0h4.02A.99.99 0 0 1 13 1.003v4.994C13 6.551 12.549 7 12.01 7H7.99A.99.99 0 0 1 7 5.997zm7 0C14 .45 14.451 0 14.99 0h4.02A.99.99 0 0 1 20 1.003v4.994C20 6.551 19.549 7 19.01 7h-4.02A.99.99 0 0 1 14 5.997z"></path>
-              </svg>`
+                    icon: `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path d="M0 9.002C0 8.45.455 8 .992 8h18.016c.548 0 .992.456.992 1.002v9.996c0 .553-.455 1.002-.992 1.002H.992C.444 20 0 19.544 0 18.998zm0-8C0 .45.451 0 .99 0h4.02A.99.99 0 0 1 6 1.003v4.994C6 6.551 5.549 7 5.01 7H.99A.99.99 0 0 1 0 5.997zm7 0C7 .45 7.451 0 7.99 0h4.02A.99.99 0 0 1 13 1.003v4.994C13 6.551 12.549 7 12.01 7H7.99A.99.99 0 0 1 7 5.997zm7 0C14 .45 14.451 0 14.99 0h4.02A.99.99 0 0 1 20 1.003v4.994C20 6.551 19.549 7 19.01 7h-4.02A.99.99 0 0 1 14 5.997z"></path></svg>`
                 },
                 {
                     id: "editor-right",
                     label: "Editor Right",
-                    icon: `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
-                <path d="M0 9.002C0 8.45.455 8 .992 8h18.016c.548 0 .992.456.992 1.002v9.996c0 .553-.455 1.002-.992 1.002H.992C.444 20 0 19.544 0 18.998zm0-8C0 .45.451 0 .99 0h4.02A.99.99 0 0 1 6 1.003v4.994C6 6.551 5.549 7 5.01 7H.99A.99.99 0 0 1 0 5.997zm7 0C7 .45 7.451 0 7.99 0h4.02A.99.99 0 0 1 13 1.003v4.994C13 6.551 12.549 7 12.01 7H7.99A.99.99 0 0 1 7 5.997zm7 0C14 .45 14.451 0 14.99 0h4.02A.99.99 0 0 1 20 1.003v4.994C20 6.551 19.549 7 19.01 7h-4.02A.99.99 0 0 1 14 5.997z"></path>
-              </svg>`
+                    icon: `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" class="EditorHeaderViewSwitcherLayoutButtons-module_newPenRightLayout-X2VCi" width="20" height="20"><path d="M0 9.002C0 8.45.455 8 .992 8h18.016c.548 0 .992.456.992 1.002v9.996c0 .553-.455 1.002-.992 1.002H.992C.444 20 0 19.544 0 18.998zm0-8C0 .45.451 0 .99 0h4.02A.99.99 0 0 1 6 1.003v4.994C6 6.551 5.549 7 5.01 7H.99A.99.99 0 0 1 0 5.997zm7 0C7 .45 7.451 0 7.99 0h4.02A.99.99 0 0 1 13 1.003v4.994C13 6.551 12.549 7 12.01 7H7.99A.99.99 0 0 1 7 5.997zm7 0C14 .45 14.451 0 14.99 0h4.02A.99.99 0 0 1 20 1.003v4.994C20 6.551 19.549 7 19.01 7h-4.02A.99.99 0 0 1 14 5.997z"></path></svg>`
                 }
             ];
-            options.forEach(opt => {
+            const container = document.getElementById("editor-switcher");
+            function clearActive() {
+                dropdown.querySelectorAll(".dropdown-btn").forEach(btn => btn.classList.remove("active"));
+            }
+            options.forEach((opt, index) => {
                 const btn = document.createElement("button");
-                btn.className = "dropdown-option";
-                btn.style.display = "flex";
-                btn.style.alignItems = "center";
-                btn.style.gap = "8px";
+                btn.className = "dropdown-btn";
                 btn.style.width = "100%";
                 btn.style.padding = "8px 12px";
-                btn.style.background = "none";
-                btn.style.border = "none";
                 btn.style.cursor = "pointer";
-                btn.style.fontSize = "14px";
-                btn.style.textAlign = "left";
+                btn.style.textAlign = "center";
                 btn.innerHTML = `${opt.icon} ${opt.label}`;
+                btn.id = opt.id;
+                if (index === 0) btn.classList.add("active");
                 btn.addEventListener("click", () => {
+                    clearActive();
+                    btn.classList.add("active");
                     applyEditorLayout(opt.id);
                     dropdown.classList.remove("dropdown-show");
                     dropdown.classList.add("dropdown-hide");
@@ -3268,8 +3299,6 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                     }
                     setTimeout(() => dropdown.remove(), 300);
                 });
-                btn.addEventListener("mouseenter", () => btn.style.background = "#f0f0f0");
-                btn.addEventListener("mouseleave", () => btn.style.background = "none");
                 dropdown.appendChild(btn);
             });
             switchWrapper.appendChild(dropdown);
@@ -3282,8 +3311,6 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                 }
             });
         });
-
-
         function setupEditorCenterVerticalResize(container) {
             if (!container) return;
             const editors = container.querySelector(".editors");
