@@ -46,7 +46,16 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
+            transition: all 0.5s ease;
         }
+
+        .editor-container.editor-center,
+        .editor-container.editor-left,
+        .editor-container.editor-right {
+            transition: all 0.5s ease;
+        }
+
+
 
         #html-editor,
         #css-editor,
@@ -74,6 +83,143 @@
             max-width: 800px;
             text-align: left;
             background: #111;
+            position: relative;
+        }
+
+        .editor-container.editor-center .editors {
+            flex-direction: row;
+            height: 100%;
+            flex: unset;
+            width: 100%;
+            min-width: unset;
+            max-width: unset;
+        }
+
+        @media(min-width:1025px) {
+            .editor-container.editor-center {
+                flex-direction: column;
+            }
+
+            .editor-container.editor-right .editors {
+                order: 2;
+            }
+
+            .editor-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(30, 30, 30, 0.85);
+                color: #0f0;
+                font-family: monospace;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 999;
+                pointer-events: none;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .editor-overlay .spinner {
+                width: 20px;
+                height: 20px;
+                border: 3px solid #0f0;
+                border-top: 3px solid transparent;
+                border-radius: 50%;
+                animation: spin 0.8s linear infinite;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .calendar-animation {
+                display: grid;
+                grid-template-columns: repeat(3, 20px);
+                grid-gap: 5px;
+                margin-bottom: 15px;
+            }
+
+            .calendar-animation .day {
+                width: 20px;
+                height: 20px;
+                background: #fff;
+                border-radius: 3px;
+                animation: dayPulse 1s infinite;
+            }
+
+            .calendar-animation .day:nth-child(1) {
+                animation-delay: 0s;
+            }
+
+            .calendar-animation .day:nth-child(2) {
+                animation-delay: 0.1s;
+            }
+
+            .calendar-animation .day:nth-child(3) {
+                animation-delay: 0.2s;
+            }
+
+            .calendar-animation .day:nth-child(4) {
+                animation-delay: 0.3s;
+            }
+
+            .calendar-animation .day:nth-child(5) {
+                animation-delay: 0.4s;
+            }
+
+            .calendar-animation .day:nth-child(6) {
+                animation-delay: 0.5s;
+            }
+
+            .calendar-animation .day:nth-child(7) {
+                animation-delay: 0.6s;
+            }
+
+            .calendar-animation .day:nth-child(8) {
+                animation-delay: 0.7s;
+            }
+
+            .calendar-animation .day:nth-child(9) {
+                animation-delay: 0.8s;
+            }
+
+            @keyframes dayPulse {
+
+                0%,
+                100% {
+                    transform: scale(1);
+                    opacity: 0.5;
+                }
+
+                50% {
+                    transform: scale(1.3);
+                    opacity: 1;
+                }
+            }
+
+            .editor-overlay .typing {
+                white-space: nowrap;
+                overflow: hidden;
+                font-size: 16px;
+                color: #fff;
+                font-weight: bold;
+            }
+
+        }
+
+        @media(max-width:1024px) {
+            .panel-resizer {
+                display: none;
+            }
         }
 
         .editor-panel {
@@ -120,6 +266,11 @@
             width: 5px;
             cursor: col-resize;
             background: #ccc;
+            display: none;
+        }
+
+        .rightResize {
+            display: none;
         }
 
         .sr-only {
@@ -196,14 +347,14 @@
             }
 
             .editors {
-                flex: 1 0 auto;
+                /* flex: 1 0 auto; */
                 padding: 10px;
                 display: flex;
                 flex-direction: column;
                 overflow: hidden;
                 min-width: unset;
                 max-width: unset;
-                margin-bottom: 9px;
+                /* margin-bottom: 9px; */
             }
 
             textarea {
@@ -224,6 +375,7 @@
             position: sticky;
             top: 0;
             width: 100%;
+            z-index: 2000;
         }
 
         .siteheader h1 {
@@ -257,10 +409,125 @@
         .panel-resizer:hover {
             background: #bbb;
         }
+
+        .editors--switch {
+            float: right;
+            margin-left: auto;
+            position: relative;
+        }
+
+        .editors--switch button {
+            width: 40px;
+            background: #fff;
+            padding: 7px;
+            border-radius: 10px;
+            cursor: pointer;
+            flex: 0 0 auto;
+        }
+
+        @keyframes dropdownFlipIn {
+            0% {
+                opacity: 0;
+                transform: rotateX(-90deg) scaleY(0.8);
+            }
+
+            100% {
+                opacity: 1;
+                transform: rotateX(0) scaleY(1);
+            }
+        }
+
+        @keyframes dropdownFlipOut {
+            0% {
+                opacity: 1;
+                transform: rotateX(0) scaleY(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: rotateX(-90deg) scaleY(0.8);
+            }
+        }
+
+        .view-switcher-dropdown.dropdown-show {
+            animation: dropdownFlipIn 0.3s ease forwards;
+        }
+
+        .view-switcher-dropdown.dropdown-hide {
+            animation: dropdownFlipOut 0.3s ease forwards;
+        }
+
+        #page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        #page-loader img {
+            width: 150px;
+            height: auto;
+            animation: loaderPulse 1.2s infinite;
+            border-radius: 50%;
+            display: block;
+            position: relative;
+            z-index: 2;
+        }
+
+        .progress-ring {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            transform: rotate(-90deg);
+            z-index: 1;
+        }
+
+        .progress-ring__circle {
+            stroke-dasharray: 339.292;
+            stroke-dashoffset: 339.292;
+            transition: stroke-dashoffset 0.2s linear;
+        }
+
+
+        @keyframes loaderPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        #page-loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .view-switcher-dropdown {
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 
 <body>
+    <div id="page-loader">
+        <div class="page--loader__cnt">>
+            <img src="https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/images/og-image.webp"
+                alt="Loading...">
+        </div>
+    </div>
     <div class="siteheader">
         <header>
             <div class="sitheader--logo">
@@ -279,9 +546,19 @@
                 <h1>Date/Time/Month/Year Pickers</h1>
                 <span>Alpha Devs</span>
             </div>
+            <div class="editors--switch">
+                <button id="view-switcher-button" title="Change View" class="Button-module_root-xw+9D">
+                    <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
+                        class="EditorHeaderViewSwitcher_iconPen-jP26l">
+                        <path
+                            d="M0 9.002C0 8.45.455 8 .992 8h18.016c.548 0 .992.456.992 1.002v9.996c0 .553-.455 1.002-.992 1.002H.992C.444 20 0 19.544 0 18.998zm0-8C0 .45.451 0 .99 0h4.02A.99.99 0 0 1 6 1.003v4.994C6 6.551 5.549 7 5.01 7H.99A.99.99 0 0 1 0 5.997zm7 0C7 .45 7.451 0 7.99 0h4.02A.99.99 0 0 1 13 1.003v4.994C13 6.551 12.549 7 12.01 7H7.99A.99.99 0 0 1 7 5.997zm7 0C14 .45 14.451 0 14.99 0h4.02A.99.99 0 0 1 20 1.003v4.994C20 6.551 19.549 7 19.01 7h-4.02A.99.99 0 0 1 14 5.997z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
         </header>
     </div>
-    <div class="editor-container">
+    <div class="editor-container editor-left">
         <div class="editor-sidebar">
             <button data-editor="html-panel" class="active"><i class="fa fa-code"></i></button>
             <button data-editor="css-panel"><i class="fa fa-paint-brush"></i></button>
@@ -2279,79 +2556,79 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
         $(".vindaterange--from__date, .vindaterange--to__date").on("focus", function () {
         showDateRangePicker($(this));
         });
-
-        // Common for All input
         $(document).ready(function () {
-        const observer = new MutationObserver(() => {
-        $(".vin--datepicker__container").each(function () {
-        let $container = $(this);
-        let $popup = $container.find(".vindatepicker--dropdown__wrapp");
-        if ($popup.length && $popup.is(":visible")) {
-        $container.addClass("datepicker-visible");
-        } else {
-        $container.removeClass("datepicker-visible");
-        }
-        });
-        });
-        observer.observe(document.body, {
-        childList: true,
-        subtree: true
-        });
-        $("body").on("focus click",
-        ".vinmonthyearpicker input, \
-        .vindaterangepicker input, \
-        .vindatetimepicker input, \
-        .vintimepicker input, \
-        .vindatepicker input",
-        function () {
-        let $container = $(this).closest(".vin--datepicker__container");
-        let $popup = $container.find(".vindatepicker--dropdown__wrapp");
-
-        if ($popup.length && $popup.is(":visible")) {
-        $container.addClass("datepicker-visible");
-        } else {
-        $container.removeClass("datepicker-visible");
-        }
-        }
-        );
+            initVinDatePickers();
         });
 
-        $("body").on("input change",
-        ".vinmonthyearpicker input, \
-        .vindaterangepicker input, \
-        .vindatetimepicker input, \
-        .vintimepicker input, \
-        .vindatepicker input",
-        function () {
-        let $container = $(this).closest(".vin--datepicker__container");
-        let $clearBtn = $container.find(".clear__selected__month");
+        function initVinDatePickers() {
+            const observer = new MutationObserver(() => {
+                $(".vin--datepicker__container").each(function () {
+                    let $container = $(this);
+                    let $popup = $container.find(".vindatepicker--dropdown__wrapp");
+                    if ($popup.length && $popup.is(":visible")) {
+                        $container.addClass("datepicker-visible");
+                    } else {
+                        $container.removeClass("datepicker-visible");
+                    }
+                });
+            });
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+            $("body").on("focus click",
+                ".vinmonthyearpicker input, \
+                .vindaterangepicker input, \
+                .vindatetimepicker input, \
+                .vintimepicker input, \
+                .vindatepicker input",
+                function () {
+                    let $container = $(this).closest(".vin--datepicker__container");
+                    let $popup = $container.find(".vindatepicker--dropdown__wrapp");
 
-        if ($(this).val().trim() !== "") {
-        $clearBtn.show();
-        } else {
-        $clearBtn.hide();
-        }
-        }
-        );
+                    if ($popup.length && $popup.is(":visible")) {
+                        $container.addClass("datepicker-visible");
+                    } else {
+                        $container.removeClass("datepicker-visible");
+                    }
+                }
+            );
+            $("body").on("input change",
+                ".vinmonthyearpicker input, \
+                .vindaterangepicker input, \
+                .vindatetimepicker input, \
+                .vintimepicker input, \
+                .vindatepicker input",
+                function () {
+                    let $container = $(this).closest(".vin--datepicker__container");
+                    let $clearBtn = $container.find(".clear__selected__month");
 
-        $("body").on("click", ".clear__selected__month", function () {
-        let $container = $(this).closest(".vin--datepicker__container");
-        let $input = $container.find("input");
-        $input.removeData("selectedDate");
-        $input.removeData("selectedMonth");
-        $input.removeData("selectedYear");
-        $input.removeData("selectedTime");
-        $container.find("td.vindatepicker--selected__date, .vindatepicker--selected__date").removeClass("vindatepicker--selected__date");
-        $container.find("td.vindatepicker--selected__month").removeClass("vindatepicker--selected__month");
-        $input.val("").trigger("change");
-        $(this).hide()
-        $('.vindatepicker--dropdown__wrapp').remove();
-        });
-        $("body").on("click", ".calendar-button", function () {
-        $(this).parents('.vin--datepicker__container').find('input').click();
-        $(this).parents('.vin--datepicker__container').find('input.vindaterange--from__date').focus();
-        $(this).parents('.vin--datepicker__container').find('input.vindaterange--to__date').focus();
-        });
+                    if ($(this).val().trim() !== "") {
+                        $clearBtn.show();
+                    } else {
+                        $clearBtn.hide();
+                    }
+                }
+            );
+            $("body").on("click", ".clear__selected__month", function () {
+                let $container = $(this).closest(".vin--datepicker__container");
+                let $input = $container.find("input");
+                $input.removeData("selectedDate selectedMonth selectedYear selectedTime");
+                $container.find("td.vindatepicker--selected__date, .vindatepicker--selected__date")
+                    .removeClass("vindatepicker--selected__date");
+                $container.find("td.vindatepicker--selected__month")
+                    .removeClass("vindatepicker--selected__month");
+                $input.val("").trigger("change");
+                $(this).hide();
+                $('.vindatepicker--dropdown__wrapp').remove();
+            });
+            $("body").on("click", ".calendar-button", function () {
+                let $container = $(this).parents('.vin--datepicker__container');
+                $container.find('input').click();
+                $container.find('input.vindaterange--from__date').focus();
+                $container.find('input.vindaterange--to__date').focus();
+            });
+        }
                         
 </textarea>
             </div>
@@ -2394,6 +2671,7 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                     window.componentFunctionMap = window.componentFunctionMap || {
                         '.vindatepicker': {
                             func: 'showDatePicker',
+                            funccommon: 'initVinDatePickers',
                             event: '$("body").on("click", ".vindatepicker input", function () {' +
                                 'let $input = $(this);' +
                                 'showDatePicker($input);' +
@@ -2401,6 +2679,7 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                         },
                         '.vintimepicker': {
                             func: 'showTimePicker',
+                            funccommon: 'initVinDatePickers',
                             event: '$("body").on("click", ".vintimepicker input", function () {' +
                                 'let $input = $(this);' +
                                 'showTimePicker($input);' +
@@ -2408,6 +2687,7 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                         },
                         '.vindatetimepicker': {
                             func: 'showDateTimePicker',
+                            funccommon: 'initVinDatePickers',
                             event: '$("body").on("click", ".vindatetimepicker input", function () {' +
                                 'let $input = $(this);' +
                                 'showDateTimePicker($input);' +
@@ -2415,6 +2695,7 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                         },
                         '.vinmonthyearpicker': {
                             func: 'showMonthYearPicker',
+                            funccommon: 'initVinDatePickers',
                             event: '$("body").on("click", ".vinmonthyearpicker input", function () {' +
                                 'let $input = $(this);' +
                                 'showMonthYearPicker($input);' +
@@ -2422,11 +2703,21 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                         },
                         '.vindaterangepicker': {
                             func: 'showDateRangePicker',
+                            funccommon: 'initVinDatePickers',
                             event: '$(".vindaterange--from__date, .vindaterange--to__date").on("focus", function () {' +
                                 'showDateRangePicker($(this));' +
                                 '});'
                         },
                     };
+                    function getPickerCode(selector) {
+                        const picker = window.componentFunctionMap[selector];
+                        if (!picker) return '';
+                        let code = '';
+                        if (picker.func1) code += "func1: '" + picker.func1 + "', ";
+                        if (picker.func) code += "func: '" + picker.func + "', ";
+                        if (picker.event) code += "event: '" + picker.event + "'";
+                        return code;
+                    }
                     function highlightCopiedState(openContainer, pre) {
                         const activeTab = openContainer.querySelector('.tab-btn.active');
                         if (!activeTab) return;
@@ -2434,7 +2725,7 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                         const originalTabBg = activeTab.style.background;
                         const originalTabColor = activeTab.style.color;
                         const originalPreBg = pre.style.background;
-                        activeTab.innerHTML = '<i class="fa fa-check" style="color:green;"></i> Copied!';
+                        activeTab.innerHTML = '<i class="fa fa-check" style="color:#fff;"></i> Copied!';
                         activeTab.style.background = '#28a745';
                         activeTab.style.color = '#fff';
                         pre.style.background = '#d4edda';
@@ -2475,12 +2766,15 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                     document.addEventListener('click', function (e) {
                         const target = e.target.closest('[data-target]');
                         const allContainers = document.querySelectorAll('.view-code-container');
-                        if (!target &&
+                        const allViewCodeBtns = document.querySelectorAll('.view-code-btn');
+                        if (
+                            !target &&
                             !e.target.closest('.view-code-container') &&
                             !e.target.closest('.editors') &&
                             !e.target.closest('#html-editor') &&
                             !e.target.closest('#css-editor') &&
-                            !e.target.closest('#js-editor')) {
+                            !e.target.closest('#js-editor')
+                        ) {
                             allContainers.forEach(c => {
                                 if (c.classList.contains('show')) {
                                     c.classList.remove('show');
@@ -2492,6 +2786,7 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                                     });
                                 }
                             });
+                            allViewCodeBtns.forEach(btn => btn.setAttribute('data-tooltip', 'Get Code'));
                             return;
                         }
                         if (target) {
@@ -2540,7 +2835,7 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                                 indicator.style.transition = 'transform 0.3s ease, width 0.3s ease';
                                 tabs.appendChild(indicator);
                                 codeContainer.appendChild(tabs);
-                                function createTabWrapper(tabName, content) {
+                                function createTabWrapper(tabName, content, pickerSelector = '') {
                                     const wrapper = document.createElement('div');
                                     wrapper.style.display = tabName === 'HTML' ? 'block' : 'none';
                                     wrapper.style.position = 'relative';
@@ -2549,7 +2844,11 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                                     pre.style.fontFamily = 'monospace';
                                     pre.style.padding = '10px';
                                     pre.style.border = '1px solid #ccc';
-                                    pre.textContent = content;
+                                    if (tabName === 'JS' && pickerSelector) {
+                                        pre.textContent = getPickerCode(pickerSelector);
+                                    } else {
+                                        pre.textContent = content;
+                                    }
                                     const copyBtn = document.createElement('button');
                                     copyBtn.innerHTML = '<i class="fa fa-copy"></i> Copy Code';
                                     Object.assign(copyBtn.style, {
@@ -2557,8 +2856,8 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                                         top: '-13px',
                                         right: '30px',
                                         fontSize: '12px',
-                                        color:'#fff',
-                                        background:'#111',
+                                        color: '#fff',
+                                        background: '#111',
                                         border: 'none',
                                         padding: '3px 15px',
                                         cursor: 'pointer',
@@ -2567,35 +2866,35 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                                         gap: '4px',
                                         transition: 'background 0.3s'
                                     });
-                                    copyBtn.addEventListener('click', () => {
-                                        let codeToCopy = '';
-                                        if (tabName === 'HTML') codeToCopy = "\\x3C!-- HTML --\\x3E\\n" + pre.textContent;
-                                        if (tabName === 'CSS') codeToCopy = "/* CSS */\\n" + pre.textContent;
-                                        if (tabName === 'JS') codeToCopy = "// JS\\n" + pre.textContent;
-                                        navigator.clipboard.writeText(codeToCopy).then(() => {
-                                            const openContainer = copyBtn.closest('.view-code-container');
-                                            highlightCopiedState(openContainer, pre);
-                                            const originalHTML = copyBtn.innerHTML;
-                                            copyBtn.innerHTML = '<i class="fa fa-check" style="color:green;"></i> Copied!';
-                                            copyBtn.style.cursor = 'not-allowed';
-                                            copyBtn.style.pointerEvents = 'none';
-                                            setTimeout(() => {
-                                                copyBtn.innerHTML = originalHTML;
-                                                copyBtn.style.cursor = 'pointer';
-                                                copyBtn.style.pointerEvents = 'auto';
-                                            }, 2000);
-                                        });
-                                    });
-                                    wrapper.appendChild(pre);
-                                    wrapper.appendChild(copyBtn);
-                                    return wrapper;
+                                copyBtn.addEventListener('click', () => { 
+                                    let codeToCopy = ''; 
+                                    if (tabName === 'HTML') codeToCopy = "\\x3C!-- HTML --\\x3E\\n" + pre.textContent; 
+                                    if (tabName === 'CSS') codeToCopy = "/* CSS */\\n" + pre.textContent; 
+                                    if (tabName === 'JS') codeToCopy = "// JS\\n" + pre.textContent; 
+                                    navigator.clipboard.writeText(codeToCopy).then(() => { 
+                                    const openContainer = copyBtn.closest('.view-code-container'); 
+                                    highlightCopiedState(openContainer, pre); 
+                                    const originalHTML = copyBtn.innerHTML; 
+                                    copyBtn.innerHTML = '<i class="fa fa-check" style="color:green;"></i> Copied!'; 
+                                    copyBtn.style.cursor = 'not-allowed'; 
+                                    copyBtn.style.pointerEvents = 'none'; 
+                                    setTimeout(() => { 
+                                        copyBtn.innerHTML = originalHTML; 
+                                        copyBtn.style.cursor = 'pointer'; 
+                                        copyBtn.style.pointerEvents = 'auto';
+                                        }, 2000); 
+                                    }); 
+                                    }); 
+                                    wrapper.appendChild(pre); 
+                                    wrapper.appendChild(copyBtn); 
+                                    return wrapper; 
                                 }
                                 const htmlContent = container.querySelector(selector)?.outerHTML || '';
                                 const cssContent = window.parent.document.getElementById('css-editor')?.value || '';
-                                const jsContent = ''; // dynamically loaded
+                                const jsContent = '';
                                 const htmlTabContent = createTabWrapper('HTML', htmlContent);
                                 const cssTabContent = createTabWrapper('CSS', cssContent);
-                                const jsTabContent = createTabWrapper('JS', jsContent);
+                                const jsTabContent = createTabWrapper('JS', jsContent, selector);
                                 codeContainer.appendChild(htmlTabContent);
                                 codeContainer.appendChild(cssTabContent);
                                 codeContainer.appendChild(jsTabContent);
@@ -2620,24 +2919,34 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                                     const cssEditorContent = window.parent.document.getElementById('css-editor')?.value || '';
                                     activateTab(cssTab, cssTabContent, cssEditorContent);
                                 });
-                                jsTab.addEventListener('click', () => {
-                                    const jsEditorContent = window.parent.document.getElementById('js-editor')?.value || '';
+                               jsTab.addEventListener('click', () => {
                                     const comp = window.componentFunctionMap[selector] || {};
-                                    const funcName = comp.func || '';
-                                    const funcText = funcName ? getFunctionText(jsEditorContent, funcName) : '';
-                                    const eventText = comp.event || '';
+                                    const jsEditorContent = window.parent.document.getElementById('js-editor')?.value || '';
                                     let finalCode = '';
-                                    if (funcText) finalCode += funcText;
-                                    if (eventText) finalCode += "\\n" + eventText;
+                                    if (comp.func) {
+                                        const funcText = getFunctionText(jsEditorContent, comp.func);
+                                        if (funcText) finalCode += funcText + "\\n";
+                                        else finalCode += comp.func + "\\n";
+                                    }
+                                    
+                                     if (comp.funccommon) {
+                                        const funccommonText = getFunctionText(jsEditorContent, comp.funccommon);
+                                        if (funccommonText) finalCode += funccommonText + "\\n";
+                                        else finalCode += comp.funccommon + "\\n";
+                                         finalCode += "$(document).ready(function() { " + comp.funccommon + "(); });\\n\\n";
+                                    }
+
+                                    if (comp.event) finalCode += comp.event + "\\n";
                                     activateTab(jsTab, jsTabContent, finalCode);
                                 });
                                 container.appendChild(codeContainer);
                                 requestAnimationFrame(() => codeContainer.classList.add('show'));
+                                allViewCodeBtns.forEach(btn => btn.setAttribute('data-tooltip', 'Get Code'));
                                 target.setAttribute('data-tooltip', 'Hide Code');
                             } else {
                                 if (codeContainer.classList.contains('show')) {
                                     codeContainer.classList.remove('show');
-                                    target.setAttribute('data-tooltip', 'Get Code');
+                                    allViewCodeBtns.forEach(btn => btn.setAttribute('data-tooltip', 'Get Code'));
                                     codeContainer.addEventListener('transitionend', function handler(ev) {
                                         if (ev.propertyName === 'transform') {
                                             codeContainer.style.display = 'none';
@@ -2645,8 +2954,13 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
                                         }
                                     });
                                 } else {
+                                    document.querySelectorAll('.view-code-container.show').forEach(c => {
+                                        c.classList.remove('show');
+                                        c.style.display = 'none';
+                                    });
                                     codeContainer.style.display = 'block';
                                     requestAnimationFrame(() => codeContainer.classList.add('show'));
+                                    allViewCodeBtns.forEach(btn => btn.setAttribute('data-tooltip', 'Get Code'));
                                     target.setAttribute('data-tooltip', 'Hide Code');
                                 }
                             }
@@ -2690,144 +3004,162 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
         cssEditor.addEventListener('input', updatePreview);
         jsEditor.addEventListener('input', updatePreview);
         updatePreview();
-        const resizer = document.getElementById('resizer');
-        const editors = document.querySelector('.editors');
-        const container = document.querySelector('.editor-container');
-        let activePointerId = null;
-        function stopCurrentResize() {
-            if (activePointerId === null) return;
-            try {
-                resizer.releasePointerCapture && resizer.releasePointerCapture(activePointerId);
-            } catch (err) { /* ignore */ }
-            activePointerId = null;
-            document.removeEventListener('pointermove', onPointerMove);
-            document.removeEventListener('pointerup', onPointerUp);
-            document.removeEventListener('pointercancel', onPointerUp);
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-            document.body.style.cursor = '';
-            document.body.style.userSelect = '';
-        }
-        function onPointerMove(e) {
-            if (activePointerId !== null && e.pointerId !== activePointerId) return;
-            const containerRect = container.getBoundingClientRect();
-            let newWidth = e.clientX - containerRect.left;
-            if (newWidth < 200) newWidth = 200;
-            if (newWidth > 800) newWidth = 800;
-            editors.style.flex = '0 0 ' + newWidth + 'px';
-        }
-        function onPointerUp(e) {
-            if (activePointerId !== null && e.pointerId !== activePointerId) return;
-            stopCurrentResize();
-        }
-        function onPointerDown(e) {
-            e.preventDefault();
-            activePointerId = e.pointerId;
-            try { e.target.setPointerCapture(activePointerId); } catch (err) { /* ignore */ }
-            document.addEventListener('pointermove', onPointerMove);
-            document.addEventListener('pointerup', onPointerUp);
-            document.addEventListener('pointercancel', onPointerUp);
-            document.body.style.cursor = 'ew-resize';
-            document.body.style.userSelect = 'none';
-        }
-        let isMouseDown = false;
-        function onMouseMove(e) {
-            if (!isMouseDown) return;
-            const containerRect = container.getBoundingClientRect();
-            let newWidth = e.clientX - containerRect.left;
-            if (newWidth < 200) newWidth = 200;
-            if (newWidth > 800) newWidth = 800;
-            editors.style.flex = '0 0 ' + newWidth + 'px';
-        }
-        function onMouseUp() {
-            if (!isMouseDown) return;
-            isMouseDown = false;
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-            document.body.style.cursor = '';
-            document.body.style.userSelect = '';
-        }
-        if (window.PointerEvent) {
-            resizer.addEventListener('pointerdown', onPointerDown);
-            window.addEventListener('blur', stopCurrentResize);
-            window.addEventListener('mouseout', (ev) => { if (!ev.relatedTarget) stopCurrentResize(); });
-        } else {
-            resizer.addEventListener('mousedown', (e) => {
+        function setupSidebarResize(sidebarSelector) {
+            const resizer = document.getElementById('resizer');
+            const editors = document.querySelector(`${sidebarSelector} .editors`);
+            const container = document.querySelector(sidebarSelector);
+            let activePointerId = null;
+            let isMouseDown = false;
+
+            function stopCurrentResize() {
+                if (activePointerId === null && !isMouseDown) return;
+                try { resizer.releasePointerCapture?.(activePointerId); } catch (e) { }
+                activePointerId = null;
+                isMouseDown = false;
+                document.removeEventListener('pointermove', onPointerMove);
+                document.removeEventListener('pointerup', onPointerUp);
+                document.removeEventListener('pointercancel', onPointerUp);
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
+
+            function onPointerMove(e) {
+                if (activePointerId !== null && e.pointerId !== activePointerId) return;
+                const containerRect = container.getBoundingClientRect();
+                let newWidth = e.clientX - containerRect.left;
+                newWidth = Math.max(200, Math.min(800, newWidth));
+                editors.style.flex = `0 0 ${newWidth}px`;
+            }
+
+            function onPointerUp(e) { stopCurrentResize(); }
+
+            function onPointerDown(e) {
                 e.preventDefault();
-                isMouseDown = true;
-                document.addEventListener('mousemove', onMouseMove);
-                document.addEventListener('mouseup', onMouseUp);
+                activePointerId = e.pointerId;
+                try { e.target.setPointerCapture(activePointerId); } catch (e) { }
+                document.addEventListener('pointermove', onPointerMove);
+                document.addEventListener('pointerup', onPointerUp);
+                document.addEventListener('pointercancel', onPointerUp);
                 document.body.style.cursor = 'ew-resize';
                 document.body.style.userSelect = 'none';
-            });
-            window.addEventListener('blur', () => {
-                if (isMouseDown) {
-                    isMouseDown = false;
-                    document.removeEventListener('mousemove', onMouseMove);
-                    document.removeEventListener('mouseup', onMouseUp);
-                    document.body.style.cursor = '';
-                    document.body.style.userSelect = '';
-                }
-            });
-        }
-        function setupPanelResizers() {
-            const container = document.querySelector('.editors'); // parent flex column
-            const panels = Array.from(document.querySelectorAll('.editor-panel'));
+            }
+
+            function onMouseMove(e) {
+                if (!isMouseDown) return;
+                const containerRect = container.getBoundingClientRect();
+                let newWidth = e.clientX - containerRect.left;
+                newWidth = Math.max(200, Math.min(800, newWidth));
+                editors.style.flex = `0 0 ${newWidth}px`;
+            }
+
+            function onMouseUp() { stopCurrentResize(); }
+
+            if (window.PointerEvent) {
+                resizer.addEventListener('pointerdown', onPointerDown);
+                window.addEventListener('blur', stopCurrentResize);
+                window.addEventListener('mouseout', (ev) => { if (!ev.relatedTarget) stopCurrentResize(); });
+            } else {
+                resizer.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    isMouseDown = true;
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                    document.body.style.cursor = 'ew-resize';
+                    document.body.style.userSelect = 'none';
+                });
+                window.addEventListener('blur', stopCurrentResize);
+            }
+
+            const panelContainer = document.querySelector(`${sidebarSelector} .editors`);
+            const panels = Array.from(document.querySelectorAll(`${sidebarSelector} .editor-panel`));
             if (panels.length < 2) return;
-            container.style.display = 'flex';
-            container.style.flexDirection = 'column';
-            container.style.height = '100%';
+            panelContainer.style.display = 'flex';
+            panelContainer.style.height = '100%';
             panels.forEach((panel, index) => {
                 if (index === panels.length - 1) return;
                 const resizer = document.createElement('div');
                 resizer.className = 'panel-resizer';
                 Object.assign(resizer.style, {
-                    height: '3px',
-                    background: '#ccc',
-                    cursor: 'row-resize',
-                    userSelect: 'none',
+                    height: '3px', background: '#ccc', cursor: 'row-resize', userSelect: 'none'
                 });
                 panel.insertAdjacentElement('afterend', resizer);
-            });
-            let currentResizer = null;
-            let prevPanel = null;
-            let nextPanel = null;
-            let startY = 0;
-            let prevStartHeight = 0;
-            let nextStartHeight = 0;
-            function onPointerMove(e) {
-                if (!currentResizer) return;
-                const dy = e.clientY - startY;
-                const containerHeight = container.getBoundingClientRect().height;
-                let newPrevHeight = ((prevStartHeight + dy) / containerHeight) * 100;
-                let newNextHeight = ((nextStartHeight - dy) / containerHeight) * 100;
-                if (newPrevHeight < 10) newPrevHeight = 10;
-                if (newNextHeight < 10) newNextHeight = 10;
-                prevPanel.style.flex = `0 0 ${newPrevHeight}%`;
-                nextPanel.style.flex = `0 0 ${newNextHeight}%`;
-            }
-            function stopResize() {
-                document.removeEventListener('pointermove', onPointerMove);
-                document.removeEventListener('pointerup', stopResize);
-                document.body.style.cursor = '';
-                currentResizer = null;
-            }
-            document.querySelectorAll('.panel-resizer').forEach(resizer => {
-                resizer.addEventListener('pointerdown', (e) => {
+                let startY = 0, prevStartHeight = 0, nextStartHeight = 0;
+                let currentResizer = null;
+                const prevPanel = panel;
+                const nextPanel = panels[index + 1];
+                resizer.addEventListener('pointerdown', e => {
                     e.preventDefault();
                     currentResizer = resizer;
-                    prevPanel = resizer.previousElementSibling;
-                    nextPanel = resizer.nextElementSibling;
                     startY = e.clientY;
                     prevStartHeight = prevPanel.getBoundingClientRect().height;
                     nextStartHeight = nextPanel.getBoundingClientRect().height;
-                    document.addEventListener('pointermove', onPointerMove);
-                    document.addEventListener('pointerup', stopResize);
+                    function moveHandler(e) {
+                        if (!currentResizer) return;
+                        const dy = e.clientY - startY;
+                        const containerHeight = panelContainer.getBoundingClientRect().height;
+                        let newPrevHeight = ((prevStartHeight + dy) / containerHeight) * 100;
+                        let newNextHeight = ((nextStartHeight - dy) / containerHeight) * 100;
+                        newPrevHeight = Math.max(10, newPrevHeight);
+                        newNextHeight = Math.max(10, newNextHeight);
+                        prevPanel.style.flex = `0 0 ${newPrevHeight}%`;
+                        nextPanel.style.flex = `0 0 ${newNextHeight}%`;
+                    }
+                    function stopHandler() {
+                        document.removeEventListener('pointermove', moveHandler);
+                        document.removeEventListener('pointerup', stopHandler);
+                        document.body.style.cursor = '';
+                        currentResizer = null;
+                    }
+                    document.addEventListener('pointermove', moveHandler);
+                    document.addEventListener('pointerup', stopHandler);
                     document.body.style.cursor = 'row-resize';
                 });
             });
         }
-        setupPanelResizers();
+        function setupCenterResize(centerSelector) {
+            const editorCenter = document.querySelector(centerSelector);
+            if (!editorCenter) return;
+            const editorsContainer = editorCenter.querySelector('.editors');
+            editorsContainer.style.height = '400px';
+            editorsContainer.style.minHeight = '100px';
+            let hResizer = document.getElementById('resizerHorizontal');
+            if (!hResizer) {
+                hResizer = document.createElement('div');
+                hResizer.id = 'resizerHorizontal';
+                hResizer.className = 'resizer-horizontal';
+                editorCenter.insertBefore(hResizer, editorsContainer);
+                Object.assign(hResizer.style, {
+                    height: '5px', background: '#ccc', cursor: 'row-resize', userSelect: 'none'
+                });
+            }
+            let isResizing = false, startY = 0, startHeight = 0;
+            hResizer.addEventListener('mousedown', e => {
+                e.preventDefault();
+                isResizing = true;
+                startY = e.clientY;
+                startHeight = editorsContainer.offsetHeight;
+                document.body.style.cursor = 'row-resize';
+                document.body.style.userSelect = 'none';
+            });
+            document.addEventListener('mousemove', e => {
+                if (!isResizing) return;
+                const dy = e.clientY - startY;
+                let newHeight = startHeight + dy;
+                newHeight = Math.max(100, Math.min(800, newHeight));
+                editorsContainer.style.height = `${newHeight}px`;
+            });
+            document.addEventListener('mouseup', () => {
+                if (!isResizing) return;
+                isResizing = false;
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            });
+        }
+        setupSidebarResize('.editor-left');
+        setupCenterResize('.editor-center');
+
         window.addEventListener("beforeunload", function (e) {
             e.preventDefault();
             e.returnValue = "Changes could not update if page get refresh.";
@@ -2852,6 +3184,305 @@ if (state.view === "month" && state.year < currentYear) state.year++; else if (s
         }
         window.addEventListener('resize', activateFirstTabOnMobile);
         activateFirstTabOnMobile();
+        const viewSwitcherBtn = document.getElementById("view-switcher-button");
+        viewSwitcherBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const switchWrapper = document.querySelector(".editors--switch");
+            if (!switchWrapper) return;
+            const existingDropdown = switchWrapper.querySelector(".view-switcher-dropdown");
+            if (existingDropdown) {
+                existingDropdown.classList.remove("dropdown-show");
+                existingDropdown.classList.add("dropdown-hide");
+                setTimeout(() => existingDropdown.remove(), 300);
+                return;
+            }
+            const dropdown = document.createElement("div");
+            dropdown.className = "view-switcher-dropdown dropdown-show";
+            dropdown.style.position = "absolute";
+            dropdown.style.top = "100%"
+            dropdown.style.left = "-120px"
+            dropdown.style.background = "#fff";
+            dropdown.style.border = "1px solid #ccc";
+            dropdown.style.borderRadius = "6px";
+            dropdown.style.boxShadow = "0 2px 10px rgba(0,0,0,0.1)";
+            dropdown.style.padding = "5px 0";
+            dropdown.style.zIndex = 999;
+            dropdown.style.minWidth = "160px";
+            dropdown.style.transformOrigin = "top center";
+            const options = [
+                {
+                    id: "editor-left",
+                    label: "Editor Left",
+                    icon: `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+                <path d="M0 9.002C0 8.45.455 8 .992 8h18.016c.548 0 .992.456.992 1.002v9.996c0 .553-.455 1.002-.992 1.002H.992C.444 20 0 19.544 0 18.998zm0-8C0 .45.451 0 .99 0h4.02A.99.99 0 0 1 6 1.003v4.994C6 6.551 5.549 7 5.01 7H.99A.99.99 0 0 1 0 5.997zm7 0C7 .45 7.451 0 7.99 0h4.02A.99.99 0 0 1 13 1.003v4.994C13 6.551 12.549 7 12.01 7H7.99A.99.99 0 0 1 7 5.997zm7 0C14 .45 14.451 0 14.99 0h4.02A.99.99 0 0 1 20 1.003v4.994C20 6.551 19.549 7 19.01 7h-4.02A.99.99 0 0 1 14 5.997z"></path>
+              </svg>`
+                },
+                {
+                    id: "editor-center",
+                    label: "Editor Center",
+                    icon: `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+                <path d="M0 9.002C0 8.45.455 8 .992 8h18.016c.548 0 .992.456.992 1.002v9.996c0 .553-.455 1.002-.992 1.002H.992C.444 20 0 19.544 0 18.998zm0-8C0 .45.451 0 .99 0h4.02A.99.99 0 0 1 6 1.003v4.994C6 6.551 5.549 7 5.01 7H.99A.99.99 0 0 1 0 5.997zm7 0C7 .45 7.451 0 7.99 0h4.02A.99.99 0 0 1 13 1.003v4.994C13 6.551 12.549 7 12.01 7H7.99A.99.99 0 0 1 7 5.997zm7 0C14 .45 14.451 0 14.99 0h4.02A.99.99 0 0 1 20 1.003v4.994C20 6.551 19.549 7 19.01 7h-4.02A.99.99 0 0 1 14 5.997z"></path>
+              </svg>`
+                },
+                {
+                    id: "editor-right",
+                    label: "Editor Right",
+                    icon: `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+                <path d="M0 9.002C0 8.45.455 8 .992 8h18.016c.548 0 .992.456.992 1.002v9.996c0 .553-.455 1.002-.992 1.002H.992C.444 20 0 19.544 0 18.998zm0-8C0 .45.451 0 .99 0h4.02A.99.99 0 0 1 6 1.003v4.994C6 6.551 5.549 7 5.01 7H.99A.99.99 0 0 1 0 5.997zm7 0C7 .45 7.451 0 7.99 0h4.02A.99.99 0 0 1 13 1.003v4.994C13 6.551 12.549 7 12.01 7H7.99A.99.99 0 0 1 7 5.997zm7 0C14 .45 14.451 0 14.99 0h4.02A.99.99 0 0 1 20 1.003v4.994C20 6.551 19.549 7 19.01 7h-4.02A.99.99 0 0 1 14 5.997z"></path>
+              </svg>`
+                }
+            ];
+            options.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.className = "dropdown-option";
+                btn.style.display = "flex";
+                btn.style.alignItems = "center";
+                btn.style.gap = "8px";
+                btn.style.width = "100%";
+                btn.style.padding = "8px 12px";
+                btn.style.background = "none";
+                btn.style.border = "none";
+                btn.style.cursor = "pointer";
+                btn.style.fontSize = "14px";
+                btn.style.textAlign = "left";
+                btn.innerHTML = `${opt.icon} ${opt.label}`;
+                btn.addEventListener("click", () => {
+                    applyEditorLayout(opt.id);
+                    dropdown.classList.remove("dropdown-show");
+                    dropdown.classList.add("dropdown-hide");
+                    const container = document.querySelector(".editor-container");
+                    const editors = container.querySelector(".editors");
+                    if (opt.id === "editor-center") {
+                        editors.style.flex = "0 0 400px";
+                        editors.style.height = "400px";
+                        setupEditorCenterVerticalResize(container);
+                    }
+                    else if (opt.id === "editor-right") {
+                        setupEditorRightResize();
+                        editors.style.flex = "0 0 100%";
+                        editors.style.height = "100%";
+                    }
+                    else if (opt.id === "editor-left") {
+                        editors.style.flex = "0 0 100%";
+                        editors.style.height = "100%";
+                    }
+                    setTimeout(() => dropdown.remove(), 300);
+                });
+                btn.addEventListener("mouseenter", () => btn.style.background = "#f0f0f0");
+                btn.addEventListener("mouseleave", () => btn.style.background = "none");
+                dropdown.appendChild(btn);
+            });
+            switchWrapper.appendChild(dropdown);
+            document.addEventListener("click", function closeDropdownOutside(e) {
+                if (!dropdown.contains(e.target) && e.target !== viewSwitcherBtn) {
+                    dropdown.classList.remove("dropdown-show");
+                    dropdown.classList.add("dropdown-hide");
+                    setTimeout(() => dropdown.remove(), 300);
+                    document.removeEventListener("click", closeDropdownOutside);
+                }
+            });
+        });
+
+
+        function setupEditorCenterVerticalResize(container) {
+            if (!container) return;
+            const editors = container.querySelector(".editors");
+            if (!editors) return;
+            const existingResizer = container.querySelector(".verticalResizer");
+            if (existingResizer) existingResizer.remove();
+            const resizer = document.createElement("div");
+            resizer.className = "verticalResizer";
+            Object.assign(resizer.style, {
+                height: "5px",
+                width: "100%",
+                background: "#ccc",
+                cursor: "row-resize",
+                position: "absolute",
+                top: "auto",
+                bottom: "0",
+                left: "0",
+                right: "0",
+                zIndex: 100,
+            });
+            container.style.position = "relative";
+            editors.appendChild(resizer);
+            let isResizing = false;
+            let startY = 0;
+            let startHeight = 0;
+            resizer.addEventListener("mousedown", e => {
+                e.preventDefault();
+                isResizing = true;
+                startY = e.clientY;
+                startHeight = editors.offsetHeight;
+                document.body.style.cursor = "row-resize";
+                document.body.style.userSelect = "none";
+            });
+            document.addEventListener("mousemove", e => {
+                if (!isResizing) return;
+                const dy = e.clientY - startY;
+                let newHeight = startHeight + dy;
+                newHeight = Math.max(100, Math.min(800, newHeight));
+                editors.style.height = `${newHeight}px`;
+                editors.style.flex = `0 0 ${newHeight}px`;
+            });
+            document.addEventListener("mouseup", () => {
+                if (!isResizing) return;
+                isResizing = false;
+                document.body.style.cursor = "";
+                document.body.style.userSelect = "";
+            });
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            const editorCenter = document.querySelector('.editor-center');
+            setupEditorCenterVerticalResize(editorCenter);
+        });
+        function setupEditorRightResize() {
+            const container = document.querySelector('.editor-right');
+            if (!container) return;
+            const editors = container.querySelector('.editors');
+            if (!editors) return;
+            const globalResizer = document.getElementById('resizer');
+            if (globalResizer) globalResizer.style.display = 'none';
+            const oldResizer = editors.querySelector('.rightResize');
+            if (oldResizer) oldResizer.remove();
+            const resizer = document.createElement('div');
+            resizer.className = 'rightResize';
+            Object.assign(resizer.style, {
+                width: '5px',
+                background: '#ccc',
+                cursor: 'ew-resize',
+                position: 'absolute',
+                top: '0',
+                bottom: '0',
+                left: '0',
+                zIndex: 100
+            });
+            editors.style.position = 'relative';
+            editors.appendChild(resizer);
+            resizer.addEventListener('mousedown', e => {
+                e.preventDefault();
+                let isResizing = true;
+                const startX = e.clientX;
+                const startWidth = editors.getBoundingClientRect().width;
+                const moveHandler = e => {
+                    if (!isResizing) return;
+                    let newWidth = startWidth + (startX - e.clientX);
+                    newWidth = Math.max(200, Math.min(846, newWidth));
+                    editors.style.flex = `0 0 ${newWidth}px`;
+                };
+                const upHandler = () => {
+                    isResizing = false;
+                    document.removeEventListener('mousemove', moveHandler);
+                    document.removeEventListener('mouseup', upHandler);
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                };
+                document.addEventListener('mousemove', moveHandler);
+                document.addEventListener('mouseup', upHandler);
+                document.body.style.cursor = 'ew-resize';
+                document.body.style.userSelect = 'none';
+            });
+        }
+        function applyEditorLayout(mode) {
+            const editorContainer = document.querySelector(".editor-container");
+            if (!editorContainer) return;
+            editorContainer.classList.remove("editor-left", "editor-center", "editor-right");
+            void editorContainer.offsetWidth;
+            editorContainer.classList.add(mode);
+            const overlay = document.createElement("div");
+            overlay.className = "editor-overlay";
+            const calendarAnimation = document.createElement("div");
+            calendarAnimation.className = "calendar-animation";
+            for (let i = 0; i < 9; i++) {
+                const day = document.createElement("div");
+                day.className = "day";
+                calendarAnimation.appendChild(day);
+            }
+            overlay.appendChild(calendarAnimation);
+            const typing = document.createElement("div");
+            typing.className = "typing";
+            overlay.appendChild(typing);
+            editorContainer.style.position = "relative";
+            editorContainer.appendChild(overlay);
+            const text = "Applying layout...";
+            let index = 0;
+            const typeInterval = setInterval(() => {
+                typing.textContent += text[index];
+                index++;
+                if (index >= text.length) clearInterval(typeInterval);
+            }, 50);
+            setTimeout(() => overlay.remove(), 800);
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            const loader = document.getElementById('page-loader');
+            document.documentElement.style.overflow = 'hidden';
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                document.documentElement.style.overflow = '';
+                document.body.style.overflow = '';
+            }, 1500);
+        });
+        function reloadWithLoader() {
+            const loader = document.getElementById('page-loader');
+            loader.classList.remove('hidden');
+            document.documentElement.style.overflow = 'hidden';
+            document.body.style.overflow = 'hidden';
+
+            setTimeout(() => {
+                location.reload();
+            }, 300);
+        }
+        function showReloadAlert() {
+            if (confirm("Do you want to reload the page?")) {
+                reloadWithLoader();
+            }
+        }
+        document.body.addEventListener("keydown", function (e) {
+            const target = e.target;
+            if (!target.matches(".editor-panel textarea")) return;
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+                e.preventDefault();
+                const panel = target.closest(".editor-panel");
+                let panelType = "Unknown";
+                if (panel.id === "html-panel") panelType = "HTML";
+                else if (panel.id === "css-panel") panelType = "CSS";
+                else if (panel.id === "js-panel") panelType = "JS";
+                showPanelSavePopup(panel, `${panelType} code has been saved`);
+            }
+        });
+
+        function showPanelSavePopup(panel, message) {
+            const existingPopup = panel.querySelector(".save-popup");
+            if (existingPopup) existingPopup.remove();
+            const popup = document.createElement("div");
+            popup.className = "save-popup";
+            popup.textContent = message;
+            Object.assign(popup.style, {
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+                background: "#4caf50",
+                color: "#fff",
+                padding: "5px 10px",
+                borderRadius: "4px",
+                fontSize: "12px",
+                zIndex: 1000,
+                opacity: 0,
+                transition: "opacity 0.3s"
+            });
+            if (getComputedStyle(panel).position === "static") {
+                panel.style.position = "relative";
+            }
+            panel.appendChild(popup);
+            requestAnimationFrame(() => {
+                popup.style.opacity = 1;
+            });
+            setTimeout(() => {
+                popup.style.opacity = 0;
+                setTimeout(() => popup.remove(), 300);
+            }, 1500);
+        }
     </script>
 </body>
 
