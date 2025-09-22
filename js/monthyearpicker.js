@@ -156,7 +156,9 @@ function showMonthYearPicker($input) {
     }
     showPopup();
 }
-$("body").on("click", ".vinmonthyearpicker input", function () {
-    let $input = $(this);
-    showMonthYearPicker($input);
+document.body.addEventListener('click', function (event) {
+    const target = event.target;
+    if (target.matches('.vinmonthyearpicker input')) {
+        showMonthYearPicker(target);
+    }
 });

@@ -381,7 +381,7 @@ function showTimePicker($input) {
         function () { selectedHour = (selectedHour + 1) % 24; renderArrow(); });
     $popup.on("click", ".vindatepicker--time__hdown", function () {
         selectedHour = (selectedHour - 1 + 24) %
-        24; renderArrow();
+            24; renderArrow();
     }); $popup.on("click", ".vindatepicker--time__mup", function () {
         selectedMinute = (selectedMinute + 1) % 60; renderArrow();
     });
@@ -390,7 +390,7 @@ function showTimePicker($input) {
             60) % 60; renderArrow();
     }); $popup.on("click", ".vindatepicker--apply__timeapply", function () {
         const
-        formatted = `${padHour(selectedHour)}:${pad(selectedMinute)} ${selectedAMPM}`;
+            formatted = `${padHour(selectedHour)}:${pad(selectedMinute)} ${selectedAMPM}`;
         $input.val(formatted).trigger("change"); $input.data("selectedTime", formatted); $popup.remove();
         $(document).off("mousedown.cuzTimePicker");
     }); $(document).on("mousedown.cuzTimePicker", function (e) {
@@ -401,6 +401,9 @@ function showTimePicker($input) {
     }); return $popup;
 }
 
-$("body").on("click", ".vintimepicker input", function () {
-    showTimePicker($(this));
+document.body.addEventListener('click', function (event) {
+    const target = event.target;
+    if (target.matches('.vintimepicker input')) {
+        showTimePicker(target);
+    }
 });
