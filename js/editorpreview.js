@@ -417,6 +417,7 @@ function handleEditorResize() {
     const container = document.querySelector(".editor-container");
     if (!container) return;
     const editors = container.querySelector(".editors");
+
     if (window.innerWidth >= 1025) {
         container.classList.add("desktop-mode");
         container.classList.remove("mobile-mode");
