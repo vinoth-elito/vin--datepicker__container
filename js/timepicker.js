@@ -401,9 +401,6 @@ function showTimePicker($input) {
     }); return $popup;
 }
 
-document.body.addEventListener('click', function (event) {
-    const target = event.target;
-    if (target.matches('.vintimepicker input')) {
-        showTimePicker(target);
-    }
+$("body").on("click", ".vintimepicker input", function () {
+    showTimePicker($(this));
 });
