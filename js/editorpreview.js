@@ -17,38 +17,35 @@ async function updatePreview() {
     faLink.rel = 'stylesheet';
     faLink.href = `https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css?v=${cacheBuster}`;
     doc.head.appendChild(faLink);
-    doc.defaultView.$ = window.$;
-    doc.defaultView.jQuery = window.jQuery;
-
-    // Inject JS editor code
-    const scriptEl = doc.createElement('script');
-    scriptEl.textContent = jsEditor.value;
-    scriptEl.textContent = jsEditor.value;
-    doc.body.appendChild(scriptEl);
-    scriptEl.textContent = jsEditor.value;
-    doc.body.appendChild(scriptEl);
-    const codeScript = doc.createElement('script');
-    const initScript = doc.createElement('script');
-    const clickFocusScript = doc.createElement('script');
-    initScript.textContent = `
+    const jq = doc.createElement('script');
+    jq.src = `https://code.jquery.com/jquery-3.7.1.min.js?v=${cacheBuster}`;
+    doc.body.appendChild(jq);
+    jq.onload = () => {
+        const scriptEl = doc.createElement('script');
+        scriptEl.textContent = jsEditor.value;
+        doc.body.appendChild(scriptEl);
+        const codeScript = doc.createElement('script');
+        const initScript = doc.createElement('script');
+        const clickFocusScript = doc.createElement('script');
+        initScript.textContent = `
                     if (typeof initVinDatePickers === 'function') {
                         initVinDatePickers();
                     }
                 `;
-    doc.body.appendChild(initScript);
-    const handlers = {
-        ".vindatetimepicker input": "showDateTimePicker",
-        ".vindatepicker input": "showDatePicker",
-        ".vinmonthyearpicker input": "showMonthYearPicker",
-        ".vintimepicker input": "showTimePicker",
-        ".vindatepicker input": "showDatePicker"
-    };
+        doc.body.appendChild(initScript);
+        const handlers = {
+            ".vindatetimepicker input": "showDateTimePicker",
+            ".vindatepicker input": "showDatePicker",
+            ".vinmonthyearpicker input": "showMonthYearPicker",
+            ".vintimepicker input": "showTimePicker",
+            ".vindatepicker input": "showDatePicker"
+        };
 
-    const clickScript = doc.createElement('script');
-    let handlerCode = '';
-    for (const selector in handlers) {
-        const funcName = handlers[selector];
-        handlerCode += `
+        const clickScript = doc.createElement('script');
+        let handlerCode = '';
+        for (const selector in handlers) {
+            const funcName = handlers[selector];
+            handlerCode += `
                         $("body").on("click", "${selector}", function () {
                             let $input = $(this);
                             if (typeof ${funcName} === "function") {
@@ -56,8 +53,8 @@ async function updatePreview() {
                             }
                         });
                     `;
-    }
-    handlerCode += `
+        }
+        handlerCode += `
                     $("body").on("focus", ".vindaterange--from__date, .vindaterange--to__date", function () {
                         let $input = $(this);
                         if (typeof showDateRangePicker === "function") {
@@ -65,56 +62,50 @@ async function updatePreview() {
                         }
                     });
                 `;
-    clickScript.textContent = handlerCode;
-    clickFocusScript.textContent = handlerCode;
-    doc.body.appendChild(clickFocusScript);
-    doc.body.appendChild(clickScript);
-    codeScript.textContent = `
+        clickScript.textContent = handlerCode;
+        clickFocusScript.textContent = handlerCode;
+        doc.body.appendChild(clickFocusScript);
+        doc.body.appendChild(clickScript);
+        codeScript.textContent = `
                     window.componentFunctionMap = window.componentFunctionMap || {
                         '.vindatepicker': {
                             func: 'showDatePicker',
                             funccommon: 'initVinDatePickers',
-                            event: 'document.body.addEventListener("click", function(event) {' +
-                            'if(event.target.matches(".vindatepicker input")) {' +
-                            'showDatePicker(event.target);' +
-                            '}' +
-                            '});'
+                            event: '$("body").on("click", ".vindatepicker input", function () {' +
+                                'let $input = $(this);' +
+                                'showDatePicker($input);' +
+                                '});'
                         },
                         '.vintimepicker': {
                             func: 'showTimePicker',
                             funccommon: 'initVinDatePickers',
-                            event: 'document.body.addEventListener("click", function(event) {' +
-                            'if(event.target.matches(".vintimepicker input")) {' +
-                            'showTimePicker(event.target);' +
-                            '}' +
-                            '});'
+                            event: '$("body").on("click", ".vintimepicker input", function () {' +
+                                'let $input = $(this);' +
+                                'showTimePicker($input);' +
+                                '});'
                         },
                         '.vindatetimepicker': {
                             func: 'showDateTimePicker',
                             funccommon: 'initVinDatePickers',
-                            event: 'document.body.addEventListener("click", function(event) {' +
-                            'if(event.target.matches(".vindatetimepicker input")){' +
-                            'showDateTimePicker(event.target);' +
-                            '}' +
-                            '});'
+                            event: '$("body").on("click", ".vindatetimepicker input", function () {' +
+                                'let $input = $(this);' +
+                                'showDateTimePicker($input);' +
+                                '});'
                         },
                         '.vinmonthyearpicker': {
                             func: 'showMonthYearPicker',
                             funccommon: 'initVinDatePickers',
-                           event: 'document.body.addEventListener("click", function(event) {' +
-                            'if(event.target.matches(".vinmonthyearpicker input")) {' +
-                            'showMonthYearPicker(event.target);' +
-                            '}' +
-                            '});'
+                            event: '$("body").on("click", ".vinmonthyearpicker input", function () {' +
+                                'let $input = $(this);' +
+                                'showMonthYearPicker($input);' +
+                                '});'
                         },
                         '.vindaterangepicker': {
                             func: 'showDateRangePicker',
                             funccommon: 'initVinDatePickers',
-                            event: 'document.querySelectorAll(".vindaterange--from__date, .vindaterange--to__date").forEach(function(el) {' +
-                            'el.addEventListener("focus", function() {' +
-                            'showDateRangePicker(this);' +
-                            '});' +
-                            '});'
+                            event: '$(".vindaterange--from__date, .vindaterange--to__date").on("focus", function () {' +
+                                'showDateRangePicker($(this));' +
+                                '});'
                         },
                     };
                     function getPickerCode(selector) {
@@ -404,8 +395,8 @@ async function updatePreview() {
                         }
                     });
                 `;
-    doc.body.appendChild(codeScript);
-
+        doc.body.appendChild(codeScript);
+    };
 }
 htmlEditor.addEventListener('input', updatePreview);
 cssEditor.addEventListener('input', updatePreview);
@@ -1037,7 +1028,7 @@ async function loadCSS() {
         const res = await fetch(cssUrl, { cache: 'no-store' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         editor.value = await res.text();
-        updatePreview();
+        updatePreview(); // apply immediately
     } catch (err) {
         editor.value = `/* Could not load ${cssUrl}: ${err.message} */`;
     }
