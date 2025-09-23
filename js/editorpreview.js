@@ -18,7 +18,7 @@ async function updatePreview() {
     faLink.href = `https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css?v=${cacheBuster}`;
     doc.head.appendChild(faLink);
     try {
-        const cssUrl = `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/css/preview.css}`;
+        const cssUrl = `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/css/preview.css?v=${cacheBuster}`;
         const res = await fetch(cssUrl, { cache: 'no-store' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const cssText = await res.text();
