@@ -1028,7 +1028,7 @@ async function loadCSS() {
         const res = await fetch(cssUrl, { cache: 'no-store' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         editor.value = await res.text();
-        updatePreview(); // apply immediately
+        updatePreview();
     } catch (err) {
         editor.value = `/* Could not load ${cssUrl}: ${err.message} */`;
     }

@@ -48,114 +48,60 @@ function showTimePicker($input) {
     }
     function renderArrow() {
         $popup.html(`
-        <div class="vintimepicker--time__arrow">
-            <div class="vindatepicker--time__controlselect vinflex vinflex--alignitemscenter">
-                <!-- Hour Column -->
-                <div class="vintimepicker--time__col vinflex vinflex--alignitemscenter vinflex--1">
-                    <button class="vindatepicker--time__hup">▲</button>
-                    <div class="vindatepicker--time__hval">${padHour(selectedHour % 12 === 0 ? 12 : selectedHour % 12)}</div>
-                    <button class="vindatepicker--time__hdown">▼</button>
-                </div>
-                <span>:</span>
-                <!-- Minute Column -->
-                <div class="vintimepicker--time__col vinflex vinflex--alignitemscenter vinflex--1">
-                    <button class="vindatepicker--time__mup">▲</button>
-                    <div class="vindatepicker--time__mval">${pad(selectedMinute)}</div>
-                    <button class="vindatepicker--time__mdown">▼</button>
-                </div>
-
-                <!-- AM/PM Toggle -->
-                <div class="vindatepicker--time__ampm vinflex vinflex--column" style="margin-left:10px; position:relative;">
-                    <div class="vindatepicker--time__ampmgroup vin--inflex" style="position:relative; border:1px solid #ccc; border-radius:4px; overflow:hidden;">
-                        <div class="vindatepicker--timeampm__btnactive-bg" style="position:absolute; top:0; left:0; width:50%; height:100%; background:#007bff; transition: transform 0.3s;"></div>
-                        <button class="vindatepicker--timeampm__btn ${selectedAMPM === 'AM' ? 'active' : ''}" data-value="AM" style="flex:1; z-index:1; background:transparent; border:none;">AM</button>
-                        <button class="vindatepicker--timeampm__btn ${selectedAMPM === 'PM' ? 'active' : ''}" data-value="PM" style="flex:1; z-index:1; background:transparent; border:none;">PM</button>
+            <div class="vintimepicker--time__arrow">
+                <div class="vindatepicker--time__controlselect vinflex vinflex--alignitemscenter">
+                    <!-- Hour Column -->
+                    <div class="vintimepicker--time__col vinflex vinflex--alignitemscenter vinflex--1">
+                        <button class="vindatepicker--time__hup">▲</button>
+                        <div class="vindatepicker--time__hval">${padHour(selectedHour)}</div>
+                        <button class="vindatepicker--time__hdown">▼</button>
+                    </div>
+                    <span>:</span>
+                    <!-- Minute Column -->
+                    <div class="vintimepicker--time__col vinflex vinflex--alignitemscenter vinflex--1">
+                        <button class="vindatepicker--time__mup">▲</button>
+                        <div class="vindatepicker--time__mval">${pad(selectedMinute)}</div>
+                        <button class="vindatepicker--time__mdown">▼</button>
                     </div>
                 </div>
+                <!-- AM/PM Toggle -->
+                <div class="vindatepicker--time__ampm" style="margin-top: 10px; text-align: center;">
+                    <div class="vindatepicker--time__ampmgroup vin--inflex">
+                        <button class="vindatepicker--timeampm__btn ${selectedAMPM === 'AM' ? 'active' : ''}" data-value="AM">AM</button>
+                        <button class="vindatepicker--timeampm__btn ${selectedAMPM === 'PM' ? 'active' : ''}" data-value="PM">PM</button>
+                        <div class="vindatepicker--timeampm__btnactive-bg"></div>
+                    </div>
+                </div>
+                <div class="vintimepicker--time__actions vinflex vin--textcenter">
+                    <button class="vindatepicker--apply__timecancel">Cancel</button>
+                    <button class="vindatepicker--apply__timeapply">Apply</button>
+                </div>
             </div>
-
-            <!-- Hour List -->
-            <div class="vintimepicker--hourlist vinflex vinflex--column vin--textcenter" style="margin-top:10px;"></div>
-            <!-- Minute List -->
-            <div class="vintimepicker--minutelist vinflex vinflex--column vin--textcenter" style="margin-top:10px;"></div>
-
-            <!-- Apply/Cancel -->
-            <div class="vintimepicker--time__actions vinflex vin--textcenter" style="margin-top:10px;">
-                <button class="vindatepicker--apply__timecancel">Cancel</button>
-                <button class="vindatepicker--apply__timeapply">Apply</button>
-            </div>
-        </div>
-    `);
+        `);
 
         const $hourVal = $popup.find(".vindatepicker--time__hval");
         const $minuteVal = $popup.find(".vindatepicker--time__mval");
+        $popup.find(".vindatepicker--time__hup").on("click", () => { selectedHour = (selectedHour + 1) % 24; renderArrow(); });
+        $popup.find(".vindatepicker--time__hdown").on("click", () => { selectedHour = (selectedHour - 1 + 24) % 24; renderArrow(); });
+        $popup.find(".vindatepicker--time__mup").on("click", () => { selectedMinute = (selectedMinute + 1) % 60; renderArrow(); });
+        $popup.find(".vindatepicker--time__mdown").on("click", () => { selectedMinute = (selectedMinute - 1 + 60) % 60; renderArrow(); });
+
+        // AM/PM Toggle
         const $amPmBtns = $popup.find(".vindatepicker--timeampm__btn");
         const $activeBg = $popup.find(".vindatepicker--timeampm__btnactive-bg");
-        const $hourList = $popup.find(".vintimepicker--hourlist");
-        const $minuteList = $popup.find(".vintimepicker--minutelist");
+        $activeBg.css("transform", selectedAMPM === "PM" ? "translateX(100%)" : "translateX(0)");
 
-        function updateHourDisplay() {
-            $hourVal.text(padHour(selectedHour % 12 === 0 ? 12 : selectedHour % 12));
-        }
-
-        function updateMinuteDisplay() {
-            $minuteVal.text(pad(selectedMinute));
-        }
-
-        function toggleAMPM(value) {
-            if (value !== selectedAMPM) {
-                if (value === 'AM' && selectedHour >= 12) selectedHour -= 12;
-                if (value === 'PM' && selectedHour < 12) selectedHour += 12;
-                selectedAMPM = value;
-                $amPmBtns.removeClass("active");
-                $amPmBtns.filter(`[data-value='${value}']`).addClass("active");
-                $activeBg.css("transform", value === "PM" ? "translateX(100%)" : "translateX(0)");
-                updateHourDisplay();
-            }
-        }
-
-        // --- Increment/Decrement ---
-        $popup.find(".vindatepicker--time__hup").on("click", () => { selectedHour = (selectedHour + 1) % 24; updateHourDisplay(); });
-        $popup.find(".vindatepicker--time__hdown").on("click", () => { selectedHour = (selectedHour - 1 + 24) % 24; updateHourDisplay(); });
-        $popup.find(".vindatepicker--time__mup").on("click", () => { selectedMinute = (selectedMinute + 1) % 60; updateMinuteDisplay(); });
-        $popup.find(".vindatepicker--time__mdown").on("click", () => { selectedMinute = (selectedMinute - 1 + 60) % 60; updateMinuteDisplay(); });
-
-        // --- AM/PM toggle ---
-        $amPmBtns.on("click", function () { toggleAMPM($(this).data("value")); });
-
-        // --- Hour list ---
-        function renderHourList() {
-            $hourList.empty();
-            for (let h = 1; h <= 12; h++) {
-                $hourList.append(`<div class="vintimepicker--houritem" data-hour="${h}">${padHour(h)}</div>`);
-            }
-            $hourList.find(".vintimepicker--houritem").on("click", function () {
-                const h = parseInt($(this).data("hour"), 10);
-                selectedHour = selectedAMPM === "PM" && h !== 12 ? h + 12 : (selectedAMPM === "AM" && h === 12 ? 0 : h);
-                updateHourDisplay();
-            });
-        }
-
-        // --- Minute list ---
-        function renderMinuteList() {
-            $minuteList.empty();
-            for (let m = 0; m < 60; m += 5) {
-                $minuteList.append(`<div class="vintimepicker--minuteitem" data-minute="${m}">${pad(m)}</div>`);
-            }
-            $minuteList.find(".vintimepicker--minuteitem").on("click", function () {
-                selectedMinute = parseInt($(this).data("minute"), 10);
-                updateMinuteDisplay();
-            });
-        }
-
-        renderHourList();
-        renderMinuteList();
-
-        // --- Apply/Cancel ---
+        $amPmBtns.on("click", function () {
+            selectedAMPM = $(this).data("value");
+            $amPmBtns.removeClass("active");
+            $(this).addClass("active");
+            $activeBg.css("transform", selectedAMPM === "PM" ? "translateX(100%)" : "translateX(0)");
+        });
         $popup.find(".vindatepicker--apply__timeapply").on("click", function () {
             let hour24 = selectedHour;
             if (selectedAMPM === "PM" && hour24 !== 12) hour24 += 12;
             if (selectedAMPM === "AM" && hour24 === 12) hour24 = 0;
+
             const formatted = `${padHour(hour24)}:${pad(selectedMinute)} ${selectedAMPM}`;
             $input.val(formatted).trigger("change");
             $input.data("selectedTime", formatted);
