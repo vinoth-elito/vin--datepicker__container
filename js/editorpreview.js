@@ -20,13 +20,16 @@ async function updatePreview() {
     const jq = doc.createElement('script');
     jq.src = `https://code.jquery.com/jquery-3.7.1.min.js?v=${cacheBuster}`;
     doc.body.appendChild(jq);
-    jq.onload = () => {
+    loadJQueryOnce(() => {
         const scriptEl = doc.createElement('script');
         scriptEl.textContent = jsEditor.value;
         doc.body.appendChild(scriptEl);
         const codeScript = doc.createElement('script');
         const initScript = doc.createElement('script');
         const clickFocusScript = doc.createElement('script');
+        const iframeWindow = livePreview.contentWindow;
+        iframeWindow.$ = window.$;
+        iframeWindow.jQuery = window.jQuery;
         initScript.textContent = `
                     if (typeof initVinDatePickers === 'function') {
                         initVinDatePickers();
@@ -87,10 +90,11 @@ async function updatePreview() {
                         '.vindatetimepicker': {
                             func: 'showDateTimePicker',
                             funccommon: 'initVinDatePickers',
-                            event: '$("body").on("click", ".vindatetimepicker input", function () {' +
-                                'let $input = $(this);' +
-                                'showDateTimePicker($input);' +
-                                '});'
+                            event: 'document.body.addEventListener("click", function (event) {
+    if (event.target.matches(".vindatetimepicker input")) {
+        showDateTimePicker(event.target);
+    }
+});'
                         },
                         '.vinmonthyearpicker': {
                             func: 'showMonthYearPicker',
@@ -396,7 +400,7 @@ async function updatePreview() {
                     });
                 `;
         doc.body.appendChild(codeScript);
-    };
+    });
 }
 htmlEditor.addEventListener('input', updatePreview);
 cssEditor.addEventListener('input', updatePreview);
