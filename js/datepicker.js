@@ -114,9 +114,10 @@ function showDatePicker($input) {
         }
     });
 }
-$("body").on("click", ".vindatepicker input", function () {
-    let $input = $(this);
-    showDatePicker($input);
+document.body.addEventListener("click", function (event) {
+    if (event.target.matches(".vindatepicker input")) {
+        showDatePicker(event.target);
+    }
 });
 $(document).ready(function () {
     initVinDatePickers();

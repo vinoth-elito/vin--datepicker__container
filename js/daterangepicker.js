@@ -211,6 +211,9 @@ function showDateRangePicker($input) {
     return $popup;
 }
 
-$(".vindaterange--from__date, .vindaterange--to__date").on("focus", function () {
-    showDateRangePicker($(this));
+const inputs = document.querySelectorAll(".vindaterange--from__date, .vindaterange--to__date");
+inputs.forEach(input => {
+    input.addEventListener("focus", function () {
+        showDateRangePicker(this); // pass the element itself
+    });
 });

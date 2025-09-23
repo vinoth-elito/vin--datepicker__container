@@ -210,9 +210,10 @@ function showDateTimePicker($input) {
     });
 }
 
-$("body").on("click", ".vindatetimepicker input", function () {
-    let $input = $(this);
-    showDateTimePicker($input);
+document.body.addEventListener("click", function (event) {
+    if (event.target.matches(".vindatetimepicker input")) {
+        showDateTimePicker(event.target);
+    }
 });
 
 
