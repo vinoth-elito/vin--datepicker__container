@@ -18,15 +18,17 @@ async function updatePreview() {
     faLink.href = `https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css?v=${cacheBuster}`;
     doc.head.appendChild(faLink);
     try {
-        const cssUrl = `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/css/preview.css?v=${cacheBuster}`;
-        const res = await fetch(cssUrl, { cache: 'no-store' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const cssText = await res.text();
-        const previewStyle = doc.createElement('style');
-        previewStyle.textContent = cssText;
-        doc.head.appendChild(previewStyle);
+        const linkEl = doc.createElement('link');
+        linkEl.rel = 'stylesheet';
+        linkEl.type = 'text/css';
+        linkEl.href = `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/css/preview.css?v=${cacheBuster}`;
+
+        doc.head.appendChild(linkEl);
+
+        linkEl.onload = () => console.log("preview.css loaded successfully!");
+        linkEl.onerror = () => console.error("Failed to load preview.css");
     } catch (err) {
-        console.error("Failed to load preview.css:", err);
+        console.error("Error adding preview.css:", err);
     }
     const jq = doc.createElement('script');
     jq.src = `https://code.jquery.com/jquery-3.7.1.min.js?v=${cacheBuster}`;
@@ -1031,7 +1033,7 @@ function loadScripts() {
 window.addEventListener('load', loadScripts);
 async function loadCSS() {
     const editor = document.getElementById('css-editor');
-    const cssUrl = 'https://raw.githubusercontent.com/vinoth-elito/vin--datepicker__container/main/css/preview.css';
+    const cssUrl = 'https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/css/preview.css';
 
     try {
         const res = await fetch(cssUrl, { cache: 'no-store' });
