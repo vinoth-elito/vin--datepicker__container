@@ -22,7 +22,6 @@
 
 body {
     background: #111;
-    display: none;
 }
 
 .vintimepicker--circle__timeinputs input[type="number"] {
