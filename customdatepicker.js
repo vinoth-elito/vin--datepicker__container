@@ -1127,28 +1127,28 @@ function showDateTimePicker($input) {
     });
 }
 
-$("body").on("click", ".vindatepicker input", function () {
-    let $input = $(this);
-    showDatePicker($input);
-});
+// $("body").on("click", ".vindatepicker input", function () {
+//     let $input = $(this);
+//     showDatePicker($input);
+// });
 
-$("body").on("click", ".vinmonthyearpicker input", function () {
-    let $input = $(this);
-    showMonthYearPicker($input);
-});
+// $("body").on("click", ".vinmonthyearpicker input", function () {
+//     let $input = $(this);
+//     showMonthYearPicker($input);
+// });
 
-$(".vindaterange--from__date, .vindaterange--to__date").on("focus", function () {
-    showDateRangePicker($(this));
-});
+// $(".vindaterange--from__date, .vindaterange--to__date").on("focus", function () {
+//     showDateRangePicker($(this));
+// });
 
-$("body").on("click", ".vindatetimepicker input", function () {
-    let $input = $(this);
-    showDateTimePicker($input);
-});
+// $("body").on("click", ".vindatetimepicker input", function () {
+//     let $input = $(this);
+//     showDateTimePicker($input);
+// });
 
-$("body").on("click", ".vintimepicker input", function () {
-    showTimePicker($(this));
-});
+// $("body").on("click", ".vintimepicker input", function () {
+//     showTimePicker($(this));
+// });
 
 $(document).ready(function () {
     const observer = new MutationObserver(() => {

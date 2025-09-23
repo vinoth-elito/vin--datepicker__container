@@ -74,41 +74,47 @@ async function updatePreview() {
                         '.vindatepicker': {
                             func: 'showDatePicker',
                             funccommon: 'initVinDatePickers',
-                            event: '$("body").on("click", ".vindatepicker input", function () {' +
-                                'let $input = $(this);' +
-                                'showDatePicker($input);' +
-                                '});'
+                            event: 'document.body.addEventListener("click", function(event) {' +
+                            'if(event.target.matches(".vindatepicker input")) {' +
+                            'showDatePicker(event.target);' +
+                            '}' +
+                            '});'
                         },
                         '.vintimepicker': {
                             func: 'showTimePicker',
                             funccommon: 'initVinDatePickers',
-                            event: '$("body").on("click", ".vintimepicker input", function () {' +
-                                'let $input = $(this);' +
-                                'showTimePicker($input);' +
-                                '});'
+                            event: 'document.body.addEventListener("click", function(event) {' +
+                            'if(event.target.matches(".vintimepicker input")) {' +
+                            'showTimePicker(event.target);' +
+                            '}' +
+                            '});'
                         },
                         '.vindatetimepicker': {
                             func: 'showDateTimePicker',
                             funccommon: 'initVinDatePickers',
-                            event: '$("body").on("click", ".vindatetimepicker input", function () {' +
-                                'let $input = $(this);' +
-                                'showDateTimePicker($input);' +
-                                '});'
+                            event: 'document.body.addEventListener("click", function(event) {' +
+                            'if(event.target.matches(".vindatetimepicker input")){' +
+                            'showDateTimePicker(event.target);' +
+                            '}' +
+                            '});'
                         },
                         '.vinmonthyearpicker': {
                             func: 'showMonthYearPicker',
                             funccommon: 'initVinDatePickers',
-                            event: '$("body").on("click", ".vinmonthyearpicker input", function () {' +
-                                'let $input = $(this);' +
-                                'showMonthYearPicker($input);' +
-                                '});'
+                           event: 'document.body.addEventListener("click", function(event) {' +
+                            'if(event.target.matches(".vinmonthyearpicker input")) {' +
+                            'showMonthYearPicker(event.target);' +
+                            '}' +
+                            '});'
                         },
                         '.vindaterangepicker': {
                             func: 'showDateRangePicker',
                             funccommon: 'initVinDatePickers',
-                            event: '$(".vindaterange--from__date, .vindaterange--to__date").on("focus", function () {' +
-                                'showDateRangePicker($(this));' +
-                                '});'
+                            event: 'document.querySelectorAll(".vindaterange--from__date, .vindaterange--to__date").forEach(function(el) {' +
+                            'el.addEventListener("focus", function() {' +
+                            'showDateRangePicker(this);' +
+                            '});' +
+                            '});'
                         },
                     };
                     function getPickerCode(selector) {
