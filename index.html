@@ -301,29 +301,13 @@
             <iframe id="live-preview" title="Live preview of your HTML, CSS, and JS output"></iframe>
         </div>
     </div>
-    <script>
-        function loadJQueryOnce(callback) {
-            if (window.jQuery) {
-                callback();
-                return;
-            }
-            const cacheBuster = Date.now();
-            const script = document.createElement('script');
-            script.src = `https://code.jquery.com/jquery-3.7.1.min.js?v=${cacheBuster}`;
-            script.onload = callback;
-            document.head.appendChild(script);
-        }
-    </script>
     <script src="js/editorpreview.js"></script>
-
-    <script
-        src="https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/js/datetimepicker.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/js/datepicker.js"></script>
-    <script
-        src="https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/js/monthyearpicker.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/datetimepicker.js"></script>
+    <script src="js/datepicker.js"></script>
+    <script src="js/monthyearpicker.js"></script>
     <script src="js/timepicker.js"></script>
-    <script
-        src="https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/js/daterangepicker.js"></script>
+    <script src="js/daterangepicker.js"></script>
 </body>
 
 </html>
