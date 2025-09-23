@@ -630,7 +630,7 @@ img {
 }
 
 .input__row {
-    display: flex;
+    display: none;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 20px;
