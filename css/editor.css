@@ -259,6 +259,12 @@ textarea {
     display: none;
 }
 
+@media(min-width:1025px) {
+    #js-panel.editor-panel {
+        padding-bottom: 70px;
+    }
+}
+
 .editor-panel.active {
     display: block;
 }
