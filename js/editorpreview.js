@@ -17,10 +17,10 @@ async function updatePreview() {
     faLink.rel = 'stylesheet';
     faLink.href = `https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css?v=${cacheBuster}`;
     doc.head.appendChild(faLink);
-    const jq = doc.createElement('script');
-    jq.src = `https://code.jquery.com/jquery-3.7.1.min.js?v=${cacheBuster}`;
-    doc.body.appendChild(jq);
-    jq.onload = () => {
+    const libScript = doc.createElement('script');
+    libScript.src = window.$some;
+    doc.body.appendChild(libScript);
+    libScript.onload = () => {
         const scriptEl = doc.createElement('script');
         scriptEl.textContent = jsEditor.value;
         doc.body.appendChild(scriptEl);

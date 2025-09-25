@@ -35,7 +35,7 @@
 
 <body>
     <div id="page-loader">
-        <div class="page--loader__cnt">>
+        <div class="page--loader__cnt">
             <img src="https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/images/og-image.webp"
                 alt="Loading...">
         </div>
@@ -301,13 +301,21 @@
             <iframe id="live-preview" title="Live preview of your HTML, CSS, and JS output"></iframe>
         </div>
     </div>
-    <script src="js/editorpreview.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script>
+        window.$some = "https://code.jquery.com/jquery-3.7.1.min.js";
+        document.addEventListener('DOMContentLoaded', () => {
+            updatePreview();
+        });
+    </script>
+
     <script src="js/datetimepicker.js"></script>
     <script src="js/datepicker.js"></script>
     <script src="js/monthyearpicker.js"></script>
     <script src="js/timepicker.js"></script>
     <script src="js/daterangepicker.js"></script>
+    <script src="js/editorpreview.js"></script>
+
 </body>
 
 </html>

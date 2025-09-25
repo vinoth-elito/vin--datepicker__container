@@ -119,19 +119,17 @@ document.body.addEventListener("click", function (event) {
         showDatePicker(event.target);
     }
 });
-$(document).ready(function () {
-    initVinDatePickers();
-});
+
 
 function initVinDatePickers() {
     const observer = new MutationObserver(() => {
         $(".vin--datepicker__container").each(function () {
             let $container = $(this);
-            let $popup = $container.find(".vindatepicker--dropdown__wrapp");
+            let $popup = $(this).find(".vindatepicker--dropdown__wrapp");
             if ($popup.length && $popup.is(":visible")) {
-                $container.addClass("datepicker-visible");
+                $(this).addClass("datepicker-visible");
             } else {
-                $container.removeClass("datepicker-visible");
+                $(this).removeClass("datepicker-visible");
             }
         });
     });
@@ -139,12 +137,13 @@ function initVinDatePickers() {
         childList: true,
         subtree: true
     });
+
     $("body").on("focus click",
         ".vinmonthyearpicker input, \
-                .vindaterangepicker input, \
-                .vindatetimepicker input, \
-                .vintimepicker input, \
-                .vindatepicker input",
+         .vindaterangepicker input, \
+         .vindatetimepicker input, \
+         .vintimepicker input, \
+         .vindatepicker input",
         function () {
             let $container = $(this).closest(".vin--datepicker__container");
             let $popup = $container.find(".vindatepicker--dropdown__wrapp");
@@ -156,12 +155,13 @@ function initVinDatePickers() {
             }
         }
     );
+
     $("body").on("input change",
         ".vinmonthyearpicker input, \
-                .vindaterangepicker input, \
-                .vindatetimepicker input, \
-                .vintimepicker input, \
-                .vindatepicker input",
+         .vindaterangepicker input, \
+         .vindatetimepicker input, \
+         .vintimepicker input, \
+         .vindatepicker input",
         function () {
             let $container = $(this).closest(".vin--datepicker__container");
             let $clearBtn = $container.find(".clear__selected__month");
@@ -173,6 +173,7 @@ function initVinDatePickers() {
             }
         }
     );
+
     $("body").on("click", ".clear__selected__month", function () {
         let $container = $(this).closest(".vin--datepicker__container");
         let $input = $container.find("input");
@@ -185,6 +186,7 @@ function initVinDatePickers() {
         $(this).hide();
         $('.vindatepicker--dropdown__wrapp').remove();
     });
+
     $("body").on("click", ".calendar-button", function () {
         let $container = $(this).parents('.vin--datepicker__container');
         $container.find('input').click();
@@ -192,3 +194,5 @@ function initVinDatePickers() {
         $container.find('input.vindaterange--to__date').focus();
     });
 }
+
+initVinDatePickers();
