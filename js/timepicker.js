@@ -1,5 +1,6 @@
 function showTimePicker($input) {
-    const $container = $input.closest(".vintimepicker");
+    $input = $($input);
+    const $container = $($input).closest(".vintimepicker"); // ✅ Wrap with $()
     const isArrowMode = $container.hasClass("vintimepicker--with__wrrow");
     const isCircleMode = $container.hasClass("vintimepicker--with__circle");
     $container.find(".vindatepicker--dropdown__wrapp").remove();
@@ -392,77 +393,3 @@ document.body.addEventListener("click", function (event) {
         showTimePicker(event.target);
     }
 });
-// function initVinDatePickers() {
-//     const observer = new MutationObserver(() => {
-//         $(".vin--datepicker__container").each(function () {
-//             let $container = $(this);
-//             let $popup = $(this).find(".vindatepicker--dropdown__wrapp");
-//             if ($popup.length && $popup.is(":visible")) {
-//                 $(this).addClass("datepicker-visible");
-//             } else {
-//                 $(this).removeClass("datepicker-visible");
-//             }
-//         });
-//     });
-//     observer.observe(document.body, {
-//         childList: true,
-//         subtree: true
-//     });
-
-//     $("body").on("focus click",
-//         ".vinmonthyearpicker input, \
-//          .vindaterangepicker input, \
-//          .vindatetimepicker input, \
-//          .vintimepicker input, \
-//          .vindatepicker input",
-//         function () {
-//             let $container = $(this).closest(".vin--datepicker__container");
-//             let $popup = $container.find(".vindatepicker--dropdown__wrapp");
-
-//             if ($popup.length && $popup.is(":visible")) {
-//                 $container.addClass("datepicker-visible");
-//             } else {
-//                 $container.removeClass("datepicker-visible");
-//             }
-//         }
-//     );
-
-//     $("body").on("input change",
-//         ".vinmonthyearpicker input, \
-//          .vindaterangepicker input, \
-//          .vindatetimepicker input, \
-//          .vintimepicker input, \
-//          .vindatepicker input",
-//         function () {
-//             let $container = $(this).closest(".vin--datepicker__container");
-//             let $clearBtn = $container.find(".clear__selected__month");
-
-//             if ($(this).val().trim() !== "") {
-//                 $clearBtn.show();
-//             } else {
-//                 $clearBtn.hide();
-//             }
-//         }
-//     );
-
-//     $("body").on("click", ".clear__selected__month", function () {
-//         let $container = $(this).closest(".vin--datepicker__container");
-//         let $input = $container.find("input");
-//         $input.removeData("selectedDate selectedMonth selectedYear selectedTime");
-//         $container.find("td.vindatepicker--selected__date, .vindatepicker--selected__date")
-//             .removeClass("vindatepicker--selected__date");
-//         $container.find("td.vindatepicker--selected__month")
-//             .removeClass("vindatepicker--selected__month");
-//         $input.val("").trigger("change");
-//         $(this).hide();
-//         $('.vindatepicker--dropdown__wrapp').remove();
-//     });
-
-//     $("body").on("click", ".calendar-button", function () {
-//         let $container = $(this).parents('.vin--datepicker__container');
-//         $container.find('input').click();
-//         $container.find('input.vindaterange--from__date').focus();
-//         $container.find('input.vindaterange--to__date').focus();
-//     });
-// }
-// initVinDatePickers();

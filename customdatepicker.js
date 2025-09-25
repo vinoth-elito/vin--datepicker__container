@@ -330,6 +330,7 @@ function showDateRangePicker($input) {
 }
 
 function showTimePicker($input) {
+    $input = $($input);
     const $container = $input.closest(".vintimepicker");
     const isArrowMode = $container.hasClass("vintimepicker--with__wrrow");
     const isCircleMode = $container.hasClass("vintimepicker--with__circle");

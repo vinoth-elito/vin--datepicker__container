@@ -31,11 +31,12 @@
     <noscript>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     </noscript>
+
 </head>
 
 <body>
     <div id="page-loader">
-        <div class="page--loader__cnt">
+        <div class="page--loader__cnt">>
             <img src="https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/images/og-image.webp"
                 alt="Loading...">
         </div>
@@ -82,148 +83,7 @@
                 <div class="editor-header">HTML</div>
                 <label for="html-editor" class="sr-only">HTML Editor</label>
                 <textarea id="html-editor" spellcheck="false">
-<div class="input__row">
-    <!-- Div For Datepicker-->
-    <div class="input__col">
-        <div class="head__tag">
-            <h2> Date Picker <a href="javascript:void(0)" data-target=".vindatepicker" class="view-code-btn" data-tooltip="Get Code"><i class="fa fa-code"></i></a></h2>
-        </div>
-        <div class="vin--datepicker__container vindatepicker vin--relative">
-            <form>
-                <label for="Date-picker" class="sr-only">Select Date</label>
-                <input type="text" id="Date-picker" name="date" placeholder="Select Date" aria-label="date" autocomplete="off" readonly>
-                <button type="button" class="calendar-button" aria-label="Open calendar">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
-                        <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
-                    </svg>
-                </button>
-                <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions" aria-label="Clear selected month" style="display:none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
-                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                    </svg>
-                </button>
-            </form>
-        </div>
-    </div>
-    <!-- Div For Timepicker-->
-    <div class="input__col">
-        <div class="head__tag">
-            <h2> Time Picker <a href="javascript:void(0)" data-target=".vintimepicker" class="view-code-btn" data-tooltip="Get Code"><i class="fa fa-code"></i></a></h2>
-        </div>
-        <div class="vin--datepicker__container vintimepicker vin--relative">
-            <form>
-                <label for="Time-picker" class="sr-only">Select Time</label>
-                <input type="text" id="Time-picker" name="time" aria-label="time" placeholder="Select Date" autocomplete="off" readonly>
-                <button type="button" class="calendar-button" aria-label="Open calendar">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
-                        <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
-                    </svg>
-                </button>
-                <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
-                    aria-label="Clear selected month" style="display:none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
-                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                    </svg>
-                </button>
-            </form>
-        </div>
-    </div>
-    <!-- Div For Timepicker(Arrow)-->
-    <div class="input__col">
-        <div class="head__tag">
-            <h2> Time Picker with Arrow <a href="javascript:void(0)" data-target=".vintimepicker" class="view-code-btn" data-tooltip="Get Code"><i class="fa fa-code"></i></a></h2>
-        </div>
-        <div class="vin--datepicker__container vintimepicker vintimepicker--with__wrrow vin--relative">
-            <form>
-                <label for="Time-picker-arrow" class="sr-only">Select Time</label>
-                <input type="text" id="Time-picker-arrow" name="time-picker-arrow" aria-label="time-picker-arrow" placeholder="Select Date" autocomplete="off" readonly>
-                <button type="button" class="calendar-button" aria-label="Open calendar">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
-                        <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
-                    </svg>
-                </button>
-                <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
-                    aria-label="Clear selected month" style="display:none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
-                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                    </svg>
-                </button>
-            </form>
-        </div>
-    </div>
-    <!-- Div For Timepicker(Circle)-->
-    <div class="input__col">
-        <div class="head__tag">
-            <h2> Time Picker with Circle <a href="javascript:void(0)" data-target=".vintimepicker" class="view-code-btn" data-tooltip="Get Code"><i class="fa fa-code"></i></a></h2>
-        </div>
-        <div class="vin--datepicker__container vintimepicker vintimepicker--with__circle vin--relative">
-            <form>
-                <label for="Time-picker-circle" class="sr-only">Select Time</label>
-                <input type="text" id="Time-picker-circle" name="time-picker-circle" aria-label="time-picker-arrow"
-                    placeholder="Select Date" autocomplete="off" readonly>
-                <button type="button" class="calendar-button" aria-label="Open calendar">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
-                        <path
-                            d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
-                    </svg>
-                </button>
-                <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
-                    aria-label="Clear selected month" style="display:none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
-                        <path
-                            d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                    </svg>
-                </button>
-            </form>
-        </div>
-    </div>
-    <!-- Div For MonthYear picker-->
-    <div class="input__col">
-        <div class="head__tag">
-            <h2> Month Year Picker <a href="javascript:void(0)" data-target=".vinmonthyearpicker" class="view-code-btn" data-tooltip="Get Code"><i class="fa fa-code"></i></a></h2>
-        </div>
-        <div class="vin--datepicker__container vinmonthyearpicker vin--relative">
-            <form>
-                <label for="month-year-picker" class="sr-only">Select Time</label>
-                <input type="text" id="month-year-picker" name="month-year-picker" aria-label="month-year-picker"
-                    placeholder="Select Month/Year" autocomplete="off" readonly>
-                <button type="button" class="calendar-button" aria-label="Open calendar">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
-                        <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
-                    </svg>
-                </button>
-                <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions"
-                    aria-label="Clear selected month" style="display:none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
-                        <path
-                            d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                    </svg>
-                </button>
-            </form>
-        </div>
-    </div>
-    <!-- Div For DateTime picker-->
-    <div class="input__col">
-        <div class="head__tag"><h2> Date and Time Picker <a href="javascript:void(0)" data-target=".vindatetimepicker" class="view-code-btn" data-tooltip="Get Code"><i class="fa fa-code"></i></a></h2></div>
-        <div class="vin--datepicker__container vindatetimepicker vin--relative">
-            <form>
-                <label for="Date-time-picker" class="sr-only">Select Time</label>
-                <input type="text" id="Date-time-picker" name="Date-time-picker" aria-label="Date-time-picker"
-                    placeholder="Select Date/Time" autocomplete="off" readonly>
-                <button type="button" class="calendar-button" aria-label="Open calendar">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true">
-                        <path d="M152 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H64c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H328V64c0-8.8-7.2-16-16-16s-16 7.2-16 16V96H152V64zM64 160H384V416H64V160z" />
-                    </svg>
-                </button>
-                <button type="button" class="clear__selected__month alp_close_icon" data-type="transactions" aria-label="Clear selected month" style="display:none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="12" height="12" aria-hidden="true">
-                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                    </svg>
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
+
 <div class="input__row" style="justify-content: left;margin-top:30px;">
     <!-- Div For Date Range picker-->
     <div class="input__col">
@@ -301,21 +161,36 @@
             <iframe id="live-preview" title="Live preview of your HTML, CSS, and JS output"></iframe>
         </div>
     </div>
-
     <script>
-        window.$some = "https://code.jquery.com/jquery-3.7.1.min.js";
-        document.addEventListener('DOMContentLoaded', () => {
-            updatePreview();
-        });
-    </script>
+        window.$jqlibraryURL = "https://code.jquery.com/jquery-3.7.1.min.js";
+        const script = document.createElement('script');
+        script.src = window.$jqlibraryURL;
+        const cacheBuster = Date.now();
+        script.src = window.$jqlibraryURL + `?v=${cacheBuster}`;
+        script.onload = function () {
+            const scripts = [
+                'js/editorpreview.js',
+                'js/datetimepicker.js',
+                'js/datepicker.js',
+                'js/monthyearpicker.js',
+                'js/timepicker.js',
+                'js/daterangepicker.js'
+            ];
+            scripts.forEach(src => {
+                const s = document.createElement('script');
+                s.src = src + `?v=${cacheBuster}`;
+                document.head.appendChild(s);
+            });
 
+        };
+        document.head.appendChild(script);
+    </script>
+    <!-- <script src="js/editorpreview.js"></script>
     <script src="js/datetimepicker.js"></script>
     <script src="js/datepicker.js"></script>
     <script src="js/monthyearpicker.js"></script>
     <script src="js/timepicker.js"></script>
-    <script src="js/daterangepicker.js"></script>
-    <script src="js/editorpreview.js"></script>
-
+    <script src="js/daterangepicker.js"></script> -->
 </body>
 
 </html>

@@ -17,151 +17,169 @@ async function updatePreview() {
     faLink.rel = 'stylesheet';
     faLink.href = `https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css?v=${cacheBuster}`;
     doc.head.appendChild(faLink);
-    const libScript = doc.createElement('script');
-    libScript.src = window.$some;
-    doc.body.appendChild(libScript);
-    libScript.onload = () => {
+    const jq = doc.createElement('script');
+    jq.src = window.$jqlibraryURL + `?v=${cacheBuster}`;
+    doc.head.appendChild(jq);
+    jq.onload = () => {
         const scriptEl = doc.createElement('script');
         scriptEl.textContent = jsEditor.value;
         doc.body.appendChild(scriptEl);
-        const codeScript = doc.createElement('script');
-        const initScript = doc.createElement('script');
-        const clickFocusScript = doc.createElement('script');
-        initScript.textContent = `
-                    if (typeof initVinDatePickers === 'function') {
-                        initVinDatePickers();
-                    }
-                `;
-        doc.body.appendChild(initScript);
-        const handlers = {
-            ".vindatetimepicker input": "showDateTimePicker",
-            ".vindatepicker input": "showDatePicker",
-            ".vinmonthyearpicker input": "showMonthYearPicker",
-            ".vintimepicker input": "showTimePicker",
-            ".vindatepicker input": "showDatePicker"
-        };
-
-        const clickScript = doc.createElement('script');
-        let handlerCode = '';
-        for (const selector in handlers) {
-            const funcName = handlers[selector];
-            handlerCode += `
-                        $("body").on("click", "${selector}", function () {
-                            let $input = $(this);
-                            if (typeof ${funcName} === "function") {
-                                ${funcName}($input);
-                            }
-                        });
-                    `;
-        }
-        handlerCode += `
-                    $("body").on("focus", ".vindaterange--from__date, .vindaterange--to__date", function () {
-                        let $input = $(this);
-                        if (typeof showDateRangePicker === "function") {
-                            showDateRangePicker($input);
+        const pickerScripts = [
+            "js/datetimepicker.js",
+            "js/datepicker.js",
+            "js/monthyearpicker.js",
+            "js/timepicker.js",
+            "js/daterangepicker.js"
+        ];
+        let loadedCount = 0;
+        pickerScripts.forEach(src => {
+            const s = doc.createElement('script');
+            s.src = src + `?v=${cacheBuster}`;
+            s.onload = () => {
+                loadedCount++;
+                if (loadedCount === pickerScripts.length) {
+                    const initScript = doc.createElement('script');
+                    initScript.textContent = `
+                        if (typeof initVinDatePickers === 'function') {
+                            initVinDatePickers();
                         }
-                    });
-                `;
-        clickScript.textContent = handlerCode;
-        clickFocusScript.textContent = handlerCode;
-        doc.body.appendChild(clickFocusScript);
-        doc.body.appendChild(clickScript);
-        codeScript.textContent = `
-                    window.componentFunctionMap = window.componentFunctionMap || {
-                        '.vindatepicker': {
-                            func: 'showDatePicker',
-                            funccommon: 'initVinDatePickers',
-                            event: '$("body").on("click", ".vindatepicker input", function () {' +
-                                'let $input = $(this);' +
-                                'showDatePicker($input);' +
-                                '});'
-                        },
-                        '.vintimepicker': {
-                            func: 'showTimePicker',
-                            funccommon: 'initVinDatePickers',
-                            event: '$("body").on("click", ".vintimepicker input", function () {' +
-                                'let $input = $(this);' +
-                                'showTimePicker($input);' +
-                                '});'
-                        },
-                        '.vindatetimepicker': {
-                            func: 'showDateTimePicker',
-                            funccommon: 'initVinDatePickers',
-                            event: '$("body").on("click", ".vindatetimepicker input", function () {' +
-                                'let $input = $(this);' +
-                                'showDateTimePicker($input);' +
-                                '});'
-                        },
-                        '.vinmonthyearpicker': {
-                            func: 'showMonthYearPicker',
-                            funccommon: 'initVinDatePickers',
-                            event: '$("body").on("click", ".vinmonthyearpicker input", function () {' +
-                                'let $input = $(this);' +
-                                'showMonthYearPicker($input);' +
-                                '});'
-                        },
-                        '.vindaterangepicker': {
-                            func: 'showDateRangePicker',
-                            funccommon: 'initVinDatePickers',
-                            event: '$(".vindaterange--from__date, .vindaterange--to__date").on("focus", function () {' +
-                                'showDateRangePicker($(this));' +
-                                '});'
-                        },
+                    `;
+                    doc.body.appendChild(initScript);
+                    const handlers = {
+                        ".vindatetimepicker input": "showDateTimePicker",
+                        ".vindatepicker input": "showDatePicker",
+                        ".vinmonthyearpicker input": "showMonthYearPicker",
+                        ".vintimepicker input": "showTimePicker",
+                        ".vindatepicker input": "showDatePicker"
                     };
-                    function getPickerCode(selector) {
-                        const picker = window.componentFunctionMap[selector];
-                        if (!picker) return '';
-                        let code = '';
-                        if (picker.func1) code += "func1: '" + picker.func1 + "', ";
-                        if (picker.func) code += "func: '" + picker.func + "', ";
-                        if (picker.event) code += "event: '" + picker.event + "'";
-                        return code;
+                    let handlerCode = '';
+                    for (const selector in handlers) {
+                        const funcName = handlers[selector];
+                        handlerCode += `
+                            (function($){
+                                $("body").on("click", "${selector}", function () {
+                                    let $input = $(this);
+                                    if (typeof window["${funcName}"] === "function") {
+                                        window["${funcName}"]($input);
+                                    }
+                                });
+                            })(window.jQuery);
+                        `;
                     }
-                    function highlightCopiedState(openContainer, pre) {
-                        const activeTab = openContainer.querySelector('.tab-btn.active');
-                        if (!activeTab) return;
-                        const originalTabHTML = activeTab.innerHTML;
-                        const originalTabBg = activeTab.style.background;
-                        const originalTabColor = activeTab.style.color;
-                        const originalPreBg = pre.style.background;
-                        activeTab.innerHTML = '<i class="fa fa-check" style="color:#fff;"></i> Copied!';
-                        activeTab.style.background = '#28a745';
-                        activeTab.style.color = '#fff';
-                        setTimeout(() => {
-                            activeTab.innerHTML = originalTabHTML;
-                            activeTab.style.background = originalTabBg;
-                            activeTab.style.color = originalTabColor;
-                            pre.style.background = originalPreBg;
-                        }, 1500);
-                    }
-                    window.getFunctionText = window.getFunctionText || function(jsCode, funcName) {
-                        const funcStart = jsCode.indexOf('function ' + funcName + '(');
-                        if (funcStart === -1) return '';
-                        let i = funcStart;
-                        let braceCount = 0;
-                        let inString = false;
-                        let stringChar = '';
-                        let escapeNext = false;
-                        for (; i < jsCode.length; i++) {
-                            const char = jsCode[i];
-                            if (escapeNext) { escapeNext = false; continue; }
-                            if (inString) {
-                                if (char === '\\\\') escapeNext = true;
-                                else if (char === stringChar) inString = false;
-                            } else {
-                                if (char === '"' || char === "'" || char === '\\\`') {
-                                    inString = true;
-                                    stringChar = char;
-                                } else if (char === '{') braceCount++;
-                                else if (char === '}') {
-                                    braceCount--;
-                                    if (braceCount === 0) return jsCode.substring(funcStart, i + 1);
+                    handlerCode += `
+                        (function($){
+                            $("body").on("focus", ".vindaterange--from__date, .vindaterange--to__date", function () {
+                                let $input = $(this);
+                                if (typeof window["showDateRangePicker"] === "function") {
+                                    window["showDateRangePicker"]($input);
+                                }
+                            });
+                        })(window.jQuery);
+                    `;
+                    const clickScript = doc.createElement('script');
+                    clickScript.textContent = handlerCode;
+                    doc.body.appendChild(clickScript);
+                    const codeScript = doc.createElement('script');
+                    codeScript.textContent = `
+                        window.componentFunctionMap = window.componentFunctionMap || {
+                            '.vindatepicker': {
+                                func: 'showDatePicker',
+                                funccommon: 'initVinDatePickers',
+                                event: '$("body").on("click", ".vindatepicker input", function () {' +
+                                    'let $input = $(this);' +
+                                    'showDatePicker($input);' +
+                                    '});'
+                            },
+                            '.vintimepicker': {
+                                func: 'showTimePicker',
+                                funccommon: 'initVinDatePickers',
+                                event: '$("body").on("click", ".vintimepicker input", function () {' +
+                                    'let $input = $(this);' +
+                                    'showTimePicker($input);' +
+                                    '});'
+                            },
+                            '.vindatetimepicker': {
+                                func: 'showDateTimePicker',
+                                funccommon: 'initVinDatePickers',
+                                event: '$("body").on("click", ".vindatetimepicker input", function () {' +
+                                    'let $input = $(this);' +
+                                    'showDateTimePicker($input);' +
+                                    '});'
+                            },
+                            '.vinmonthyearpicker': {
+                                func: 'showMonthYearPicker',
+                                funccommon: 'initVinDatePickers',
+                                event: '$("body").on("click", ".vinmonthyearpicker input", function () {' +
+                                    'let $input = $(this);' +
+                                    'showMonthYearPicker($input);' +
+                                    '});'
+                            },
+                            '.vindaterangepicker': {
+                                func: 'showDateRangePicker',
+                                funccommon: 'initVinDatePickers',
+                                event: '$(".vindaterange--from__date, .vindaterange--to__date").on("focus", function () {' +
+                                    'showDateRangePicker($(this));' +
+                                    '});'
+                            },
+                        };
+
+                        function getPickerCode(selector) {
+                            const picker = window.componentFunctionMap[selector];
+                            if (!picker) return '';
+                            let code = '';
+                            if (picker.func1) code += "func1: '" + picker.func1 + "', ";
+                            if (picker.func) code += "func: '" + picker.func + "', ";
+                            if (picker.event) code += "event: '" + picker.event + "'";
+                            return code;
+                        }
+
+                        function highlightCopiedState(openContainer, pre) {
+                            const activeTab = openContainer.querySelector('.tab-btn.active');
+                            if (!activeTab) return;
+                            const originalTabHTML = activeTab.innerHTML;
+                            const originalTabBg = activeTab.style.background;
+                            const originalTabColor = activeTab.style.color;
+                            const originalPreBg = pre.style.background;
+                            activeTab.innerHTML = '<i class="fa fa-check" style="color:#fff;"></i> Copied!';
+                            activeTab.style.background = '#28a745';
+                            activeTab.style.color = '#fff';
+                            setTimeout(() => {
+                                activeTab.innerHTML = originalTabHTML;
+                                activeTab.style.background = originalTabBg;
+                                activeTab.style.color = originalTabColor;
+                                pre.style.background = originalPreBg;
+                            }, 1500);
+                        }
+
+                        window.getFunctionText = window.getFunctionText || function(jsCode, funcName) {
+                            const funcStart = jsCode.indexOf('function ' + funcName + '(');
+                            if (funcStart === -1) return '';
+                            let i = funcStart;
+                            let braceCount = 0;
+                            let inString = false;
+                            let stringChar = '';
+                            let escapeNext = false;
+                            for (; i < jsCode.length; i++) {
+                                const char = jsCode[i];
+                                if (escapeNext) { escapeNext = false; continue; }
+                                if (inString) {
+                                    if (char === '\\\\') escapeNext = true;
+                                    else if (char === stringChar) inString = false;
+                                } else {
+                                    if (char === '"' || char === "'" || char === '\\\`') {
+                                        inString = true;
+                                        stringChar = char;
+                                    } else if (char === '{') braceCount++;
+                                    else if (char === '}') {
+                                        braceCount--;
+                                        if (braceCount === 0) return jsCode.substring(funcStart, i + 1);
+                                    }
                                 }
                             }
-                        }
-                        return '';
-                    };
-                    document.addEventListener('click', function (e) {
+                            return '';
+                        };
+
+                        document.addEventListener('click', function (e) {
                         const target = e.target.closest('[data-target]');
                         const allContainers = document.querySelectorAll('.view-code-container');
                         const allViewCodeBtns = document.querySelectorAll('.view-code-btn');
@@ -264,28 +282,28 @@ async function updatePreview() {
                                         gap: '4px',
                                         transition: 'background 0.3s'
                                     });
-                                copyBtn.addEventListener('click', () => { 
-                                    let codeToCopy = ''; 
-                                    if (tabName === 'HTML') codeToCopy = "\\x3C!-- HTML --\\x3E\\n" + pre.textContent; 
-                                    if (tabName === 'CSS') codeToCopy = "/* CSS */\\n" + pre.textContent; 
-                                    if (tabName === 'JS') codeToCopy = "// JS\\n" + pre.textContent; 
-                                    navigator.clipboard.writeText(codeToCopy).then(() => { 
-                                    const openContainer = copyBtn.closest('.view-code-container'); 
-                                    highlightCopiedState(openContainer, pre); 
-                                    const originalHTML = copyBtn.innerHTML; 
-                                    copyBtn.innerHTML = '<i class="fa fa-check" style="color:green;"></i> Copied!'; 
-                                    copyBtn.style.cursor = 'not-allowed'; 
-                                    copyBtn.style.pointerEvents = 'none'; 
-                                    setTimeout(() => { 
-                                        copyBtn.innerHTML = originalHTML; 
-                                        copyBtn.style.cursor = 'pointer'; 
+                                copyBtn.addEventListener('click', () => {
+                                    let codeToCopy = '';
+                                    if (tabName === 'HTML') codeToCopy = "\\x3C!-- HTML --\\x3E\\n" + pre.textContent;
+                                    if (tabName === 'CSS') codeToCopy = "/* CSS */\\n" + pre.textContent;
+                                    if (tabName === 'JS') codeToCopy = "// JS\\n" + pre.textContent;
+                                    navigator.clipboard.writeText(codeToCopy).then(() => {
+                                    const openContainer = copyBtn.closest('.view-code-container');
+                                    highlightCopiedState(openContainer, pre);
+                                    const originalHTML = copyBtn.innerHTML;
+                                    copyBtn.innerHTML = '<i class="fa fa-check" style="color:green;"></i> Copied!';
+                                    copyBtn.style.cursor = 'not-allowed';
+                                    copyBtn.style.pointerEvents = 'none';
+                                    setTimeout(() => {
+                                        copyBtn.innerHTML = originalHTML;
+                                        copyBtn.style.cursor = 'pointer';
                                         copyBtn.style.pointerEvents = 'auto';
-                                        }, 2000); 
-                                    }); 
-                                    }); 
-                                    wrapper.appendChild(pre); 
-                                    wrapper.appendChild(copyBtn); 
-                                    return wrapper; 
+                                        }, 2000);
+                                    });
+                                    });
+                                    wrapper.appendChild(pre);
+                                    wrapper.appendChild(copyBtn);
+                                    return wrapper;
                                 }
                                 const htmlContent = container.querySelector(selector)?.outerHTML || '';
                                 const cssContent = window.parent.document.getElementById('css-editor')?.value || '';
@@ -326,7 +344,7 @@ async function updatePreview() {
                                         if (funcText) finalCode += funcText + "\\n";
                                         else finalCode += comp.func + "\\n";
                                     }
-                                    
+
                                      if (comp.funccommon) {
                                         const funccommonText = getFunctionText(jsEditorContent, comp.funccommon);
                                         if (funccommonText) finalCode += funccommonText + "\\n";
@@ -394,15 +412,19 @@ async function updatePreview() {
                             });
                         }
                     });
-                `;
-        doc.body.appendChild(codeScript);
+                    `;
+                    doc.body.appendChild(codeScript);
+                }
+            };
+            doc.head.appendChild(s);
+        });
     };
 }
 htmlEditor.addEventListener('input', updatePreview);
 cssEditor.addEventListener('input', updatePreview);
 jsEditor.addEventListener('input', updatePreview);
 updatePreview();
-function handleEditorResize() {
+function setupViewSwitcher() {
     const container = document.querySelector(".editor-container");
     if (!container) return;
     const editors = container.querySelector(".editors");
@@ -536,8 +558,8 @@ function handleEditorResize() {
         document.removeEventListener("pointerup", null);
     }
 }
-document.addEventListener("DOMContentLoaded", handleEditorResize);
-window.addEventListener("resize", handleEditorResize);
+setupViewSwitcher();
+window.addEventListener("resize", setupViewSwitcher);
 function setupSidebarResize(sidebarSelector, defaultWidth = 600, defaultPanelHeights = []) {
     const container = document.querySelector(sidebarSelector);
     if (!container) return;
@@ -870,8 +892,6 @@ function setupEditorRightResize({ minWidth = 200, defaultWidth = 600 } = {}) {
         document.addEventListener('pointerup', onUp, { once: true });
     }
 }
-document.addEventListener("DOMContentLoaded", handleEditorResize);
-window.addEventListener("resize", handleEditorResize);
 function applyEditorLayout(mode) {
     const editorContainer = document.querySelector(".editor-container");
     if (!editorContainer) return;
@@ -902,26 +922,7 @@ function applyEditorLayout(mode) {
     }, 50);
     setTimeout(() => overlay.remove(), 800);
 }
-window.addEventListener('DOMContentLoaded', () => {
-    const loader = document.getElementById('page-loader');
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => {
-        loader.classList.add('hidden');
-        document.documentElement.style.overflow = '';
-        document.body.style.overflow = '';
-    }, 1500);
-});
-function reloadWithLoader() {
-    const loader = document.getElementById('page-loader');
-    loader.classList.remove('hidden');
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
 
-    setTimeout(() => {
-        location.reload();
-    }, 300);
-}
 function showReloadAlert() {
     if (confirm("Do you want to reload the page?")) {
         reloadWithLoader();
@@ -1004,21 +1005,29 @@ function loadScripts() {
         'showTimePicker',
         'showDateRangePicker'
     ];
-
     let combinedCode = '';
-
     functionsToInclude.forEach(funcName => {
         if (typeof window[funcName] === 'function') {
             combinedCode += window[funcName].toString() + '\n\n';
-            if (typeof window.initVinDatePickers === 'function') {
-                combinedCode += window.initVinDatePickers.toString() + '\n\n';
-            }
         }
     });
+    if (typeof window.initVinDatePickers === 'function') {
+        combinedCode += window.initVinDatePickers.toString() + '\n\n';
+        combinedCode += '$(document).ready(function() {\n    initVinDatePickers();\n});\n';
+    }
     editor.value = combinedCode;
 }
-window.addEventListener('load', loadScripts);
+function waitForFunctions() {
+    const allReady = ['showDateTimePicker', 'showDatePicker', 'showMonthYearPicker', 'showTimePicker', 'showDateRangePicker', 'initVinDatePickers']
+        .every(fn => typeof window[fn] === 'function');
 
+    if (allReady) {
+        loadScripts();
+    } else {
+        setTimeout(waitForFunctions, 50);
+    }
+}
+waitForFunctions();
 async function loadCSS() {
     const editor = document.getElementById('css-editor');
     const cacheBuster = Date.now();
@@ -1028,9 +1037,46 @@ async function loadCSS() {
         const res = await fetch(cssUrl, { cache: 'no-store' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         editor.value = await res.text();
-        updatePreview(); // apply immediately
+        updatePreview();
     } catch (err) {
         editor.value = `/* Could not load ${cssUrl}: ${err.message} */`;
     }
 }
 loadCSS()
+async function loadHTMLRows() {
+    // Define rows and the files in each row
+    const rows = [
+        ['datepicker.html', 'timepicker.html'], // Row 1
+        ['datetimepicker.html']                 // Row 2
+    ];
+
+    let finalHTML = '';
+
+    for (let rowFiles of rows) {
+        let rowHTML = '<div class="input__row">\n';
+        for (let file of rowFiles) {
+            try {
+                const response = await fetch(file);
+                const htmlContent = await response.text();
+                // Append the content directly; don't wrap in input__col
+                rowHTML += `${htmlContent}\n`;
+            } catch (err) {
+                console.error(`Failed to load ${file}:`, err);
+            }
+        }
+        rowHTML += '</div>\n'; // Close the row
+        finalHTML += rowHTML;
+    }
+
+    // Insert combined HTML into textarea
+    document.getElementById('html-editor').value = finalHTML;
+}
+
+loadHTMLRows();
+window.onload = () => {
+    const loader = document.getElementById('page-loader');
+    if (!loader) return;
+    setTimeout(() => {
+        loader.classList.add('hidden');
+    }, 1500);
+};
