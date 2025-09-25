@@ -1044,34 +1044,42 @@ async function loadCSS() {
 }
 loadCSS()
 async function loadHTMLRows() {
-    // Define rows and the files in each row
+    const editor = document.getElementById('html-editor');
+    const cacheBuster = Date.now();
     const rows = [
-        ['datepicker.html', 'timepicker.html'], // Row 1
-        ['datetimepicker.html']                 // Row 2
+        [
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/datepicker.html?v=${cacheBuster}`,
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/timepicker.html?v=${cacheBuster}`,
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/timepickerarrow.html?v=${cacheBuster}`,
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/timepickercircle.html?v=${cacheBuster}`,
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/monthyearpicker.html?v=${cacheBuster}`,
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/datetimepicker.html?v=${cacheBuster}`
+        ],
+        [
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/daterangepicker.html?v=${cacheBuster}`,
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/daterangepickersingle.html?v=${cacheBuster}`
+        ]
     ];
-
     let finalHTML = '';
-
     for (let rowFiles of rows) {
         let rowHTML = '<div class="input__row">\n';
         for (let file of rowFiles) {
             try {
-                const response = await fetch(file);
+                const response = await fetch(file, { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const htmlContent = await response.text();
-                // Append the content directly; don't wrap in input__col
                 rowHTML += `${htmlContent}\n`;
             } catch (err) {
                 console.error(`Failed to load ${file}:`, err);
+                rowHTML += `<!-- Failed to load ${file} -->\n`;
             }
         }
-        rowHTML += '</div>\n'; // Close the row
+        rowHTML += '</div>\n';
         finalHTML += rowHTML;
     }
-
-    // Insert combined HTML into textarea
-    document.getElementById('html-editor').value = finalHTML;
+    editor.value = finalHTML;
+    updatePreview();
 }
-
 loadHTMLRows();
 window.onload = () => {
     const loader = document.getElementById('page-loader');
