@@ -17,6 +17,10 @@ html {
     transition: all 0.5s ease;
 }
 
+body>.editor-container {
+    visibility: hidden;
+}
+
 .editor-container.editor-center,
 .editor-container.editor-left,
 .editor-container.editor-right {
@@ -258,6 +262,7 @@ textarea {
 .editor-panel {
     display: none;
 }
+
 
 @media(min-width:1025px) {
     #js-panel.editor-panel {

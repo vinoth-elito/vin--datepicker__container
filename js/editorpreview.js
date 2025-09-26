@@ -784,7 +784,7 @@ function setupEditorCenterResizers(container, minWidth = 50, minHeight = 100, ma
             width: "5px",
             height: "100%",
             cursor: "ew-resize",
-            background: 'rgba(255,255,255,0.2)',
+            background: "#ccc",
             zIndex: 100
         });
         panel.appendChild(widthResizer);
@@ -996,6 +996,73 @@ window.addEventListener("beforeunload", function (e) {
     e.preventDefault();
     e.returnValue = "Changes could not update if page get refresh.";
 });
+async function loadCSS() {
+    const editor = document.getElementById('css-editor');
+    const cacheBuster = Date.now();
+    const cssUrl = `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/css/preview.css?v=${cacheBuster}`;
+
+    try {
+        const res = await fetch(cssUrl, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        editor.value = await res.text();
+        updatePreview();
+    } catch (err) {
+        editor.value = `/* Could not load ${cssUrl}: ${err.message} */`;
+    }
+}
+
+async function loadHTMLRows() {
+    const editor = document.getElementById('html-editor');
+    const cacheBuster = Date.now();
+    const rows = [
+        [
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/datepicker.html?v=${cacheBuster}`,
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/timepicker.html?v=${cacheBuster}`,
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/timepickerarrow.html?v=${cacheBuster}`,
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/timepickercircle.html?v=${cacheBuster}`,
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/monthyearpicker.html?v=${cacheBuster}`,
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/datetimepicker.html?v=${cacheBuster}`
+        ],
+        [
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/daterangepicker.html?v=${cacheBuster}`,
+            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/daterangepickersingle.html?v=${cacheBuster}`
+        ]
+    ];
+    let finalHTML = '';
+
+    for (let i = 0; i < rows.length; i++) {
+        let style = i === 1 ? ' style="justify-content: left;margin-top:30px;"' : '';
+        let rowHTML = `<div class="input__row"${style}>\n`;
+        for (let file of rows[i]) {
+            try {
+                const response = await fetch(file, { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const htmlContent = await response.text();
+                rowHTML += `${htmlContent}\n`;
+            } catch (err) {
+                console.error(`Failed to load ${file}:`, err);
+                rowHTML += `<!-- Failed to load ${file} -->\n`;
+            }
+        }
+        rowHTML += '</div>\n';
+        finalHTML += rowHTML;
+    }
+    editor.value = finalHTML;
+    updatePreview();
+}
+
+// Wait for all JS functions to be defined
+function waitForFunctions() {
+    const allReady = ['showDateTimePicker', 'showDatePicker', 'showMonthYearPicker', 'showTimePicker', 'showDateRangePicker', 'initVinDatePickers']
+        .every(fn => typeof window[fn] === 'function');
+
+    if (allReady) {
+        loadScripts();
+    } else {
+        setTimeout(waitForFunctions, 50);
+    }
+}
+
 function loadScripts() {
     const editor = document.getElementById('js-editor');
     const functionsToInclude = [
@@ -1017,75 +1084,21 @@ function loadScripts() {
     }
     editor.value = combinedCode;
 }
-function waitForFunctions() {
-    const allReady = ['showDateTimePicker', 'showDatePicker', 'showMonthYearPicker', 'showTimePicker', 'showDateRangePicker', 'initVinDatePickers']
-        .every(fn => typeof window[fn] === 'function');
 
-    if (allReady) {
-        loadScripts();
-    } else {
-        setTimeout(waitForFunctions, 50);
-    }
-}
-waitForFunctions();
-async function loadCSS() {
-    const editor = document.getElementById('css-editor');
-    const cacheBuster = Date.now();
-    const cssUrl = `https://vinoth-elito.github.io/vin--datepicker__container/css/preview.css?v=${cacheBuster}`;
-
-    try {
-        const res = await fetch(cssUrl, { cache: 'no-store' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        editor.value = await res.text();
-        updatePreview();
-    } catch (err) {
-        editor.value = `/* Could not load ${cssUrl}: ${err.message} */`;
-    }
-}
-loadCSS()
-async function loadHTMLRows() {
-    const editor = document.getElementById('html-editor');
-    const cacheBuster = Date.now();
-    const rows = [
-        [
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/datepicker.html?v=${cacheBuster}`,
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/timepicker.html?v=${cacheBuster}`,
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/timepickerarrow.html?v=${cacheBuster}`,
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/timepickercircle.html?v=${cacheBuster}`,
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/monthyearpicker.html?v=${cacheBuster}`,
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/datetimepicker.html?v=${cacheBuster}`
-        ],
-        [
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/daterangepicker.html?v=${cacheBuster}`,
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/daterangepickersingle.html?v=${cacheBuster}`
-        ]
-    ];
-    let finalHTML = '';
-    for (let i = 0; i < rows.length; i++) {
-        let style = i === 1 ? ' style="justify-content: left;margin-top:30px;"' : '';
-        let rowHTML = `<div class="input__row"${style}>\n`;
-        for (let file of rows[i]) {
-            try {
-                const response = await fetch(file, { cache: 'no-store' });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const htmlContent = await response.text();
-                rowHTML += `${htmlContent}\n`;
-            } catch (err) {
-                console.error(`Failed to load ${file}:`, err);
-                rowHTML += `<!-- Failed to load ${file} -->\n`;
-            }
-        }
-        rowHTML += '</div>\n';
-        finalHTML += rowHTML;
-    }
-    editor.value = finalHTML;
-    updatePreview();
-}
-loadHTMLRows();
-window.onload = () => {
+// Main function to fetch everything and then hide loader
+async function initPage() {
     const loader = document.getElementById('page-loader');
-    if (!loader) return;
-    setTimeout(() => {
-        loader.classList.add('hidden');
-    }, 1500);
-};
+    const editorContainer = document.querySelector('.editor-container');
+    if (!loader || !editorContainer) return;
+
+    await Promise.all([
+        loadCSS(),
+        loadHTMLRows(),
+        new Promise(resolve => waitForFunctions() || resolve()) // wait until JS functions are ready
+    ]);
+
+    // Hide loader and reveal main content
+    loader.classList.add('hidden');
+    editorContainer.style.visibility = 'visible';
+}
+window.addEventListener('load', initPage);
