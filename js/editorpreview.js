@@ -1031,7 +1031,7 @@ waitForFunctions();
 async function loadCSS() {
     const editor = document.getElementById('css-editor');
     const cacheBuster = Date.now();
-    const cssUrl = `https://rawcdn.githack.com/vinoth-elito/vin--datepicker__container/main/css/preview.css?v=${cacheBuster}`;
+    const cssUrl = `https://vinoth-elito.github.io/vin--datepicker__container/css/preview.css?v=${cacheBuster}`;
 
     try {
         const res = await fetch(cssUrl, { cache: 'no-store' });
