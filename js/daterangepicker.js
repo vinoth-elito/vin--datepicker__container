@@ -20,7 +20,6 @@ function showDateRangePicker($input) {
         const d = String(date.getDate()).padStart(2, "0");
         return `${y}-${m}-${d}`;
     }
-    const $inputs = $container.find("input");
     function formatDisplay(date) {
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
             "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -215,9 +214,11 @@ function showDateRangePicker($input) {
     return $popup;
 }
 
-const inputs = document.querySelectorAll(".vindaterange--from__date, .vindaterange--to__date");
-inputs.forEach(input => {
-    input.addEventListener("focus", function () {
-        showDateRangePicker(this); // pass the element itself
+(() => {
+    const dateRangeInputs = document.querySelectorAll(".vindaterange--from__date, .vindaterange--to__date");
+    dateRangeInputs.forEach(input => {
+        input.addEventListener("focus", function () {
+            showDateRangePicker(this); // pass the element itself
+        });
     });
-});
+})();

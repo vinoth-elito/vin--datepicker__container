@@ -1030,7 +1030,9 @@ function waitForFunctions() {
 waitForFunctions();
 async function loadCSS() {
     const editor = document.getElementById('css-editor');
-    const cssUrl = `https://raw.githubusercontent.com/vinoth-elito/vin--datepicker__container/main/css/preview.css?time=${Date.now()}`;
+    const cacheBuster = Date.now();
+    const cssUrl = `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/css/preview.css?v=${cacheBuster}`;
+
     try {
         const res = await fetch(cssUrl, { cache: 'no-store' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
