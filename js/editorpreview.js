@@ -13,10 +13,11 @@ async function updatePreview() {
     doc.head.appendChild(styleEl);
     doc.body.innerHTML = htmlEditor.value;
     const cacheBuster = Date.now();
-    const faLink = doc.createElement('link');
-    faLink.rel = 'stylesheet';
-    faLink.href = `https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css?v=${cacheBuster}`;
-    doc.head.appendChild(faLink);
+    const parentFA = document.getElementById('fa-css');
+    if (parentFA && !doc.getElementById('fa-css')) {
+        const faLink = parentFA.cloneNode(true);
+        doc.head.appendChild(faLink);
+    }
     const jq = doc.createElement('script');
     jq.src = window.$jqlibraryURL + `?v=${cacheBuster}`;
     doc.head.appendChild(jq);
@@ -565,9 +566,25 @@ function setupSidebarResize(sidebarSelector, defaultWidth = 600, defaultPanelHei
     if (!container) return;
     const editors = container.querySelector('.editors');
     if (!editors) return;
-    const initialWidth = defaultWidth;
-    editors.style.flex = `0 0 ${initialWidth}px`;
-    editors.style.width = `${initialWidth}px`;
+    function updateWidth() {
+        if (window.innerWidth >= 1025) {
+            editors.style.flex = `0 0 ${defaultWidth}px`;
+            editors.style.width = `${defaultWidth}px`;
+            const panels = editors.querySelectorAll('.editor-panel');
+            panels.forEach((panel, index) => {
+                panel.style.flex = `0 0 ${100 / panels.length}%`;
+            });
+        } else {
+            editors.style.flex = `0 0 50%`;
+            editors.style.width = `100%`;
+            const panels = editors.querySelectorAll('.editor-panel');
+            panels.forEach(panel => {
+                panel.style.flex = `0 0 100%`;
+            });
+        }
+    }
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
     const resizer = document.getElementById('resizer');
     if (resizer) {
         let activePointerId = null;
@@ -631,6 +648,8 @@ function setupSidebarResize(sidebarSelector, defaultWidth = 600, defaultPanelHei
             window.addEventListener('blur', stopCurrentResize);
         }
     }
+
+    // ---------- Panel resizing code ----------
     const panels = Array.from(editors.querySelectorAll('.editor-panel'));
     if (panels.length < 2) return;
     editors.style.display = 'flex';
@@ -638,9 +657,18 @@ function setupSidebarResize(sidebarSelector, defaultWidth = 600, defaultPanelHei
     editors.style.height = '100%';
     const panelCount = panels.length;
     panels.forEach((panel, index) => {
-        let heightPercent = defaultPanelHeights[index] ?? (100 / panelCount);
-        panel.style.flex = `0 0 ${heightPercent}%`;
-        panel.style.position = 'relative';
+        function updateLayout() {
+            if (window.innerWidth >= 1025) {
+                let heightPercent = defaultPanelHeights[index] ?? (100 / panelCount);
+                panel.style.flex = `0 0 ${heightPercent}%`;
+                panel.style.position = 'relative';
+            } else {
+                panel.style.flex = `0 0 100%`;
+                panel.style.position = 'relative';
+            }
+        }
+        updateLayout();
+        window.addEventListener('resize', updateLayout);
         if (index === panelCount - 1) return;
         const resizer = document.createElement('div');
         resizer.className = 'panel-resizer';
@@ -684,12 +712,35 @@ function setupSidebarResize(sidebarSelector, defaultWidth = 600, defaultPanelHei
         });
     });
 }
+
+
 function setupCenterResize(centerSelector) {
     const editorCenter = document.querySelector(centerSelector);
     if (!editorCenter) return;
     const editorsContainer = editorCenter.querySelector('.editors');
-    editorsContainer.style.height = '400px';
-    editorsContainer.style.minHeight = '100px';
+    const editorsContainerpanel = editorCenter.querySelector('.editor-panel');
+
+    function setupCenterresponsive() {
+
+        if (window.innerWidth >= 1025) {
+            editorsContainer.style.height = '400px';
+            editorsContainer.style.minHeight = '100px';
+            editorsContainer.style.flex = '0 0 400px';
+            editorsContainer.style.width = '100%';
+            editorsContainer.style.flexDirection = 'row';
+            editorsContainerpanel.style.flex = "0 0 33.3333%";
+        } else {
+            editorsContainer.style.height = '100%';
+            editorsContainer.style.minHeight = '100px';
+            editorsContainer.style.flex = '0 0 33.3333%';
+            editorsContainer.style.width = '100%';
+            editorsContainerpanel.style.flex = "0 0 100%";
+        }
+    }
+
+    setupCenterresponsive();
+    window.addEventListener('resize', setupCenterresponsive);
+
     let hResizer = document.getElementById('resizerHorizontal');
     if (!hResizer) {
         hResizer = document.createElement('div');
@@ -941,6 +992,49 @@ document.body.addEventListener("keydown", function (e) {
         showPanelSavePopup(panel, `${panelType} code has been saved`);
     }
 });
+document.body.addEventListener("keydown", function (e) {
+    const target = e.target;
+    if (!target.matches(".editor-panel textarea")) return;
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "c") {
+        const panel = target.closest(".editor-panel");
+        let panelType = "Unknown";
+        if (panel.id === "html-panel") panelType = "HTML";
+        else if (panel.id === "css-panel") panelType = "CSS";
+        else if (panel.id === "js-panel") panelType = "JS";
+        showPanelCopyPopup(panel, `${panelType} code has been copied`);
+    }
+});
+
+function showPanelCopyPopup(panel, message) {
+    let existingPopup = panel.querySelector(".panel-copy-popup");
+    if (existingPopup) existingPopup.remove();
+    const popup = document.createElement("div");
+    popup.className = "panel-copy-popup";
+    popup.textContent = message;
+    Object.assign(popup.style, {
+        position: "absolute",
+        top: "10px",
+        right: "10px",
+        background: "#007bff",
+        color: "#fff",
+        padding: "6px 12px",
+        borderRadius: "6px",
+        fontSize: "13px",
+        fontWeight: "500",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+        opacity: "0",
+        transition: "opacity 0.3s ease",
+        zIndex: "50"
+    });
+    panel.appendChild(popup);
+    requestAnimationFrame(() => {
+        popup.style.opacity = "1";
+    });
+    setTimeout(() => {
+        popup.style.opacity = "0";
+        setTimeout(() => popup.remove(), 300);
+    }, 2000);
+}
 function showPanelSavePopup(panel, message) {
     const existingPopup = panel.querySelector(".save-popup");
     if (existingPopup) existingPopup.remove();
@@ -972,6 +1066,168 @@ function showPanelSavePopup(panel, message) {
         setTimeout(() => popup.remove(), 300);
     }, 1500);
 }
+
+document.body.addEventListener("keydown", function (e) {
+    const panel = e.target.closest(".editor-panel");
+    if (!panel) return;
+
+    // Open search overlay with Ctrl+F / Cmd+F
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") {
+        e.preventDefault();
+        showPanelSearch(panel);
+    }
+});
+
+function showPanelSearch(panel) {
+    const textarea = panel.querySelector("textarea");
+    if (!textarea) return;
+
+    // Remove any existing overlay
+    const existingOverlay = panel.querySelector(".panel-search-overlay");
+    if (existingOverlay) existingOverlay.remove();
+
+    // Create search overlay
+    const overlay = document.createElement("div");
+    overlay.className = "panel-search-overlay";
+    Object.assign(overlay.style, {
+        position: "absolute",
+        top: "5px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        background: "rgba(255,255,255,0.95)",
+        padding: "6px",
+        borderRadius: "6px",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+        zIndex: "100",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px"
+    });
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Search text...";
+    Object.assign(input.style, {
+        width: "200px",
+        padding: "4px 8px",
+        fontSize: "14px",
+        outline: "none"
+    });
+
+    const counter = document.createElement("span");
+    Object.assign(counter.style, { fontSize: "13px", color: "#333" });
+
+    const prevBtn = document.createElement("button");
+    prevBtn.textContent = "Prev";
+    const nextBtn = document.createElement("button");
+    nextBtn.textContent = "Next";
+    [prevBtn, nextBtn].forEach(btn => {
+        Object.assign(btn.style, { padding: "2px 6px", fontSize: "12px", cursor: "pointer" });
+    });
+
+    overlay.appendChild(input);
+    overlay.appendChild(prevBtn);
+    overlay.appendChild(nextBtn);
+    overlay.appendChild(counter);
+    panel.appendChild(overlay);
+    input.focus();
+
+    let matches = [];
+    let currentIndex = -1;
+
+    // Function to find all matches
+    function findMatches() {
+        const term = input.value;
+        matches = [];
+        currentIndex = -1;
+        counter.textContent = "";
+        if (!term) return;
+
+        const regex = new RegExp(term.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), "gi");
+        let match;
+        while ((match = regex.exec(textarea.value)) !== null) {
+            matches.push({ start: match.index, end: regex.lastIndex });
+            // Prevent infinite loop for zero-length matches
+            if (match.index === regex.lastIndex) regex.lastIndex++;
+        }
+
+        counter.textContent = matches.length ? `0 / ${matches.length}` : "No matches";
+    }
+
+    // Scroll exactly to start of match
+    function scrollToMatch(match) {
+        const textBeforeMatch = textarea.value.slice(0, match.start);
+
+        // Create a mirror div to measure exact position
+        const mirror = document.createElement("div");
+        const style = window.getComputedStyle(textarea);
+        mirror.style.position = "absolute";
+        mirror.style.visibility = "hidden";
+        mirror.style.whiteSpace = "pre-wrap";
+        mirror.style.wordWrap = "break-word";
+        mirror.style.width = textarea.clientWidth + "px";
+
+        // Copy text styles
+        ["fontFamily", "fontSize", "lineHeight", "paddingTop", "paddingLeft", "paddingRight", "paddingBottom", "borderLeftWidth", "borderTopWidth", "boxSizing"].forEach(prop => {
+            mirror.style[prop] = style[prop];
+        });
+
+        // Insert text up to match start
+        mirror.textContent = textBeforeMatch;
+        document.body.appendChild(mirror);
+
+        const offsetTop = mirror.offsetHeight; // exact vertical offset to start of match
+        document.body.removeChild(mirror);
+
+        textarea.focus();
+        textarea.setSelectionRange(match.start, match.end);
+        textarea.scrollTop = offsetTop;
+    }
+
+    function goNext() {
+        if (!matches.length) return;
+        currentIndex = (currentIndex + 1) % matches.length;
+        scrollToMatch(matches[currentIndex]);
+        counter.textContent = `${currentIndex + 1} / ${matches.length}`;
+    }
+
+    function goPrev() {
+        if (!matches.length) return;
+        currentIndex = (currentIndex - 1 + matches.length) % matches.length;
+        scrollToMatch(matches[currentIndex]);
+        counter.textContent = `${currentIndex + 1} / ${matches.length}`;
+    }
+
+    input.addEventListener("input", findMatches);
+    input.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            goNext();
+        }
+        if (e.key === "Escape") {
+            overlay.remove();
+            textarea.focus();
+        }
+    });
+
+    nextBtn.addEventListener("click", goNext);
+    prevBtn.addEventListener("click", goPrev);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const tabButtons = document.querySelectorAll('.editor-sidebar button');
 const editorPanels = document.querySelectorAll('.editor-panel');
 tabButtons.forEach(button => {
@@ -1037,18 +1293,29 @@ async function typeWithBackspaceLoop(element, messages, typingSpeed = 50, pause 
         currentMsg = (currentMsg + 1) % messages.length;
     }
 }
+async function typeOnce(element, message, typingSpeed = 50) {
+    element.textContent = "";
+    for (let i = 0; i < message.length; i++) {
+        element.textContent += message[i];
+        await new Promise(r => setTimeout(r, typingSpeed));
+    }
+    await new Promise(r => setTimeout(r, 1000));
+}
 async function loadAll() {
     const cacheBuster = Date.now();
     const pageLoader = document.getElementById('page-loader');
     const loadingMsg = document.getElementById('loading-message');
     const typingText = document.getElementById('main__typing--text');
     const editorContainer = document.querySelector('.editor-container');
+    const siteHeader = document.querySelector('.siteheader');
+    siteHeader.style.pointerEvents = 'none';
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     pageLoader.style.display = 'flex';
     await new Promise(resolve => setTimeout(resolve, 500));
     pageLoader.style.display = 'none';
-    loadingMsg.style.display = 'block';
+    loadingMsg.style.display = 'flex';
+    loadingMsg.style.opacity = '1';
     const stopFlag = { ready: false };
     const typingLoop = typeWithBackspaceLoop(
         typingText,
@@ -1111,10 +1378,17 @@ async function loadAll() {
     });
     loadScripts();
     stopFlag.ready = true;
+    await typingLoop;
+    await typeOnce(typingText, "The content is ready for view, thanks for your patience", 50);
+    for (let i = typingText.textContent.length; i >= 0; i--) {
+        typingText.textContent = typingText.textContent.slice(0, i);
+        await new Promise(r => setTimeout(r, 30));
+    }
     $(loadingMsg).fadeOut(500);
     $(editorContainer).css('visibility', 'visible').hide().fadeIn(500);
     document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
-    await typingLoop;
+    siteHeader.style.pointerEvents = ''; // enable clicks
 }
+
 window.onload = loadAll;

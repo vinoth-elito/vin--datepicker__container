@@ -34,9 +34,11 @@ body>.editor-container {
     z-index: 9998;
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
-    font-size: 24px;
+    font-size: 16px;
+    text-align: center;
     font-family: Arial, sans-serif;
-    color: #333;
+    color: #fff;
+    font-weight: bold;
     z-index: 200;
 }
 
@@ -303,7 +305,9 @@ textarea {
 
 
 @media(min-width:1025px) {
-    #js-panel.editor-panel {
+
+    .editor-left #js-panel.editor-panel,
+    .editor-right #js-panel.editor-panel {
         padding-bottom: 70px;
     }
 }
