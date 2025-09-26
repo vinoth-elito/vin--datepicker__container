@@ -784,7 +784,7 @@ function setupEditorCenterResizers(container, minWidth = 50, minHeight = 100, ma
             width: "5px",
             height: "100%",
             cursor: "ew-resize",
-            background: "#ccc",
+            background: 'rgba(255,255,255,0.2)',
             zIndex: 100
         });
         panel.appendChild(widthResizer);
@@ -1030,9 +1030,7 @@ function waitForFunctions() {
 waitForFunctions();
 async function loadCSS() {
     const editor = document.getElementById('css-editor');
-    const cacheBuster = Date.now();
-    const cssUrl = `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/css/preview.css?v=${cacheBuster}`;
-
+    const cssUrl = `https://raw.githubusercontent.com/vinoth-elito/vin--datepicker__container/main/css/preview.css?time=${Date.now()}`;
     try {
         const res = await fetch(cssUrl, { cache: 'no-store' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
