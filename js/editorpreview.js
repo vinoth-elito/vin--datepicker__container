@@ -987,7 +987,6 @@ function applyEditorLayout(mode) {
     }, 50);
     setTimeout(() => overlay.remove(), 800);
 }
-
 function showReloadAlert() {
     if (confirm("Do you want to reload the page?")) {
         reloadWithLoader();
@@ -1018,7 +1017,6 @@ document.body.addEventListener("keydown", function (e) {
         showPanelCopyPopup(panel, `${panelType} code has been copied`);
     }
 });
-
 function showPanelCopyPopup(panel, message) {
     let existingPopup = panel.querySelector(".panel-copy-popup");
     if (existingPopup) existingPopup.remove();
@@ -1392,5 +1390,4 @@ async function loadAll() {
     document.body.style.overflow = '';
     siteHeader.style.pointerEvents = '';
 }
-
 window.onload = loadAll;
