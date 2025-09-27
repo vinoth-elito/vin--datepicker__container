@@ -1338,16 +1338,16 @@ async function loadAll() {
     const htmlEditor = document.getElementById('html-editor');
     const rows = [
         [
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/datepicker.html?v=${cacheBuster}`,
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/timepicker.html?v=${cacheBuster}`,
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/timepickerarrow.html?v=${cacheBuster}`,
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/timepickercircle.html?v=${cacheBuster}`,
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/monthyearpicker.html?v=${cacheBuster}`,
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/datetimepicker.html?v=${cacheBuster}`
+            `https://vinoth-elito.github.io/vin--datepicker__container/datepicker.html?v=${cacheBuster}`,
+            `https://vinoth-elito.github.io/vin--datepicker__container/timepicker.html?v=${cacheBuster}`,
+            `https://vinoth-elito.github.io/vin--datepicker__container/timepickerarrow.html?v=${cacheBuster}`,
+            `https://vinoth-elito.github.io/vin--datepicker__container/timepickercircle.html?v=${cacheBuster}`,
+            `https://vinoth-elito.github.io/vin--datepicker__container/monthyearpicker.html?v=${cacheBuster}`,
+            `https://vinoth-elito.github.io/vin--datepicker__container/datetimepicker.html?v=${cacheBuster}`
         ],
         [
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/daterangepicker.html?v=${cacheBuster}`,
-            `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/daterangepickersingle.html?v=${cacheBuster}`
+            `https://vinoth-elito.github.io/vin--datepicker__container/daterangepicker.html?v=${cacheBuster}`,
+            `https://vinoth-elito.github.io/vin--datepicker__container/daterangepickersingle.html?v=${cacheBuster}`
         ]
     ];
     let finalHTML = '';
