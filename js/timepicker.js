@@ -1,6 +1,6 @@
 function showTimePicker($input) {
     $input = $($input);
-    const $container = $($input).closest(".vintimepicker"); // ✅ Wrap with $()
+    const $container = $($input).closest(".vintimepicker");
     const isArrowMode = $container.hasClass("vintimepicker--with__wrrow");
     const isCircleMode = $container.hasClass("vintimepicker--with__circle");
     $container.find(".vindatepicker--dropdown__wrapp").remove();
@@ -233,13 +233,10 @@ function showTimePicker($input) {
         function dragKnob(knobType) {
             const knob = knobType === "hour" ? hourKnob : minuteKnob;
             const rCircle = knobType === "hour" ? radiusHours : radiusMinutes;
-
-            knob.style.pointerEvents = "all"; // ensure knob is draggable
-
+            knob.style.pointerEvents = "all";
             knob.addEventListener("pointerdown", e => {
                 e.preventDefault();
                 knob.setPointerCapture(e.pointerId);
-
                 const moveHandler = ev => {
                     const rect = $svg.getBoundingClientRect();
                     const x = ev.clientX - rect.left;

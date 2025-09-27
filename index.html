@@ -26,16 +26,15 @@
         href="https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/favicon_io/favicon.ico">
     <link id="fa-css" rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
         as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="stylesheet" href="css/editor.css?v=${Date.now()}">
     <noscript>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     </noscript>
-    <!-- <script>
+    <script>
         const editorCss = document.createElement("link");
         editorCss.rel = "stylesheet";
         editorCss.href = `https://vinoth-elito.github.io/vin--datepicker__container/css/editor.css?v=${Date.now()}`;
         document.head.appendChild(editorCss);
-    </script> -->
+    </script>
 
 </head>
 
@@ -102,8 +101,9 @@
                 <label for="js-editor" class="sr-only">JavaScript Editor</label>
                 <textarea id="js-editor" spellcheck="false"></textarea>
             </div>
+            <div class="resizer" id="resizer"></div>
         </div>
-        <div class="resizer" id="resizer"></div>
+
         <div class="preview-panel">
             <div class="editor-header">Live Preview</div>
             <iframe id="live-preview" title="Live preview of your HTML, CSS, and JS output"></iframe>

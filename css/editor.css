@@ -242,6 +242,12 @@ body>.editor-container {
     position: relative;
 }
 
+textarea::selection {
+    background: #fff;
+    color: #000;
+}
+
+
 .editor-header {
     background: #2d2d2d;
     color: #fff;
@@ -273,11 +279,6 @@ textarea {
     height: 100%;
 }
 
-.resizer {
-    width: 5px;
-    cursor: col-resize;
-    background: #ccc;
-}
 
 .editor-right .resizer,
 .editor-right .panel-width-resizer,
@@ -299,22 +300,17 @@ textarea {
     border: 0;
 }
 
-.editor-panel {
-    display: none;
-}
+@media(max-width:1024px) {
+    .editor-panel {
+        display: none;
+    }
 
-
-@media(min-width:1025px) {
-
-    .editor-left #js-panel.editor-panel,
-    .editor-right #js-panel.editor-panel {
-        padding-bottom: 70px;
+    .editor-panel.active {
+        display: block;
     }
 }
 
-.editor-panel.active {
-    display: block;
-}
+
 
 .editor-sidebar {
     display: none;

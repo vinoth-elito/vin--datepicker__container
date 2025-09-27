@@ -429,7 +429,6 @@ function setupViewSwitcher() {
     const container = document.querySelector(".editor-container");
     if (!container) return;
     const editors = container.querySelector(".editors");
-
     if (window.innerWidth >= 1025) {
         container.classList.add("desktop-mode");
         container.classList.remove("mobile-mode");
@@ -491,28 +490,40 @@ function setupViewSwitcher() {
                     btn.innerHTML = `${opt.icon} ${opt.label}`;
                     btn.id = opt.id;
                     if (opt.id === currentLayout) btn.classList.add("active");
+                    let activeResizeCleanup = null;
                     btn.addEventListener("click", (e) => {
                         e.stopPropagation();
                         dropdown.querySelectorAll(".dropdown-btn").forEach(b => b.classList.remove("active"));
                         btn.classList.add("active");
                         currentLayout = opt.id;
                         applyEditorLayout(opt.id);
-                        const editors = document.querySelector(".editor-container .editors");
+                        let editors = document.querySelector(".editor-container .editors");
+                        editors.querySelectorAll(".resizer-horizontal, .panel-width-resizer, .resize-handle").forEach(r => r.remove());
+                        if (activeResizeCleanup) activeResizeCleanup();
+                        activeResizeCleanup = null;
+                        const newEditors = editors.cloneNode(true);
+                        editors.replaceWith(newEditors);
+                        editors = newEditors;
+                        editors.style.flex = "";
+                        editors.style.height = "";
+                        editors.style.width = "";
+                        editors.style.flexDirection = "";
                         if (opt.id === "editor-center") {
                             editors.style.flex = "0 0 400px";
                             editors.style.height = "400px";
-                            editors.style.flexDirection = 'row';
                             editors.style.width = "100%";
-                            setupEditorCenterResizers(document.querySelector(".editor-container"));
+                            editors.style.flexDirection = 'row';
+                            activeResizeCleanup = setupCenterResize('.editor-center', "100%", 50, 100, 800);
                         } else if (opt.id === "editor-right") {
-                            setupEditorRightResize();
                             editors.style.flex = "0 0 600px";
                             editors.style.height = "100%";
                             editors.style.flexDirection = 'column';
+                            activeResizeCleanup = setupEditorRightResize({ defaultWidth: 600, minWidth: 200 });
                         } else if (opt.id === "editor-left") {
                             editors.style.flex = "0 0 600px";
                             editors.style.height = "100%";
                             editors.style.flexDirection = 'column';
+                            activeResizeCleanup = setupSidebarResize('.editor-left', 600);
                         }
                         dropdown.classList.remove("dropdown-show");
                         dropdown.classList.add("dropdown-hide");
@@ -579,7 +590,7 @@ function setupSidebarResize(sidebarSelector, defaultWidth = 600, defaultPanelHei
             editors.style.width = `100%`;
             const panels = editors.querySelectorAll('.editor-panel');
             panels.forEach(panel => {
-                panel.style.flex = `0 0 100%`;
+                panel.style.flex = `1`;
             });
         }
     }
@@ -589,6 +600,15 @@ function setupSidebarResize(sidebarSelector, defaultWidth = 600, defaultPanelHei
     if (resizer) {
         let activePointerId = null;
         let isMouseDown = false;
+        Object.assign(resizer.style, {
+            position: 'absolute',
+            right: '0',
+            width: '5px',
+            height: '100%',
+            cursor: 'col-resize',
+            background: 'rgba(255,255,255,0.2)',
+            zIndex: 10
+        });
         function stopCurrentResize() {
             if (activePointerId === null && !isMouseDown) return;
             try { resizer.releasePointerCapture?.(activePointerId); } catch (e) { }
@@ -648,8 +668,6 @@ function setupSidebarResize(sidebarSelector, defaultWidth = 600, defaultPanelHei
             window.addEventListener('blur', stopCurrentResize);
         }
     }
-
-    // ---------- Panel resizing code ----------
     const panels = Array.from(editors.querySelectorAll('.editor-panel'));
     if (panels.length < 2) return;
     editors.style.display = 'flex';
@@ -657,13 +675,15 @@ function setupSidebarResize(sidebarSelector, defaultWidth = 600, defaultPanelHei
     editors.style.height = '100%';
     const panelCount = panels.length;
     panels.forEach((panel, index) => {
+        const existingResizer = panel.querySelector('.panel-resizer');
+        if (existingResizer) existingResizer.remove();
         function updateLayout() {
             if (window.innerWidth >= 1025) {
                 let heightPercent = defaultPanelHeights[index] ?? (100 / panelCount);
                 panel.style.flex = `0 0 ${heightPercent}%`;
                 panel.style.position = 'relative';
             } else {
-                panel.style.flex = `0 0 100%`;
+                panel.style.flex = `1`;
                 panel.style.position = 'relative';
             }
         }
@@ -674,7 +694,7 @@ function setupSidebarResize(sidebarSelector, defaultWidth = 600, defaultPanelHei
         resizer.className = 'panel-resizer';
         Object.assign(resizer.style, {
             position: 'absolute',
-            bottom: '-15px',
+            bottom: '1px',
             left: '0',
             width: '100%',
             height: '6px',
@@ -712,142 +732,95 @@ function setupSidebarResize(sidebarSelector, defaultWidth = 600, defaultPanelHei
         });
     });
 }
-
-
-function setupCenterResize(centerSelector) {
+function setupCenterResize(centerSelector, defaultWidth = "100%", minWidth = 50, minHeight = 100, maxHeight = 800) {
     const editorCenter = document.querySelector(centerSelector);
     if (!editorCenter) return;
     const editorsContainer = editorCenter.querySelector('.editors');
-    const editorsContainerpanel = editorCenter.querySelector('.editor-panel');
-
-    function setupCenterresponsive() {
-
+    if (!editorsContainer) return;
+    const panels = Array.from(editorsContainer.querySelectorAll('.editor-panel'));
+    if (!panels.length) return;
+    editorsContainer.querySelectorAll('.panel-resizer').forEach(r => r.remove());
+    function applyResponsiveLayout() {
+        editorsContainer.style.width = defaultWidth;
         if (window.innerWidth >= 1025) {
             editorsContainer.style.height = '400px';
-            editorsContainer.style.minHeight = '100px';
-            editorsContainer.style.flex = '0 0 400px';
-            editorsContainer.style.width = '100%';
+            editorsContainer.style.minHeight = `${minHeight}px`;
+            editorsContainer.style.flex = `0 0 400px`;
             editorsContainer.style.flexDirection = 'row';
-            editorsContainerpanel.style.flex = "0 0 33.3333%";
+            panels.forEach(panel => panel.style.flex = `1 1 0%`);
         } else {
-            editorsContainer.style.height = '100%';
-            editorsContainer.style.minHeight = '100px';
-            editorsContainer.style.flex = '0 0 33.3333%';
-            editorsContainer.style.width = '100%';
-            editorsContainerpanel.style.flex = "0 0 100%";
+            editorsContainer.style.height = 'auto%';
+            editorsContainer.style.minHeight = `${minHeight}px`;
+            editorsContainer.style.flex = '1';
+            editorsContainer.style.flexDirection = 'column';
+            panels.forEach(panel => panel.style.flex = `1`);
         }
     }
-
-    setupCenterresponsive();
-    window.addEventListener('resize', setupCenterresponsive);
-
-    let hResizer = document.getElementById('resizerHorizontal');
+    applyResponsiveLayout();
+    window.addEventListener('resize', applyResponsiveLayout);
+    let hResizer = editorsContainer.querySelector('.resizer-horizontal');
     if (!hResizer) {
         hResizer = document.createElement('div');
-        hResizer.id = 'resizerHorizontal';
         hResizer.className = 'resizer-horizontal';
-        editorCenter.insertBefore(hResizer, editorsContainer);
         Object.assign(hResizer.style, {
-            height: '5px', background: '#ccc', cursor: 'row-resize', userSelect: 'none'
+            height: '5px',
+            background: 'rgba(255,255,255,0.2)',
+            cursor: 'row-resize',
+            userSelect: 'none',
+            position: 'absolute',
+            bottom: '0',
+            left: '0',
+            width: '100%',
+            zIndex: 100
         });
+        editorsContainer.appendChild(hResizer);
     }
-    let isResizing = false, startY = 0, startHeight = 0;
+    let isResizingHeight = false, startY = 0, startHeight = 0;
     hResizer.addEventListener('mousedown', e => {
         e.preventDefault();
-        isResizing = true;
+        isResizingHeight = true;
         startY = e.clientY;
         startHeight = editorsContainer.offsetHeight;
         document.body.style.cursor = 'row-resize';
         document.body.style.userSelect = 'none';
     });
     document.addEventListener('mousemove', e => {
-        if (!isResizing) return;
+        if (!isResizingHeight) return;
         const dy = e.clientY - startY;
         let newHeight = startHeight + dy;
-        newHeight = Math.max(100, Math.min(800, newHeight));
+        newHeight = Math.max(minHeight, Math.min(maxHeight, newHeight));
         editorsContainer.style.height = `${newHeight}px`;
+        editorsContainer.style.flex = `0 0 ${newHeight}px`;
     });
     document.addEventListener('mouseup', () => {
-        if (!isResizing) return;
-        isResizing = false;
+        if (!isResizingHeight) return;
+        isResizingHeight = false;
         document.body.style.cursor = '';
         document.body.style.userSelect = '';
     });
-}
-setupSidebarResize('.editor-left');
-setupCenterResize('.editor-center');
-function setupEditorCenterResizers(container, minWidth = 50, minHeight = 100, maxHeight = 800) {
-    if (!container) return;
-    const editors = container.querySelector(".editors");
-    if (!editors) return;
-    container.style.position = "relative";
-    editors.style.display = "flex";
-    editors.style.flexDirection = "row";
-    const existingH = container.querySelector(".horizontalResizer");
-    if (existingH) existingH.remove();
-    const hResizer = document.createElement("div");
-    hResizer.className = "horizontalResizer";
-    Object.assign(hResizer.style, {
-        height: "5px",
-        width: "100%",
-        background: "#ccc",
-        cursor: "row-resize",
-        position: "absolute",
-        bottom: "0",
-        left: "0",
-        zIndex: 100
-    });
-    editors.appendChild(hResizer);
-    let startY = 0, startHeight = 0;
-    hResizer.addEventListener("mousedown", e => {
-        e.preventDefault();
-        startY = e.clientY;
-        startHeight = editors.offsetHeight;
-        document.body.style.cursor = "row-resize";
-        document.body.style.userSelect = "none";
-        function onMove(ev) {
-            const dy = ev.clientY - startY;
-            const newHeight = Math.max(minHeight, Math.min(maxHeight, startHeight + dy));
-            editors.style.height = `${newHeight}px`;
-            editors.style.flex = `0 0 ${newHeight}px`;
-        }
-        function onUp() {
-            document.removeEventListener("mousemove", onMove);
-            document.removeEventListener("mouseup", onUp);
-            document.body.style.cursor = "";
-            document.body.style.userSelect = "";
-        }
-        document.addEventListener("mousemove", onMove);
-        document.addEventListener("mouseup", onUp, { once: true });
-    });
-    const vPanels = Array.from(editors.querySelectorAll(".editor-panel"));
-    if (!vPanels.length) return;
-    container.querySelectorAll(".panel-width-resizer").forEach(r => r.remove());
-    vPanels.forEach((panel, idx) => {
-        if (idx === vPanels.length - 1) return;
-        panel.style.position = "relative";
-        const widthResizer = document.createElement("div");
-        widthResizer.className = "panel-width-resizer";
+    panels.forEach((panel, idx) => {
+        if (idx === panels.length - 1) return;
+        panel.style.position = 'relative';
+        const widthResizer = document.createElement('div');
+        widthResizer.className = 'panel-width-resizer';
         Object.assign(widthResizer.style, {
-            position: "absolute",
-            top: "0",
-            right: "0",
-            width: "5px",
-            height: "100%",
-            cursor: "ew-resize",
-            background: "#ccc",
+            position: 'absolute',
+            top: '0',
+            right: '0',
+            width: '5px',
+            height: '100%',
+            cursor: 'ew-resize',
+            background: 'rgba(255,255,255,0.2)',
             zIndex: 100
         });
         panel.appendChild(widthResizer);
-        const nextPanel = vPanels[idx + 1];
-        widthResizer.addEventListener("mousedown", e => {
+        const nextPanel = panels[idx + 1];
+        widthResizer.addEventListener('mousedown', e => {
             e.preventDefault();
-            const parentWidth = editors.getBoundingClientRect().width;
+            const parentWidth = editorsContainer.getBoundingClientRect().width;
             const startX = e.clientX;
             const startCurrWidth = panel.getBoundingClientRect().width;
             const startNextWidth = nextPanel.getBoundingClientRect().width;
-            document.body.style.cursor = "ew-resize";
-            document.body.style.userSelect = "none";
             function onMove(ev) {
                 const dx = ev.clientX - startX;
                 let newCurrWidth = startCurrWidth + dx;
@@ -857,26 +830,20 @@ function setupEditorCenterResizers(container, minWidth = 50, minHeight = 100, ma
                 nextPanel.style.flex = `0 0 ${(newNextWidth / parentWidth) * 100}%`;
             }
             function onUp() {
-                document.removeEventListener("mousemove", onMove);
-                document.removeEventListener("mouseup", onUp);
-                document.body.style.cursor = "";
-                document.body.style.userSelect = "";
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
             }
-            document.addEventListener("mousemove", onMove);
-            document.addEventListener("mouseup", onUp, { once: true });
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp, { once: true });
         });
     });
 }
-document.addEventListener("DOMContentLoaded", () => {
-    const editorCenter = document.querySelector(".editor-center");
-    setupEditorCenterResizers(editorCenter);
-});
-function setupEditorRightResize({ minWidth = 200, defaultWidth = 600 } = {}) {
-    const container = document.querySelector('.editor-container.editor-right, .editor-right');
-    if (!container) return;
+function setupEditorRightResize({ containerSelector = '.editor-right', defaultWidth = 600, minWidth = 200 } = {}) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return null;
     const editors = container.querySelector('.editors');
-    if (!editors) return;
-    editors.querySelectorAll('.resize-handle').forEach(h => h.remove());
+    if (!editors) return null;
+    editors.querySelectorAll('.resize-handle, .panel-resizer').forEach(h => h.remove());
     editors.style.width = `${defaultWidth}px`;
     editors.style.flex = `0 0 ${defaultWidth}px`;
     editors.style.position = editors.style.position || 'relative';
@@ -887,14 +854,15 @@ function setupEditorRightResize({ minWidth = 200, defaultWidth = 600 } = {}) {
             position: 'absolute',
             top: '0',
             bottom: '0',
+            left: '0',
             width: '5px',
             cursor: 'ew-resize',
             zIndex: 9999,
             touchAction: 'none',
-            background: '#ccc'
+            background: 'rgba(255,255,255,0.2)'
         });
         if (side === 'left') h.style.left = '0';
-        else h.style.left = '0';
+        else h.style.right = '0';
         editors.appendChild(h);
         h.addEventListener('pointerdown', e => startResize(e, side));
         h.addEventListener('dblclick', () => {
@@ -911,24 +879,20 @@ function setupEditorRightResize({ minWidth = 200, defaultWidth = 600 } = {}) {
     const containerRect = container.getBoundingClientRect();
     const containerCenter = (containerRect.left + containerRect.right) / 2;
     const viewportCenter = window.innerWidth / 2;
-    if (container.classList.contains('editor-center')) {
-        createHandle('left');
-        createHandle('right');
-    } else {
-        const isVisuallyRight = containerCenter >= viewportCenter;
-        createHandle(isVisuallyRight ? 'left' : 'right');
-    }
-
+    const isVisuallyRight = containerCenter >= viewportCenter;
+    createHandle(isVisuallyRight ? 'left' : 'right');
     function startResize(pointerEvent, side) {
         pointerEvent.preventDefault();
         const startPointerX = pointerEvent.clientX;
         const startWidth = editors.getBoundingClientRect().width;
         try { pointerEvent.target.setPointerCapture(pointerEvent.pointerId); } catch (e) { }
+
         document.body.style.userSelect = 'none';
         document.body.style.cursor = 'ew-resize';
         function onMove(e) {
             let delta = e.clientX - startPointerX;
-            let newWidth = startWidth - delta;
+            if (side === 'right') delta = -delta;
+            let newWidth = startWidth + delta;
             newWidth = Math.max(minWidth, Math.min(window.innerWidth, newWidth));
             editors.style.width = `${newWidth}px`;
             editors.style.flex = `0 0 ${newWidth}px`;
@@ -942,7 +906,57 @@ function setupEditorRightResize({ minWidth = 200, defaultWidth = 600 } = {}) {
         document.addEventListener('pointermove', onMove);
         document.addEventListener('pointerup', onUp, { once: true });
     }
+    const panels = Array.from(editors.querySelectorAll('.editor-panel'));
+    if (panels.length > 1) {
+        panels.forEach((panel, index) => {
+            if (index === panels.length - 1) return;
+            panel.style.position = 'relative';
+            const resizer = document.createElement('div');
+            resizer.className = 'panel-resizer';
+            Object.assign(resizer.style, {
+                position: 'absolute',
+                bottom: '1px',
+                left: '0',
+                width: '100%',
+                height: '6px',
+                cursor: 'row-resize',
+                background: 'rgba(255,255,255,0.2)',
+                zIndex: 10
+            });
+            panel.appendChild(resizer);
+            let startY = 0, prevHeight = 0, nextHeight = 0;
+            const nextPanel = panels[index + 1];
+            resizer.addEventListener('pointerdown', e => {
+                e.preventDefault();
+                startY = e.clientY;
+                prevHeight = panel.getBoundingClientRect().height;
+                nextHeight = nextPanel.getBoundingClientRect().height;
+                function onMove(ev) {
+                    const dy = ev.clientY - startY;
+                    const containerHeight = editors.getBoundingClientRect().height;
+                    let newPrevHeight = ((prevHeight + dy) / containerHeight) * 100;
+                    let newNextHeight = ((nextHeight - dy) / containerHeight) * 100;
+                    newPrevHeight = Math.max(10, newPrevHeight);
+                    newNextHeight = Math.max(10, newNextHeight);
+                    panel.style.flex = `0 0 ${newPrevHeight}%`;
+                    nextPanel.style.flex = `0 0 ${newNextHeight}%`;
+                }
+                function onUp() {
+                    document.removeEventListener('pointermove', onMove);
+                    document.removeEventListener('pointerup', onUp);
+                }
+                document.addEventListener('pointermove', onMove);
+                document.addEventListener('pointerup', onUp, { once: true });
+            });
+        });
+    }
+    return () => {
+        editors.querySelectorAll('.resize-handle, .panel-resizer').forEach(r => r.remove());
+    };
 }
+setupSidebarResize('.editor-left');
+setupCenterResize('.editor-center');
+setupEditorRightResize('.editor-right');
 function applyEditorLayout(mode) {
     const editorContainer = document.querySelector(".editor-container");
     if (!editorContainer) return;
@@ -1066,188 +1080,176 @@ function showPanelSavePopup(panel, message) {
         setTimeout(() => popup.remove(), 300);
     }, 1500);
 }
-
-document.body.addEventListener("keydown", function (e) {
-    const panel = e.target.closest(".editor-panel");
-    if (!panel) return;
-
-    // Open search overlay with Ctrl+F / Cmd+F
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") {
-        e.preventDefault();
-        showPanelSearch(panel);
-    }
+document.querySelectorAll('.editor-panel textarea').forEach(textarea => {
+    textarea.addEventListener('keydown', function (e) {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+            e.preventDefault();
+            document.querySelectorAll('.panel-search-overlay, .highlight-div').forEach(el => el.remove());
+            const panel = textarea.closest('.editor-panel');
+            openPanelSearch(panel, textarea);
+        }
+    });
 });
-
-function showPanelSearch(panel) {
-    const textarea = panel.querySelector("textarea");
-    if (!textarea) return;
-
-    // Remove any existing overlay
-    const existingOverlay = panel.querySelector(".panel-search-overlay");
-    if (existingOverlay) existingOverlay.remove();
-
-    // Create search overlay
-    const overlay = document.createElement("div");
-    overlay.className = "panel-search-overlay";
+function openPanelSearch(panel, textarea) {
+    document.querySelectorAll('.panel-search-overlay, .highlight-div').forEach(el => el.remove());
+    const highlightDiv = document.createElement('div');
+    highlightDiv.className = 'highlight-div';
+    Object.assign(highlightDiv.style, {
+        position: 'absolute',
+        top: textarea.offsetTop + 'px',
+        left: textarea.offsetLeft + 'px',
+        width: textarea.offsetWidth + 'px',
+        height: textarea.offsetHeight + 'px',
+        pointerEvents: 'none',
+        whiteSpace: 'pre-wrap',
+        wordWrap: 'break-word',
+        color: 'transparent',
+        overflow: 'hidden',
+        zIndex: 1
+    });
+    panel.insertBefore(highlightDiv, textarea);
+    textarea.style.background = 'transparent';
+    textarea.style.position = 'relative';
+    textarea.style.zIndex = 2;
+    const overlay = document.createElement('div');
+    overlay.className = 'panel-search-overlay';
     Object.assign(overlay.style, {
-        position: "absolute",
-        top: "5px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        background: "rgba(255,255,255,0.95)",
-        padding: "6px",
-        borderRadius: "6px",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-        zIndex: "100",
-        display: "flex",
-        alignItems: "center",
-        gap: "6px"
+        position: 'absolute',
+        top: '5px',
+        right: '0',
+        background: 'rgba(255,255,255,0.95)',
+        padding: '4px 6px',
+        borderRadius: '6px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+        zIndex: 10,
+        display: 'flex',
+        gap: '6px',
+        alignItems: 'center'
     });
-
-    const input = document.createElement("input");
-    input.type = "text";
-    input.placeholder = "Search text...";
-    Object.assign(input.style, {
-        width: "200px",
-        padding: "4px 8px",
-        fontSize: "14px",
-        outline: "none"
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Search text...';
+    Object.assign(input.style, { width: '200px', padding: '4px 8px', fontSize: '14px' });
+    const prevBtn = document.createElement('button'); prevBtn.innerHTML = '⬆';
+    const nextBtn = document.createElement('button'); nextBtn.innerHTML = '⬇';
+    const counter = document.createElement('span'); Object.assign(counter.style, { fontSize: '13px', color: '#333' });
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '✖';
+    Object.assign(closeBtn.style, {
+        background: 'transparent',
+        border: 'none',
+        fontSize: '14px',
+        cursor: 'pointer',
+        color: '#555',
+        marginLeft: '4px'
     });
-
-    const counter = document.createElement("span");
-    Object.assign(counter.style, { fontSize: "13px", color: "#333" });
-
-    const prevBtn = document.createElement("button");
-    prevBtn.textContent = "Prev";
-    const nextBtn = document.createElement("button");
-    nextBtn.textContent = "Next";
-    [prevBtn, nextBtn].forEach(btn => {
-        Object.assign(btn.style, { padding: "2px 6px", fontSize: "12px", cursor: "pointer" });
+    closeBtn.addEventListener('click', () => {
+        overlay.remove();
+        highlightDiv.remove();
     });
-
-    overlay.appendChild(input);
-    overlay.appendChild(prevBtn);
-    overlay.appendChild(nextBtn);
-    overlay.appendChild(counter);
+    overlay.append(input, prevBtn, nextBtn, counter, closeBtn);
     panel.appendChild(overlay);
     input.focus();
-
     let matches = [];
     let currentIndex = -1;
-
-    // Function to find all matches
-    function findMatches() {
+    function escapeHtml(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    function updateHighlights() {
         const term = input.value;
         matches = [];
         currentIndex = -1;
-        counter.textContent = "";
-        if (!term) return;
-
-        const regex = new RegExp(term.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), "gi");
+        counter.textContent = '';
+        if (!term) {
+            highlightDiv.textContent = textarea.value;
+            return;
+        }
+        const regex = new RegExp(term.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), 'gi');
+        let lastIndex = 0;
+        let html = '';
         let match;
         while ((match = regex.exec(textarea.value)) !== null) {
             matches.push({ start: match.index, end: regex.lastIndex });
-            // Prevent infinite loop for zero-length matches
+            html += escapeHtml(textarea.value.substring(lastIndex, match.index));
+            html += `<span style="background: yellow; color: black;">${escapeHtml(textarea.value.substring(match.index, regex.lastIndex))}</span>`;
+            lastIndex = regex.lastIndex;
             if (match.index === regex.lastIndex) regex.lastIndex++;
         }
-
-        counter.textContent = matches.length ? `0 / ${matches.length}` : "No matches";
+        html += escapeHtml(textarea.value.substring(lastIndex));
+        highlightDiv.innerHTML = html;
+        if (matches.length) { currentIndex = 0; scrollToMatch(false); }
+        counter.textContent = matches.length ? `${currentIndex + 1} / ${matches.length}` : 'No matches';
     }
-
-    // Scroll exactly to start of match
-    function scrollToMatch(match) {
-        const textBeforeMatch = textarea.value.slice(0, match.start);
-
-        // Create a mirror div to measure exact position
-        const mirror = document.createElement("div");
-        const style = window.getComputedStyle(textarea);
-        mirror.style.position = "absolute";
-        mirror.style.visibility = "hidden";
-        mirror.style.whiteSpace = "pre-wrap";
-        mirror.style.wordWrap = "break-word";
-        mirror.style.width = textarea.clientWidth + "px";
-
-        // Copy text styles
-        ["fontFamily", "fontSize", "lineHeight", "paddingTop", "paddingLeft", "paddingRight", "paddingBottom", "borderLeftWidth", "borderTopWidth", "boxSizing"].forEach(prop => {
-            mirror.style[prop] = style[prop];
-        });
-
-        // Insert text up to match start
-        mirror.textContent = textBeforeMatch;
-        document.body.appendChild(mirror);
-
-        const offsetTop = mirror.offsetHeight; // exact vertical offset to start of match
-        document.body.removeChild(mirror);
-
-        textarea.focus();
-        textarea.setSelectionRange(match.start, match.end);
-        textarea.scrollTop = offsetTop;
-    }
-
-    function goNext() {
+    function scrollToMatch(focusTextarea = true) {
         if (!matches.length) return;
-        currentIndex = (currentIndex + 1) % matches.length;
-        scrollToMatch(matches[currentIndex]);
-        counter.textContent = `${currentIndex + 1} / ${matches.length}`;
-    }
-
-    function goPrev() {
-        if (!matches.length) return;
-        currentIndex = (currentIndex - 1 + matches.length) % matches.length;
-        scrollToMatch(matches[currentIndex]);
-        counter.textContent = `${currentIndex + 1} / ${matches.length}`;
-    }
-
-    input.addEventListener("input", findMatches);
-    input.addEventListener("keydown", e => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            goNext();
+        const match = matches[currentIndex];
+        const term = input.value;
+        let lastIndex = 0;
+        let html = '';
+        const regex = new RegExp(term.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), 'gi');
+        let m;
+        while ((m = regex.exec(textarea.value)) !== null) {
+            html += escapeHtml(textarea.value.substring(lastIndex, m.index));
+            html += `<span style="background: yellow; color: black;">${escapeHtml(textarea.value.substring(m.index, regex.lastIndex))}</span>`;
+            lastIndex = regex.lastIndex;
+            if (m.index === regex.lastIndex) regex.lastIndex++;
         }
-        if (e.key === "Escape") {
-            overlay.remove();
+        html += escapeHtml(textarea.value.substring(lastIndex));
+        highlightDiv.innerHTML = html;
+        if (focusTextarea) {
             textarea.focus();
+            textarea.setSelectionRange(match.start, match.end);
+        }
+        const beforeText = textarea.value.substring(0, match.start);
+        const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight) || 16;
+        textarea.scrollTop = (beforeText.split('\n').length - 1) * lineHeight;
+        counter.textContent = `${currentIndex + 1} / ${matches.length}`;
+    }
+    function nextMatch() {
+        if (!matches.length) return;
+        message.textContent = '';
+        currentIndex = (currentIndex + 1) % matches.length;
+        scrollToMatch(true);
+    }
+    function prevMatch() {
+        if (!matches.length) return;
+        message.textContent = '';
+        currentIndex = (currentIndex - 1 + matches.length) % matches.length;
+        scrollToMatch(true);
+    }
+    input.addEventListener('input', updateHighlights);
+    const message = document.createElement('span');
+    Object.assign(message.style, { fontSize: '13px', color: 'red', marginLeft: '8px' });
+    overlay.appendChild(message);
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (!matches.length) return;
+            message.textContent = '';
+            if (currentIndex < matches.length - 1) {
+                currentIndex++;
+                scrollToMatch(true);
+            } else {
+                scrollToMatch(true);
+                message.textContent = 'You are at the end of search results!';
+            }
+            setTimeout(() => {
+                input.focus({ preventScroll: true });
+            }, 50);
         }
     });
-
-    nextBtn.addEventListener("click", goNext);
-    prevBtn.addEventListener("click", goPrev);
+    nextBtn.addEventListener('click', nextMatch);
+    prevBtn.addEventListener('click', prevMatch);
+    textarea.addEventListener('scroll', () => { highlightDiv.scrollTop = textarea.scrollTop; });
+    updateHighlights();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const tabButtons = document.querySelectorAll('.editor-sidebar button');
-const editorPanels = document.querySelectorAll('.editor-panel');
-tabButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        tabButtons.forEach(btn => btn.classList.remove('active'));
-        editorPanels.forEach(panel => panel.classList.remove('active'));
-        button.classList.add('active');
-        const targetPanel = document.getElementById(button.dataset.editor);
-        if (targetPanel) targetPanel.classList.add('active');
-    });
+$('body').on('click', '.editor-sidebar button', function () {
+    var dataactive = $(this).attr('data-editor');
+    $(this).addClass('active').siblings('button').removeClass('active');
+    var container = $(this).closest('.editor-container');
+    container.find('.editor-panel').removeClass('active');
+    container.find('#' + dataactive).addClass('active');
 });
-function activateFirstTabOnMobile() {
-    if (window.innerWidth <= 1024) {
-        tabButtons[0].click();
-    } else {
-        editorPanels.forEach(panel => panel.classList.add('active'));
-    }
-}
-window.addEventListener('resize', activateFirstTabOnMobile);
-activateFirstTabOnMobile();
 window.addEventListener("beforeunload", function (e) {
     e.preventDefault();
     e.returnValue = "Changes could not update if page get refresh.";
@@ -1325,7 +1327,7 @@ async function loadAll() {
         stopFlag
     );
     const cssEditor = document.getElementById('css-editor');
-    const cssUrl = `https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/css/preview.css?v=${cacheBuster}`;
+    const cssUrl = `https://vinoth-elito.github.io/vin--datepicker__container/css/preview.css?v=${cacheBuster}`;
     try {
         const res = await fetch(cssUrl, { cache: 'no-store' });
         cssEditor.value = await res.text();
@@ -1388,7 +1390,7 @@ async function loadAll() {
     $(editorContainer).css('visibility', 'visible').hide().fadeIn(500);
     document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
-    siteHeader.style.pointerEvents = ''; // enable clicks
+    siteHeader.style.pointerEvents = '';
 }
 
 window.onload = loadAll;

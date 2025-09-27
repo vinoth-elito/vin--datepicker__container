@@ -624,7 +624,8 @@ img {
     border-radius: 20px;
 }
 
-.clear__selected__month svg {
+.clear__selected__month svg,
+.clear__selected__month a {
     width: 20px;
     height: 20px;
 }
