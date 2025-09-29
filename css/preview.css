@@ -22,6 +22,7 @@
 
 body {
     background: #111;
+    font-family: sans-serif;
 }
 
 .vintimepicker--circle__timeinputs input[type="number"] {
@@ -750,4 +751,5 @@ form#search__popupmain {
 
 form#search__popupmain label {
     font-size: 12px;
+    font-family: sans-serif;
 }
