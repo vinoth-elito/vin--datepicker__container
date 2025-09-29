@@ -1263,6 +1263,11 @@ window.openPanelSearch = function (panel, target) {
         opacity: '0',
         transition: 'transform 0.3s ease, opacity 0.3s ease'
     });
+    form.addEventListener('click', (e) => {
+        if (e.target.tagName.toLowerCase() === 'button') {
+            e.preventDefault();
+        }
+    });
     const label = document.createElement('label');
     label.setAttribute('for', 'search__poptxt');
     label.textContent = 'Search: ';
