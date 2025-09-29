@@ -1087,21 +1087,27 @@ document.body.addEventListener("keydown", function (e) {
         showPanelSavePopup(panel, `${panelType} code has been saved`);
     }
 });
-document.body.addEventListener("keydown", function (e) {
-    const target = e.target;
-    if (!target.matches(".editor-panel textarea")) return;
-    const isCopyShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "c";
-    if (isCopyShortcut) {
-        e.preventDefault();
-        hideAllPopups();
-        const panel = target.closest(".editor-panel");
-        if (!panel) return;
-        let panelType = "Unknown";
-        if (panel.id === "html-panel") panelType = "HTML";
-        else if (panel.id === "css-panel") panelType = "CSS";
-        else if (panel.id === "js-panel") panelType = "JS";
+document.body.addEventListener("copy", function (e) {
+    const target = document.activeElement;
+    if (!target || !target.matches(".editor-panel textarea")) return;
+    e.preventDefault();
+    hideAllPopups();
+    const selectedText = window.getSelection().toString() || target.value.substring(target.selectionStart, target.selectionEnd);
+    let panelType = "Unknown";
+    const panel = target.closest(".editor-panel");
+    if (!panel) return;
+    if (panel.id === "html-panel") panelType = "HTML";
+    else if (panel.id === "css-panel") panelType = "CSS";
+    else if (panel.id === "js-panel") panelType = "JS";
+    let codeToCopy = selectedText || target.value;
+    if (panelType === "HTML") codeToCopy = "<!-- HTML -->\n" + codeToCopy;
+    else if (panelType === "CSS") codeToCopy = "/* CSS */\n" + codeToCopy;
+    else if (panelType === "JS") codeToCopy = "// JS\n" + codeToCopy;
+    navigator.clipboard.writeText(codeToCopy).then(() => {
         showPanelCopyPopup(panel, `${panelType} code has been copied`);
-    }
+    }).catch(() => {
+        console.warn("Copy failed, fallback may be needed");
+    });
 });
 function showPanelCopyPopup(panel, message) {
     let existingPopup = panel.querySelector(".panel-copy-popup");
