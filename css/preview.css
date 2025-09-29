@@ -42,6 +42,15 @@ body {
     border: 0;
 }
 
+.highlight-match {
+    background: yellow;
+    color: transparent;
+}
+
+.highlight-match.current-match {
+    background: orange;
+}
+
 .vintimepicker--circle__timeinputs input[type="number"]::-webkit-inner-spin-button,
 .vintimepicker--circle__timeinputs input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;

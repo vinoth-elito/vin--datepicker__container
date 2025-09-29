@@ -95,6 +95,21 @@ body>.editor-container {
     position: relative;
 }
 
+.panel__search__countend span {
+    font-size: 12px;
+    color: red;
+}
+
+.highlight-match {
+    background: yellow;
+    color: transparent;
+}
+
+.highlight-match.current-match {
+    background: orange;
+}
+
+
 .editor-container.editor-center .editors {
     flex-direction: row;
     height: 100%;

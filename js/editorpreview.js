@@ -331,12 +331,18 @@ async function updatePreview() {
                                     targetWrapper.style.display = 'block';
                                     targetWrapper.querySelector('pre').textContent = content;
                                 }
-                                htmlTab.addEventListener('click', () => activateTab(htmlTab, htmlTabContent, htmlContent));
+                                    
+                                htmlTab.addEventListener('click', () => {
+                                    
+                                    activateTab(htmlTab, htmlTabContent, htmlContent);
+                                });
                                 cssTab.addEventListener('click', () => {
+                                    
                                     const cssEditorContent = window.parent.document.getElementById('css-editor')?.value || '';
                                     activateTab(cssTab, cssTabContent, cssEditorContent);
                                 });
                                jsTab.addEventListener('click', () => {
+                                
                                     const comp = window.componentFunctionMap[selector] || {};
                                     const jsEditorContent = window.parent.document.getElementById('js-editor')?.value || '';
                                     let finalCode = '';
@@ -384,35 +390,44 @@ async function updatePreview() {
                         }
                     });
                     document.addEventListener('keydown', function (e) {
-                        const openContainer = document.querySelector('.view-code-container.show');
-                        if (!openContainer) return;
-                        const activeTab = openContainer.querySelector('.tab-btn.active');
-                        if (!activeTab) return;
-                        const pre = Array.from(openContainer.querySelectorAll('pre')).find(p => p.offsetParent !== null);
-                        if (!pre) return;
-                        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
-                            const range = document.createRange();
-                            range.selectNodeContents(pre);
-                            const selection = window.getSelection();
-                            selection.removeAllRanges();
-                            selection.addRange(range);
-                            e.preventDefault();
-                        }
-                        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
-                            const selectedText = window.getSelection().toString();
-                            let codeToCopy = selectedText;
-                            if (!codeToCopy.trim()) {
-                                codeToCopy = pre.textContent;
+                            const openContainer = document.querySelector('.view-code-container.show');
+                            if (!openContainer) return;
+                            const activeTab = openContainer.querySelector('.tab-btn.active');
+                            if (!activeTab) return;
+                            const pre = Array.from(openContainer.querySelectorAll('pre'))
+                                .find(p => p.offsetParent !== null);
+                            if (!pre) return;
+                            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+                                const range = document.createRange();
+                                range.selectNodeContents(pre);
+                                const sel = window.getSelection();
+                                sel.removeAllRanges();
+                                sel.addRange(range);
+                                e.preventDefault();
                             }
-                            const tabName = activeTab.textContent.trim();
-                            if (tabName === 'HTML') codeToCopy = "\\x3C!-- HTML --\\x3E\\n" + codeToCopy;
-                            else if (tabName === 'CSS') codeToCopy = "/* CSS */\\n" + codeToCopy;
-                            else if (tabName === 'JS') codeToCopy = "// JS\\n" + codeToCopy;
-                            navigator.clipboard.writeText(codeToCopy).then(() => {
-                                highlightCopiedState(openContainer, pre);
-                            });
-                        }
-                    });
+                            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+                                const selectedText = window.getSelection().toString();
+                                let codeToCopy = selectedText || pre.textContent;
+                                const tabName = activeTab.textContent.trim();
+                                if (tabName === 'HTML') codeToCopy = "\\x3C!-- HTML --\\x3E\\n" + codeToCopy;
+                                else if (tabName === 'CSS') codeToCopy = "/* CSS */\\n" + codeToCopy;
+                                else if (tabName === 'JS') codeToCopy = "// JS\\n" + codeToCopy;
+                                navigator.clipboard.writeText(codeToCopy);
+                                e.preventDefault();
+                            }
+                            const preBlocks = Array.from(openContainer.querySelectorAll('pre'));
+                            const activePre = preBlocks.find(p => p.offsetParent !== null);
+                            if (!activePre) return;
+
+                            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+                                e.preventDefault();
+
+                                if (window.parent?.openPanelSearch) {
+                                    // Call openPanelSearch for the active <pre> only
+                                    window.parent.openPanelSearch(openContainer, activePre);
+                                }
+                            }
+                        });
                     `;
                     doc.body.appendChild(codeScript);
                 }
@@ -541,6 +556,27 @@ function setupViewSwitcher() {
                     }
                 }
                 document.addEventListener("click", handleOutsideClick);
+                const handleIframeClick = (event) => {
+                    dropdown.classList.remove("dropdown-show");
+                    dropdown.classList.add("dropdown-hide");
+                    setTimeout(() => dropdown.remove(), 300);
+                    removeIframeClickListeners();
+                    document.removeEventListener("click", handleOutsideClick);
+                };
+                function removeIframeClickListeners() {
+                    document.querySelectorAll("iframe").forEach((iframe) => {
+                        try {
+                            iframe.contentDocument.removeEventListener("mousedown", handleIframeClick);
+                        } catch (err) {
+                        }
+                    });
+                }
+                document.querySelectorAll("iframe").forEach((iframe) => {
+                    try {
+                        iframe.contentDocument.addEventListener("mousedown", handleIframeClick);
+                    } catch (err) {
+                    }
+                });
             });
         }
     } else {
@@ -992,11 +1028,22 @@ function showReloadAlert() {
         reloadWithLoader();
     }
 }
+function hideAllPopups() {
+    document.querySelectorAll('.panel-save-popup, .panel-copy-popup, .panel-search-overlay').forEach(el => el.remove());
+    document.querySelectorAll('.highlight-div').forEach(el => el.remove());
+    document.querySelectorAll('.editor-panel textarea').forEach(textarea => {
+        textarea.style.background = '';
+        textarea.style.position = '';
+        textarea.style.zIndex = '';
+    });
+}
+
 document.body.addEventListener("keydown", function (e) {
     const target = e.target;
     if (!target.matches(".editor-panel textarea")) return;
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
         e.preventDefault();
+        hideAllPopups();
         const panel = target.closest(".editor-panel");
         let panelType = "Unknown";
         if (panel.id === "html-panel") panelType = "HTML";
@@ -1009,6 +1056,7 @@ document.body.addEventListener("keydown", function (e) {
     const target = e.target;
     if (!target.matches(".editor-panel textarea")) return;
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "c") {
+        hideAllPopups();
         const panel = target.closest(".editor-panel");
         let panelType = "Unknown";
         if (panel.id === "html-panel") panelType = "HTML";
@@ -1025,7 +1073,7 @@ function showPanelCopyPopup(panel, message) {
     popup.textContent = message;
     Object.assign(popup.style, {
         position: "absolute",
-        top: "10px",
+        top: "0px",
         right: "10px",
         background: "#007bff",
         color: "#fff",
@@ -1035,15 +1083,21 @@ function showPanelCopyPopup(panel, message) {
         fontWeight: "500",
         boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
         opacity: "0",
-        transition: "opacity 0.3s ease",
+        transform: "translateY(-20px)",
+        transition: "opacity 0.3s ease, transform 0.3s ease",
         zIndex: "50"
     });
+    if (getComputedStyle(panel).position === "static") {
+        panel.style.position = "relative";
+    }
     panel.appendChild(popup);
     requestAnimationFrame(() => {
         popup.style.opacity = "1";
+        popup.style.transform = "translateY(0)";
     });
     setTimeout(() => {
         popup.style.opacity = "0";
+        popup.style.transform = "translateY(-20px)";
         setTimeout(() => popup.remove(), 300);
     }, 2000);
 }
@@ -1055,60 +1109,94 @@ function showPanelSavePopup(panel, message) {
     popup.textContent = message;
     Object.assign(popup.style, {
         position: "absolute",
-        top: "10px",
+        top: "0px",
         right: "10px",
         background: "#4caf50",
         color: "#fff",
-        padding: "5px 10px",
-        borderRadius: "4px",
-        fontSize: "12px",
+        padding: "6px 12px",
+        borderRadius: "6px",
+        fontSize: "13px",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
         zIndex: 1000,
-        opacity: 0,
-        transition: "opacity 0.3s"
+        opacity: "0",
+        transform: "translateY(-20px)",
+        transition: "opacity 0.3s ease, transform 0.3s ease"
     });
     if (getComputedStyle(panel).position === "static") {
         panel.style.position = "relative";
     }
     panel.appendChild(popup);
     requestAnimationFrame(() => {
-        popup.style.opacity = 1;
+        popup.style.opacity = "1";
+        popup.style.transform = "translateY(0)";
     });
     setTimeout(() => {
-        popup.style.opacity = 0;
+        popup.style.opacity = "0";
+        popup.style.transform = "translateY(-20px)";
         setTimeout(() => popup.remove(), 300);
     }, 1500);
 }
 document.querySelectorAll('.editor-panel textarea').forEach(textarea => {
-    textarea.addEventListener('keydown', function (e) {
+    textarea.addEventListener('keydown', e => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
             e.preventDefault();
-            document.querySelectorAll('.panel-search-overlay, .highlight-div').forEach(el => el.remove());
+            hideAllPopups();
             const panel = textarea.closest('.editor-panel');
             openPanelSearch(panel, textarea);
         }
     });
 });
-function openPanelSearch(panel, textarea) {
+
+window.openPanelSearch = function (panel, target) {
     document.querySelectorAll('.panel-search-overlay, .highlight-div').forEach(el => el.remove());
+    const isTextarea = target.tagName.toLowerCase() === 'textarea';
+    const getContent = () => isTextarea ? target.value : target.textContent;
+    const setSelection = (start, end) => {
+        if (isTextarea) {
+            target.setSelectionRange(start, end);
+        } else {
+            const range = document.createRange();
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            let remainingStart = start;
+            let remainingEnd = end;
+            const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
+            while (walker.nextNode()) {
+                const node = walker.currentNode;
+                const nodeLength = node.textContent.length;
+                if (remainingStart < nodeLength) {
+                    const rangeStart = remainingStart;
+                    const rangeEnd = Math.min(nodeLength, remainingEnd);
+                    range.setStart(node, rangeStart);
+                    range.setEnd(node, rangeEnd);
+                    sel.addRange(range);
+                    break;
+                } else {
+                    remainingStart -= nodeLength;
+                    remainingEnd -= nodeLength;
+                }
+            }
+        }
+    };
     const highlightDiv = document.createElement('div');
     highlightDiv.className = 'highlight-div';
-    Object.assign(highlightDiv.style, {
-        position: 'absolute',
-        top: textarea.offsetTop + 'px',
-        left: textarea.offsetLeft + 'px',
-        width: textarea.offsetWidth + 'px',
-        height: textarea.offsetHeight + 'px',
-        pointerEvents: 'none',
-        whiteSpace: 'pre-wrap',
-        wordWrap: 'break-word',
-        color: 'transparent',
-        overflow: 'hidden',
-        zIndex: 1
-    });
-    panel.insertBefore(highlightDiv, textarea);
-    textarea.style.background = 'transparent';
-    textarea.style.position = 'relative';
-    textarea.style.zIndex = 2;
+    highlightDiv.style.position = 'absolute';
+    highlightDiv.style.pointerEvents = 'none';
+    highlightDiv.style.whiteSpace = 'pre-wrap';
+    highlightDiv.style.wordWrap = 'break-word';
+    highlightDiv.style.color = 'transparent';
+    highlightDiv.style.overflow = 'hidden';
+    highlightDiv.style.zIndex = 1;
+    const rect = target.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    highlightDiv.style.top = (rect.top - panelRect.top + panel.scrollTop) + 'px';
+    highlightDiv.style.left = (rect.left - panelRect.left + panel.scrollLeft) + 'px';
+    highlightDiv.style.width = rect.width + 'px';
+    highlightDiv.style.height = rect.height + 'px';
+    panel.appendChild(highlightDiv);
+    target.style.background = 'transparent';
+    target.style.position = 'relative';
+    target.style.zIndex = 2;
     const overlay = document.createElement('div');
     overlay.className = 'panel-search-overlay';
     Object.assign(overlay.style, {
@@ -1121,8 +1209,17 @@ function openPanelSearch(panel, textarea) {
         boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
         zIndex: 10,
         display: 'flex',
+        flexDirection: 'column',
+        gap: '4px'
+    });
+    const searchMain = document.createElement('div');
+    Object.assign(searchMain.style, {
+        display: 'flex',
+        alignItems: 'center',
         gap: '6px',
-        alignItems: 'center'
+        transform: 'translateX(100%)',
+        opacity: '0',
+        transition: 'transform 0.3s ease, opacity 0.3s ease'
     });
     const input = document.createElement('input');
     input.type = 'text';
@@ -1130,23 +1227,42 @@ function openPanelSearch(panel, textarea) {
     Object.assign(input.style, { width: '200px', padding: '4px 8px', fontSize: '14px' });
     const prevBtn = document.createElement('button'); prevBtn.innerHTML = '⬆';
     const nextBtn = document.createElement('button'); nextBtn.innerHTML = '⬇';
-    const counter = document.createElement('span'); Object.assign(counter.style, { fontSize: '13px', color: '#333' });
+    const counter = document.createElement('span');
+    Object.assign(counter.style, { fontSize: '13px', color: '#333', minWidth: '50px', display: 'none' });
     const closeBtn = document.createElement('button');
+    closeBtn.className = 'search-close-btn';
     closeBtn.innerHTML = '✖';
-    Object.assign(closeBtn.style, {
-        background: 'transparent',
-        border: 'none',
-        fontSize: '14px',
-        cursor: 'pointer',
-        color: '#555',
-        marginLeft: '4px'
-    });
+    Object.assign(closeBtn.style, { background: 'transparent', border: 'none', fontSize: '14px', cursor: 'pointer' });
     closeBtn.addEventListener('click', () => {
-        overlay.remove();
-        highlightDiv.remove();
+        overlay.style.display = 'none';
+        highlightDiv.style.display = 'none';
+        target.style.background = '';
+        target.style.position = '';
+        target.style.zIndex = '';
     });
-    overlay.append(input, prevBtn, nextBtn, counter, closeBtn);
     panel.appendChild(overlay);
+    const searchCountEnd = document.createElement('div');
+    searchCountEnd.className = 'panel__search__countend';
+    Object.assign(searchCountEnd.style, {
+        fontSize: '13px',
+        color: 'red',
+        transition: 'opacity 0.3s ease, transform 0.3s ease',
+        transform: 'translateY(-1px)'
+    });
+    searchMain.append(input, prevBtn, nextBtn, counter, closeBtn);
+    overlay.append(searchMain, searchCountEnd);
+    panel.appendChild(overlay);
+    requestAnimationFrame(() => {
+        searchMain.style.transform = 'translateX(0)';
+        searchMain.style.opacity = '1';
+    });
+    const noResultsSpan = document.createElement('span');
+    noResultsSpan.textContent = 'No results';
+    noResultsSpan.style.display = 'none';
+    const endResultsSpan = document.createElement('span');
+    endResultsSpan.textContent = 'You are at the end of search results!';
+    endResultsSpan.style.display = 'none';
+    searchCountEnd.append(noResultsSpan, endResultsSpan);
     input.focus();
     let matches = [];
     let currentIndex = -1;
@@ -1157,90 +1273,143 @@ function openPanelSearch(panel, textarea) {
         const term = input.value;
         matches = [];
         currentIndex = -1;
-        counter.textContent = '';
+        counter.style.display = 'none';
+        const cs = window.getComputedStyle(target);
+        Object.assign(highlightDiv.style, {
+            font: cs.font,
+            lineHeight: cs.lineHeight,
+            whiteSpace: cs.whiteSpace,
+            padding: cs.padding,
+            textAlign: cs.textAlign
+        });
         if (!term) {
-            highlightDiv.textContent = textarea.value;
+            highlightDiv.textContent = getContent();
             return;
         }
         const regex = new RegExp(term.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), 'gi');
         let lastIndex = 0;
         let html = '';
         let match;
-        while ((match = regex.exec(textarea.value)) !== null) {
+        while ((match = regex.exec(getContent())) !== null) {
             matches.push({ start: match.index, end: regex.lastIndex });
-            html += escapeHtml(textarea.value.substring(lastIndex, match.index));
-            html += `<span style="background: yellow; color: black;">${escapeHtml(textarea.value.substring(match.index, regex.lastIndex))}</span>`;
+            html += escapeHtml(getContent().substring(lastIndex, match.index));
+            html += `<span class="highlight-match">${escapeHtml(getContent().substring(match.index, regex.lastIndex))}</span>`;
             lastIndex = regex.lastIndex;
             if (match.index === regex.lastIndex) regex.lastIndex++;
         }
-        html += escapeHtml(textarea.value.substring(lastIndex));
+        html += escapeHtml(getContent().substring(lastIndex));
         highlightDiv.innerHTML = html;
-        if (matches.length) { currentIndex = 0; scrollToMatch(false); }
-        counter.textContent = matches.length ? `${currentIndex + 1} / ${matches.length}` : 'No matches';
+
+        if (matches.length) {
+            currentIndex = 0;
+            highlightCurrentMatch();
+            counter.style.display = 'inline-block';
+            counter.textContent = `${currentIndex + 1} / ${matches.length}`;
+        } else {
+            counter.style.display = 'none';
+            showMessage('no-results');
+        }
     }
-    function scrollToMatch(focusTextarea = true) {
-        if (!matches.length) return;
+    function highlightCurrentMatch() {
+        highlightDiv.querySelectorAll('.highlight-match.current-match')
+            .forEach(el => el.classList.remove('current-match'));
+        if (!matches.length) {
+            counter.style.display = 'none';
+            return;
+        }
+        counter.style.display = 'inline-block';
+        const spans = highlightDiv.querySelectorAll('.highlight-match');
+        const span = spans[currentIndex];
+        if (!span) return;
+        span.classList.add('current-match');
         const match = matches[currentIndex];
-        const term = input.value;
-        let lastIndex = 0;
-        let html = '';
-        const regex = new RegExp(term.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), 'gi');
-        let m;
-        while ((m = regex.exec(textarea.value)) !== null) {
-            html += escapeHtml(textarea.value.substring(lastIndex, m.index));
-            html += `<span style="background: yellow; color: black;">${escapeHtml(textarea.value.substring(m.index, regex.lastIndex))}</span>`;
-            lastIndex = regex.lastIndex;
-            if (m.index === regex.lastIndex) regex.lastIndex++;
-        }
-        html += escapeHtml(textarea.value.substring(lastIndex));
-        highlightDiv.innerHTML = html;
-        if (focusTextarea) {
-            textarea.focus();
-            textarea.setSelectionRange(match.start, match.end);
-        }
-        const beforeText = textarea.value.substring(0, match.start);
-        const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight) || 16;
-        textarea.scrollTop = (beforeText.split('\n').length - 1) * lineHeight;
+        setSelection(match.start, match.end);
+        const beforeText = getContent().substring(0, match.start);
+        const lineHeight = parseInt(window.getComputedStyle(target).lineHeight) || 16;
+        target.scrollTop = (beforeText.split('\n').length - 1) * lineHeight;
         counter.textContent = `${currentIndex + 1} / ${matches.length}`;
     }
     function nextMatch() {
         if (!matches.length) return;
-        message.textContent = '';
         currentIndex = (currentIndex + 1) % matches.length;
-        scrollToMatch(true);
+        highlightCurrentMatch();
+        input.focus({ preventScroll: true });
     }
     function prevMatch() {
         if (!matches.length) return;
-        message.textContent = '';
         currentIndex = (currentIndex - 1 + matches.length) % matches.length;
-        scrollToMatch(true);
+        highlightCurrentMatch();
+        input.focus({ preventScroll: true });
     }
-    input.addEventListener('input', updateHighlights);
-    const message = document.createElement('span');
-    Object.assign(message.style, { fontSize: '13px', color: 'red', marginLeft: '8px' });
-    overlay.appendChild(message);
+    function showMessage(type) {
+        noResultsSpan.style.display = 'none';
+        endResultsSpan.style.display = 'none';
+        let span = null;
+        if (type === 'no-results') span = noResultsSpan;
+        if (type === 'end-results') span = endResultsSpan;
+        if (!span) return;
+        span.style.display = 'inline';
+        span.style.opacity = '1';
+        span.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        span.style.transform = 'translateY(0)';
+        clearTimeout(span._timeout);
+        span._timeout = setTimeout(() => {
+            span.style.opacity = '0';
+            span.style.transform = 'translateY(-8px)';
+            setTimeout(() => { span.style.display = 'none'; }, 300);
+        }, 2000);
+    }
     input.addEventListener('keydown', e => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            if (!matches.length) return;
-            message.textContent = '';
+            if (!matches.length) {
+                showMessage('no-results');
+                return;
+            }
             if (currentIndex < matches.length - 1) {
                 currentIndex++;
-                scrollToMatch(true);
+                highlightCurrentMatch();
             } else {
-                scrollToMatch(true);
-                message.textContent = 'You are at the end of search results!';
+                currentIndex = matches.length - 1;
+                highlightCurrentMatch();
+                showMessage('end-results');
             }
-            setTimeout(() => {
-                input.focus({ preventScroll: true });
-            }, 50);
+            input.focus({ preventScroll: true });
         }
     });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            hideAllPopups();
+        }
+    });
+    document.addEventListener('click', e => {
+        const overlay = document.querySelector('.panel-search-overlay');
+        if (!overlay) return;
+        if (!overlay.contains(e.target)) {
+            hideAllPopups();
+        }
+    });
+    document.addEventListener('click', e => {
+        const iframe = document.querySelector('iframe');
+        if (!iframe) return;
+        const rect = iframe.getBoundingClientRect();
+        if (
+            e.clientX < rect.left ||
+            e.clientX > rect.right ||
+            e.clientY < rect.top ||
+            e.clientY > rect.bottom
+        ) {
+            hideAllPopups();
+        }
+    });
+    input.addEventListener('input', updateHighlights);
     nextBtn.addEventListener('click', nextMatch);
     prevBtn.addEventListener('click', prevMatch);
-    textarea.addEventListener('scroll', () => { highlightDiv.scrollTop = textarea.scrollTop; });
+    target.addEventListener('scroll', () => {
+        highlightDiv.scrollTop = target.scrollTop;
+    });
     updateHighlights();
-}
+};
 $('body').on('click', '.editor-sidebar button', function () {
     var dataactive = $(this).attr('data-editor');
     $(this).addClass('active').siblings('button').removeClass('active');
