@@ -12,6 +12,13 @@ async function updatePreview() {
     styleEl.textContent = cssEditor.value;
     doc.head.appendChild(styleEl);
     doc.body.innerHTML = htmlEditor.value;
+    doc.addEventListener('keydown', function (e) {
+        const inputCol = e.target.closest('.input__col');
+        if (!inputCol) return;
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            e.preventDefault();
+        }
+    });
     const cacheBuster = Date.now();
     const parentFA = document.getElementById('fa-css');
     if (parentFA && !doc.getElementById('fa-css')) {
@@ -270,6 +277,7 @@ async function updatePreview() {
                                     copyBtn.innerHTML = '<i class="fa fa-copy"></i> Copy Code';
                                     Object.assign(copyBtn.style, {
                                         position: 'absolute',
+                                        zIndex:'20',
                                         top: '-13px',
                                         right: '30px',
                                         fontSize: '12px',
@@ -332,17 +340,26 @@ async function updatePreview() {
                                     targetWrapper.querySelector('pre').textContent = content;
                                 }
                                     
-                                htmlTab.addEventListener('click', () => {
+                                window.removeSearchUI = function () {
+                                    const existingHighlightDiv = document.querySelector(".highlight-div");
+                                    if (existingHighlightDiv) existingHighlightDiv.remove();
+
+                                    const existingOverlay = document.querySelector(".panel-search-overlay");
+                                    if (existingOverlay) existingOverlay.remove();
+                                };
                                     
+                                htmlTab.addEventListener('click', () => {
+                                    removeSearchUI();
                                     activateTab(htmlTab, htmlTabContent, htmlContent);
                                 });
+
                                 cssTab.addEventListener('click', () => {
-                                    
+                                    removeSearchUI();
                                     const cssEditorContent = window.parent.document.getElementById('css-editor')?.value || '';
                                     activateTab(cssTab, cssTabContent, cssEditorContent);
                                 });
                                jsTab.addEventListener('click', () => {
-                                
+                                removeSearchUI();
                                     const comp = window.componentFunctionMap[selector] || {};
                                     const jsEditorContent = window.parent.document.getElementById('js-editor')?.value || '';
                                     let finalCode = '';
@@ -382,6 +399,14 @@ async function updatePreview() {
                                         c.style.display = 'none';
                                     });
                                     codeContainer.style.display = 'block';
+                                    function removeSearchUII() {
+                                    const existingHighlightDiv = document.querySelector(".highlight-div");
+                                    if (existingHighlightDiv) existingHighlightDiv.remove();
+
+                                    const existingOverlay = document.querySelector(".panel-search-overlay");
+                                    if (existingOverlay) existingOverlay.remove();
+                                }
+                                    removeSearchUII();
                                     requestAnimationFrame(() => codeContainer.classList.add('show'));
                                     allViewCodeBtns.forEach(btn => btn.setAttribute('data-tooltip', 'Get Code'));
                                     target.setAttribute('data-tooltip', 'Hide Code');
@@ -394,36 +419,44 @@ async function updatePreview() {
                             if (!openContainer) return;
                             const activeTab = openContainer.querySelector('.tab-btn.active');
                             if (!activeTab) return;
-                            const pre = Array.from(openContainer.querySelectorAll('pre'))
-                                .find(p => p.offsetParent !== null);
-                            if (!pre) return;
-                            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
-                                const range = document.createRange();
-                                range.selectNodeContents(pre);
-                                const sel = window.getSelection();
-                                sel.removeAllRanges();
-                                sel.addRange(range);
-                                e.preventDefault();
-                            }
-                            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
-                                const selectedText = window.getSelection().toString();
-                                let codeToCopy = selectedText || pre.textContent;
-                                const tabName = activeTab.textContent.trim();
-                                if (tabName === 'HTML') codeToCopy = "\\x3C!-- HTML --\\x3E\\n" + codeToCopy;
-                                else if (tabName === 'CSS') codeToCopy = "/* CSS */\\n" + codeToCopy;
-                                else if (tabName === 'JS') codeToCopy = "// JS\\n" + codeToCopy;
-                                navigator.clipboard.writeText(codeToCopy);
-                                e.preventDefault();
-                            }
                             const preBlocks = Array.from(openContainer.querySelectorAll('pre'));
                             const activePre = preBlocks.find(p => p.offsetParent !== null);
                             if (!activePre) return;
-
-                            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+                            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+                                const range = document.createRange();
+                                range.selectNodeContents(activePre);
+                                const selection = window.getSelection();
+                                selection.removeAllRanges();
+                                selection.addRange(range);
                                 e.preventDefault();
-
+                            }
+                            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+                                let codeToCopy = window.getSelection().toString();
+                                if (!codeToCopy.trim()) {
+                                    codeToCopy = activePre.textContent;
+                                }
+                                const tabName = activeTab.textContent.trim();
+                                if (tabName === 'HTML') {
+                                    codeToCopy = "<!-- HTML -->\\n" + codeToCopy;
+                                } else if (tabName === 'CSS') {
+                                    codeToCopy = "/* CSS */\\n" + codeToCopy;
+                                } else if (tabName === 'JS') {
+                                    codeToCopy = "// JS\\n" + codeToCopy;
+                                }
+                                navigator.clipboard.writeText(codeToCopy).then(() => {
+                                    highlightCopiedState(openContainer, activePre);
+                                });
+                                if (window.parent?.closePanelSearch) {
+                                    window.parent.closePanelSearch(openContainer, activePre);
+                                }
+                            }
+                            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") {
+                                e.preventDefault();
                                 if (window.parent?.openPanelSearch) {
-                                    // Call openPanelSearch for the active <pre> only
+                                    const existingOverlay = openContainer.querySelector(".panel-search-overlay");
+                                    if (existingOverlay) existingOverlay.remove();
+                                    const existingHighlightDiv = openContainer.querySelector(".highlight-div");
+                                    if (existingHighlightDiv) existingHighlightDiv.remove();
                                     window.parent.openPanelSearch(openContainer, activePre);
                                 }
                             }
@@ -1039,12 +1072,14 @@ function hideAllPopups() {
 }
 
 document.body.addEventListener("keydown", function (e) {
-    const target = e.target;
-    if (!target.matches(".editor-panel textarea")) return;
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+    const target = e.target.closest(".editor-panel textarea");
+    if (!target) return;
+    const isSaveShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s";
+    if (isSaveShortcut) {
         e.preventDefault();
         hideAllPopups();
         const panel = target.closest(".editor-panel");
+        if (!panel) return;
         let panelType = "Unknown";
         if (panel.id === "html-panel") panelType = "HTML";
         else if (panel.id === "css-panel") panelType = "CSS";
@@ -1055,9 +1090,12 @@ document.body.addEventListener("keydown", function (e) {
 document.body.addEventListener("keydown", function (e) {
     const target = e.target;
     if (!target.matches(".editor-panel textarea")) return;
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "c") {
+    const isCopyShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "c";
+    if (isCopyShortcut) {
+        e.preventDefault();
         hideAllPopups();
         const panel = target.closest(".editor-panel");
+        if (!panel) return;
         let panelType = "Unknown";
         if (panel.id === "html-panel") panelType = "HTML";
         else if (panel.id === "css-panel") panelType = "CSS";
@@ -1138,10 +1176,12 @@ function showPanelSavePopup(panel, message) {
 }
 document.querySelectorAll('.editor-panel textarea').forEach(textarea => {
     textarea.addEventListener('keydown', e => {
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+        const isSearchShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f';
+        if (isSearchShortcut) {
             e.preventDefault();
             hideAllPopups();
             const panel = textarea.closest('.editor-panel');
+            if (!panel) return;
             openPanelSearch(panel, textarea);
         }
     });
@@ -1187,11 +1227,12 @@ window.openPanelSearch = function (panel, target) {
     highlightDiv.style.color = 'transparent';
     highlightDiv.style.overflow = 'hidden';
     highlightDiv.style.zIndex = 1;
+    highlightDiv.style.boxSizing = "border-box";
     const rect = target.getBoundingClientRect();
     const panelRect = panel.getBoundingClientRect();
     highlightDiv.style.top = (rect.top - panelRect.top + panel.scrollTop) + 'px';
     highlightDiv.style.left = (rect.left - panelRect.left + panel.scrollLeft) + 'px';
-    highlightDiv.style.width = rect.width + 'px';
+    highlightDiv.style.width = '100%';
     highlightDiv.style.height = rect.height + 'px';
     panel.appendChild(highlightDiv);
     target.style.background = 'transparent';
@@ -1213,22 +1254,28 @@ window.openPanelSearch = function (panel, target) {
         gap: '4px'
     });
     const searchMain = document.createElement('div');
+    const form = document.createElement('form');
+    form.id = 'search__popupmain';
     Object.assign(searchMain.style, {
         display: 'flex',
         alignItems: 'center',
         gap: '6px',
-        transform: 'translateX(100%)',
         opacity: '0',
         transition: 'transform 0.3s ease, opacity 0.3s ease'
     });
+    const label = document.createElement('label');
+    label.setAttribute('for', 'search__poptxt');
+    label.textContent = 'Search: ';
+
     const input = document.createElement('input');
     input.type = 'text';
+    input.id = 'search__poptxt';
     input.placeholder = 'Search text...';
     Object.assign(input.style, { width: '200px', padding: '4px 8px', fontSize: '14px' });
     const prevBtn = document.createElement('button'); prevBtn.innerHTML = '⬆';
     const nextBtn = document.createElement('button'); nextBtn.innerHTML = '⬇';
     const counter = document.createElement('span');
-    Object.assign(counter.style, { fontSize: '13px', color: '#333', minWidth: '50px', display: 'none' });
+    Object.assign(counter.style, { fontSize: '13px', color: '#333', display: 'none' });
     const closeBtn = document.createElement('button');
     closeBtn.className = 'search-close-btn';
     closeBtn.innerHTML = '✖';
@@ -1249,9 +1296,10 @@ window.openPanelSearch = function (panel, target) {
         transition: 'opacity 0.3s ease, transform 0.3s ease',
         transform: 'translateY(-1px)'
     });
-    searchMain.append(input, prevBtn, nextBtn, counter, closeBtn);
+    form.append(label, input, prevBtn, nextBtn, counter, closeBtn);
+    searchMain.appendChild(form);
+    overlay.appendChild(searchMain);
     overlay.append(searchMain, searchCountEnd);
-    panel.appendChild(overlay);
     requestAnimationFrame(() => {
         searchMain.style.transform = 'translateX(0)';
         searchMain.style.opacity = '1';
@@ -1277,9 +1325,9 @@ window.openPanelSearch = function (panel, target) {
         const cs = window.getComputedStyle(target);
         Object.assign(highlightDiv.style, {
             font: cs.font,
+            padding: cs.padding,
             lineHeight: cs.lineHeight,
             whiteSpace: cs.whiteSpace,
-            padding: cs.padding,
             textAlign: cs.textAlign
         });
         if (!term) {
@@ -1382,26 +1430,44 @@ window.openPanelSearch = function (panel, target) {
             hideAllPopups();
         }
     });
-    document.addEventListener('click', e => {
-        const overlay = document.querySelector('.panel-search-overlay');
-        if (!overlay) return;
-        if (!overlay.contains(e.target)) {
+    if (overlay) {
+        overlay.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+        document.addEventListener('click', () => {
             hideAllPopups();
-        }
-    });
-    document.addEventListener('click', e => {
+        });
+    }
+    function setupIframePopupCloser() {
         const iframe = document.querySelector('iframe');
         if (!iframe) return;
-        const rect = iframe.getBoundingClientRect();
-        if (
-            e.clientX < rect.left ||
-            e.clientX > rect.right ||
-            e.clientY < rect.top ||
-            e.clientY > rect.bottom
-        ) {
-            hideAllPopups();
+        document.addEventListener('click', e => {
+            const rect = iframe.getBoundingClientRect();
+            if (
+                e.clientX < rect.left ||
+                e.clientX > rect.right ||
+                e.clientY < rect.top ||
+                e.clientY > rect.bottom
+            ) {
+                hideAllPopups();
+            }
+        });
+        function attachInsideListener() {
+            try {
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                if (!iframeDoc) return;
+                iframeDoc.removeEventListener('click', hideAllPopups);
+                iframeDoc.addEventListener('click', hideAllPopups);
+            } catch (err) {
+                console.warn("Cross-origin iframe - cannot attach click listener inside.", err);
+            }
         }
-    });
+        iframe.addEventListener('load', attachInsideListener);
+        if (iframe.contentDocument?.readyState === 'complete') {
+            attachInsideListener();
+        }
+    }
+    setupIframePopupCloser();
     input.addEventListener('input', updateHighlights);
     nextBtn.addEventListener('click', nextMatch);
     prevBtn.addEventListener('click', prevMatch);
@@ -1410,6 +1476,27 @@ window.openPanelSearch = function (panel, target) {
     });
     updateHighlights();
 };
+document.addEventListener('click', function (e) {
+    const iframe = document.querySelector('iframe');
+    if (!iframe) return;
+
+    const rect = iframe.getBoundingClientRect();
+    const clickedOutside =
+        e.clientX < rect.left ||
+        e.clientX > rect.right ||
+        e.clientY < rect.top ||
+        e.clientY > rect.bottom;
+    if (clickedOutside) {
+        try {
+            if (iframe.contentWindow?.removeSearchUI) {
+                iframe.contentWindow.removeSearchUI();
+            }
+        } catch (err) {
+            console.warn("Could not access iframe:", err);
+        }
+    }
+});
+
 $('body').on('click', '.editor-sidebar button', function () {
     var dataactive = $(this).attr('data-editor');
     $(this).addClass('active').siblings('button').removeClass('active');
@@ -1483,8 +1570,28 @@ async function loadAll() {
     pageLoader.style.display = 'flex';
     await new Promise(resolve => setTimeout(resolve, 500));
     pageLoader.style.display = 'none';
+    loadingMsg.innerHTML = '';
     loadingMsg.style.display = 'flex';
+    loadingMsg.style.flexDirection = 'column';
+    loadingMsg.style.alignItems = 'center';
+    loadingMsg.style.justifyContent = 'center';
+    loadingMsg.style.gap = '10px';
     loadingMsg.style.opacity = '1';
+
+    const readyIconfirstContainer = document.createElement('div');
+    readyIconfirstContainer.className = 'loader__second';
+    readyIconfirstContainer.innerHTML = `
+    <ul class="c">
+  	<li></li>
+	<li></li>
+	<li></li>
+	<li></li>
+	<li></li>
+    </ul>
+`;
+    loadingMsg.appendChild(readyIconfirstContainer);
+    typingText.textContent = '';
+    loadingMsg.appendChild(typingText);
     const stopFlag = { ready: false };
     const typingLoop = typeWithBackspaceLoop(
         typingText,
@@ -1502,6 +1609,7 @@ async function loadAll() {
     } catch (e) {
         cssEditor.value = `/* Failed to load CSS: ${e.message} */`;
     }
+
     const htmlEditor = document.getElementById('html-editor');
     const rows = [
         [
@@ -1535,6 +1643,7 @@ async function loadAll() {
     }
     htmlEditor.value = finalHTML;
     updatePreview();
+
     await new Promise(resolve => {
         const interval = setInterval(() => {
             const allReady = ['showDateTimePicker', 'showDatePicker', 'showMonthYearPicker', 'showTimePicker', 'showDateRangePicker', 'initVinDatePickers']
@@ -1545,14 +1654,31 @@ async function loadAll() {
             }
         }, 50);
     });
+
     loadScripts();
     stopFlag.ready = true;
     await typingLoop;
+    loadingMsg.innerHTML = '';
+    loadingMsg.style.display = 'flex';
+    loadingMsg.style.flexDirection = 'column';
+    loadingMsg.style.alignItems = 'center';
+    loadingMsg.style.justifyContent = 'center';
+    loadingMsg.style.gap = '10px';
+    const readyIconContainer = document.createElement('div');
+    readyIconContainer.className = 'loader__second';
+    readyIconContainer.innerHTML = `
+    <ul class="c">
+  	<li></li>
+	<li></li>
+	<li></li>
+	<li></li>
+	<li></li>
+    </ul>
+`;
+    loadingMsg.appendChild(readyIconContainer);
+    typingText.textContent = '';
+    loadingMsg.appendChild(typingText);
     await typeOnce(typingText, "The content is ready for view, thanks for your patience", 50);
-    for (let i = typingText.textContent.length; i >= 0; i--) {
-        typingText.textContent = typingText.textContent.slice(0, i);
-        await new Promise(r => setTimeout(r, 30));
-    }
     $(loadingMsg).fadeOut(500);
     $(editorContainer).css('visibility', 'visible').hide().fadeIn(500);
     document.documentElement.style.overflow = '';

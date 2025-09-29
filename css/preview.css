@@ -741,3 +741,13 @@ img {
     }
 
 }
+
+form#search__popupmain {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+form#search__popupmain label {
+    font-size: 12px;
+}
