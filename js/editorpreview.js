@@ -473,12 +473,10 @@ async function updatePreview() {
     };
 }
 livePreview.addEventListener("load", () => {
-    const doc = livePreview.contentDocument;
-    if (doc && !doc.body.hasChildNodes()) {
+    if (!isManualUpdate) {
         updatePreview();
     }
 });
-livePreview.addEventListener("contextmenu", e => e.preventDefault());
 htmlEditor.addEventListener('input', updatePreview);
 cssEditor.addEventListener('input', updatePreview);
 jsEditor.addEventListener('input', updatePreview);
