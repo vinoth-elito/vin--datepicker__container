@@ -552,6 +552,7 @@ function setupViewSwitcher() {
                         const newEditors = editors.cloneNode(true);
                         editors.replaceWith(newEditors);
                         editors = newEditors;
+                        initTextareaSearch();
                         editors.style.flex = "";
                         editors.style.height = "";
                         editors.style.width = "";
@@ -1180,18 +1181,21 @@ function showPanelSavePopup(panel, message) {
         setTimeout(() => popup.remove(), 300);
     }, 1500);
 }
-document.querySelectorAll('.editor-panel textarea').forEach(textarea => {
-    textarea.addEventListener('keydown', e => {
-        const isSearchShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f';
-        if (isSearchShortcut) {
-            e.preventDefault();
-            hideAllPopups();
-            const panel = textarea.closest('.editor-panel');
-            if (!panel) return;
-            openPanelSearch(panel, textarea);
-        }
+function initTextareaSearch() {
+    document.querySelectorAll('.editor-panel textarea').forEach(textarea => {
+        textarea.addEventListener('keydown', e => {
+            const isSearchShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f';
+            if (isSearchShortcut) {
+                e.preventDefault();
+                hideAllPopups();
+                const panel = textarea.closest('.editor-panel');
+                if (!panel) return;
+                openPanelSearch(panel, textarea);
+            }
+        });
     });
-});
+}
+initTextareaSearch();
 
 window.openPanelSearch = function (panel, target) {
     document.querySelectorAll('.panel-search-overlay, .highlight-div').forEach(el => el.remove());
