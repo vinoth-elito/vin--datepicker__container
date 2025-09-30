@@ -136,20 +136,20 @@ function showDateRangePicker($input) {
             if (hour12 === 0) hour12 = 12;
             timeHTMLLeft = `
     <div class="vin--time__picker vin--time__picker-left vinflex vinflex--justifycenter">
-    <form class="vin__range__time">
-        <label>From:</label>
-        <select class="vin-time-hour-left">${Array.from({ length: 12 }, (_, i) => `<option ${i + 1 === hour12 ? 'selected' : ''}>${i + 1}</option>`).join('')}</select> :
-        <select class="vin-time-minute-left">${Array.from({ length: 60 }, (_, i) => `<option ${i === currentMinute ? 'selected' : ''}>${String(i).padStart(2, '0')}</option>`).join('')}</select>
-        <select class="vin-time-ampm-left"><option ${currentAMPM === 'AM' ? 'selected' : ''}>AM</option><option ${currentAMPM === 'PM' ? 'selected' : ''}>PM</option></select>
+    <form class="vin__range__time" aria-label="Select time range">
+        <label for="vin__hour-left">From:</label>
+        <select id="vin__hour-left" class="vin-time-hour-left">${Array.from({ length: 12 }, (_, i) => `<option ${i + 1 === hour12 ? 'selected' : ''}>${i + 1}</option>`).join('')}</select> :
+        <select id="vin__minute-left" class="vin-time-minute-left">${Array.from({ length: 60 }, (_, i) => `<option ${i === currentMinute ? 'selected' : ''}>${String(i).padStart(2, '0')}</option>`).join('')}</select>
+        <select id="vin__ampm-left" class="vin-time-ampm-left"><option ${currentAMPM === 'AM' ? 'selected' : ''}>AM</option><option ${currentAMPM === 'PM' ? 'selected' : ''}>PM</option></select>
     </form>
     </div>`;
             timeHTMLRight = `
     <div class="vin--time__picker vin--time__picker-right vinflex vinflex--justifycenter">
     <form class="vin__range__time">
-        <label>To:</label>
-        <select class="vin-time-hour-right">${Array.from({ length: 12 }, (_, i) => `<option ${i + 1 === hour12 ? 'selected' : ''}>${i + 1}</option>`).join('')}</select> :
-        <select class="vin-time-minute-right">${Array.from({ length: 60 }, (_, i) => `<option ${i === currentMinute ? 'selected' : ''}>${String(i).padStart(2, '0')}</option>`).join('')}</select>
-        <select class="vin-time-ampm-right"><option ${currentAMPM === 'AM' ? 'selected' : ''}>AM</option><option ${currentAMPM === 'PM' ? 'selected' : ''}>PM</option></select>
+        <label for="vin__hour-right">To:</label>
+        <select id="vin__hour-right" class="vin-time-hour-right">${Array.from({ length: 12 }, (_, i) => `<option ${i + 1 === hour12 ? 'selected' : ''}>${i + 1}</option>`).join('')}</select> :
+        <select id="vin__minute-right" class="vin-time-minute-right">${Array.from({ length: 60 }, (_, i) => `<option ${i === currentMinute ? 'selected' : ''}>${String(i).padStart(2, '0')}</option>`).join('')}</select>
+        <select id="vin__ampm-right" class="vin-time-ampm-right"><option ${currentAMPM === 'AM' ? 'selected' : ''}>AM</option><option ${currentAMPM === 'PM' ? 'selected' : ''}>PM</option></select>
     </form>
     </div>`;
             buttonHTML = `
