@@ -157,6 +157,10 @@ img {
     justify-content: center;
 }
 
+.vinflex--justifyend {
+    justify-content: flex-end;
+}
+
 .vinflex--alignitemscenter {
     align-items: center;
 }
@@ -752,4 +756,61 @@ form#search__popupmain {
 form#search__popupmain label {
     font-size: 12px;
     font-family: sans-serif;
+}
+
+.range__with__sidebar {
+    display: flex;
+    gap: 20px;
+}
+
+.vindaterangepicker--sidebar {
+    width: 220px;
+    border-right: 1px solid var(--td__border);
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.vindaterangepicker--sidebar ul {
+    padding: 0;
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.vindaterangepicker--sidebar ul li,
+.vin__range__header .vincustom__year__clmn,
+.vin__day__clmn,
+.vin__day__clmn button {
+    color: var(--white__bgrcolor);
+}
+
+.vincustom__year__clmn {
+    color: var(--white__bgrcolor);
+}
+
+.vin__day__clmn button {
+    background: none;
+    border: none;
+    border: 0;
+    padding: 0;
+}
+
+.vindaterangepicker__custom table tr th {
+    color: var(--white__bgrcolor);
+}
+
+.vin__canapply__sec {
+    gap: 20px;
+    border-top: 1px solid #fff;
+    margin: 20px 0 0 0;
+    padding: 10px 20px 10px 0px;
+}
+
+.vin__range__header {
+    margin: 16px 0 10px 0;
+}
+
+.vin__range__time label {
+    display: none;
 }

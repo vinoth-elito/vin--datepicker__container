@@ -31,7 +31,7 @@ async function updatePreview() {
     jq.onload = () => {
         const scriptEl = doc.createElement('script');
         scriptEl.textContent = jsEditor.value;
-        doc.body.appendChild(scriptEl);
+        // doc.body.appendChild(scriptEl);
         const pickerScripts = [
             "js/datetimepicker.js",
             "js/datepicker.js",
@@ -552,6 +552,7 @@ function setupViewSwitcher() {
                         const newEditors = editors.cloneNode(true);
                         editors.replaceWith(newEditors);
                         editors = newEditors;
+                        initTextareaSearch();
                         editors.style.flex = "";
                         editors.style.height = "";
                         editors.style.width = "";
@@ -1180,18 +1181,21 @@ function showPanelSavePopup(panel, message) {
         setTimeout(() => popup.remove(), 300);
     }, 1500);
 }
-document.querySelectorAll('.editor-panel textarea').forEach(textarea => {
-    textarea.addEventListener('keydown', e => {
-        const isSearchShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f';
-        if (isSearchShortcut) {
-            e.preventDefault();
-            hideAllPopups();
-            const panel = textarea.closest('.editor-panel');
-            if (!panel) return;
-            openPanelSearch(panel, textarea);
-        }
+function initTextareaSearch() {
+    document.querySelectorAll('.editor-panel textarea').forEach(textarea => {
+        textarea.addEventListener('keydown', e => {
+            const isSearchShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f';
+            if (isSearchShortcut) {
+                e.preventDefault();
+                hideAllPopups();
+                const panel = textarea.closest('.editor-panel');
+                if (!panel) return;
+                openPanelSearch(panel, textarea);
+            }
+        });
     });
-});
+}
+initTextareaSearch();
 
 window.openPanelSearch = function (panel, target) {
     document.querySelectorAll('.panel-search-overlay, .highlight-div').forEach(el => el.remove());
@@ -1612,7 +1616,8 @@ async function loadAll() {
         stopFlag
     );
     const cssEditor = document.getElementById('css-editor');
-    const cssUrl = `https://vinoth-elito.github.io/vin--datepicker__container/css/preview.css?v=${cacheBuster}`;
+    // const cssUrl = `https://vinoth-elito.github.io/vin--datepicker__container/css/preview.css?v=${cacheBuster}`;
+    const cssUrl = `css/preview.css?v=${cacheBuster}`;
     try {
         const res = await fetch(cssUrl, { cache: 'no-store' });
         cssEditor.value = await res.text();
@@ -1634,11 +1639,15 @@ async function loadAll() {
         [
             `https://vinoth-elito.github.io/vin--datepicker__container/daterangepicker.html?v=${cacheBuster}`,
             `https://vinoth-elito.github.io/vin--datepicker__container/daterangepickersingle.html?v=${cacheBuster}`
+        ],
+        [
+            `https://vinoth-elito.github.io/vin--datepicker__container/daterangepicker_custom.html?v=${cacheBuster}`
         ]
+
     ];
     let finalHTML = '';
     for (let i = 0; i < rows.length; i++) {
-        let style = i === 1 ? ' style="justify-content:left;margin-top:30px;"' : '';
+        let style = i != 0 ? ' style="justify-content:left;margin-top:30px;"' : '';
         let rowHTML = `<div class="input__row"${style}>\n`;
         for (let file of rows[i]) {
             try {
