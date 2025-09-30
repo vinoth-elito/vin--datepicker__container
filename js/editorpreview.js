@@ -5,6 +5,7 @@ const jsEditor = document.getElementById('js-editor');
 const livePreview = document.getElementById('live-preview');
 let isManualUpdate = false;
 async function updatePreview() {
+    isManualUpdate = true;
     const doc = livePreview.contentDocument || livePreview.contentWindow.document;
     doc.open();
     doc.write('<!DOCTYPE html><html><head></head><body></body></html>');
@@ -472,10 +473,12 @@ async function updatePreview() {
     };
 }
 livePreview.addEventListener("load", () => {
-    if (!isManualUpdate) {
+    const doc = livePreview.contentDocument;
+    if (doc && !doc.body.hasChildNodes()) {
         updatePreview();
     }
 });
+livePreview.addEventListener("contextmenu", e => e.preventDefault());
 htmlEditor.addEventListener('input', updatePreview);
 cssEditor.addEventListener('input', updatePreview);
 jsEditor.addEventListener('input', updatePreview);
