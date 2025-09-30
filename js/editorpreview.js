@@ -31,7 +31,7 @@ async function updatePreview() {
     jq.onload = () => {
         const scriptEl = doc.createElement('script');
         scriptEl.textContent = jsEditor.value;
-        doc.body.appendChild(scriptEl);
+        // doc.body.appendChild(scriptEl);
         const pickerScripts = [
             "js/datetimepicker.js",
             "js/datepicker.js",
@@ -1634,7 +1634,11 @@ async function loadAll() {
         [
             `https://vinoth-elito.github.io/vin--datepicker__container/daterangepicker.html?v=${cacheBuster}`,
             `https://vinoth-elito.github.io/vin--datepicker__container/daterangepickersingle.html?v=${cacheBuster}`
+        ],
+        [
+            `https://vinoth-elito.github.io/vin--datepicker__container/daterangepicker_custom.html?v=${cacheBuster}`
         ]
+
     ];
     let finalHTML = '';
     for (let i = 0; i < rows.length; i++) {
