@@ -3,14 +3,11 @@ const htmlEditor = document.getElementById('html-editor');
 const cssEditor = document.getElementById('css-editor');
 const jsEditor = document.getElementById('js-editor');
 const livePreview = document.getElementById('live-preview');
-let isManualUpdate = false;
 async function updatePreview() {
-    isManualUpdate = true;
     const doc = livePreview.contentDocument || livePreview.contentWindow.document;
     doc.open();
     doc.write('<!DOCTYPE html><html><head></head><body></body></html>');
     doc.close();
-    isManualUpdate = false;
     const styleEl = doc.createElement('style');
     styleEl.textContent = cssEditor.value;
     doc.head.appendChild(styleEl);
@@ -472,11 +469,6 @@ async function updatePreview() {
         });
     };
 }
-livePreview.addEventListener("load", () => {
-    if (!isManualUpdate) {
-        updatePreview();
-    }
-});
 htmlEditor.addEventListener('input', updatePreview);
 cssEditor.addEventListener('input', updatePreview);
 jsEditor.addEventListener('input', updatePreview);
