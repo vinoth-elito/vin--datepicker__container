@@ -631,6 +631,7 @@ function setupViewSwitcher() {
             panel.style.flex = "";
             panel.style.height = "";
             panel.style.width = "";
+            editors.style.padding = "";
         });
         document.body.style.cursor = "";
         document.body.style.userSelect = "";
