@@ -398,12 +398,18 @@ function buildSrcDoc() {
   <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/timepicker.js?v=${cacheBuster}"></script>
   <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/daterangepicker.js?v=${cacheBuster}"></script>
   <script>
-    try { ${js} } catch (e) { console.error(e); }
-    try 
-      ${INIT_CODE}
-    } catch (e) { console.error(e); }
-    if (typeof attachResize === 'function') { attachResize(); }
-  </script>
+  try {
+    ${js}
+  } catch (e) {
+    console.error(e);
+  }
+
+  try {
+    ${INIT_CODE}
+  } catch (e) {
+    console.error(e);
+  }
+</script>
 </body>
 </html>`;
 }
