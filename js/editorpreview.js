@@ -3,483 +3,421 @@ const htmlEditor = document.getElementById('html-editor');
 const cssEditor = document.getElementById('css-editor');
 const jsEditor = document.getElementById('js-editor');
 const livePreview = document.getElementById('live-preview');
-livePreview.addEventListener('load', () => {
-    const doc = livePreview.contentDocument || livePreview.contentWindow.document;
-    doc.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        doc.body.innerHTML = '';
-        updatePreview();
-    });
-});
-async function updatePreview() {
-    const doc = livePreview.contentDocument || livePreview.contentWindow.document;
-    doc.open();
-    doc.write('<!DOCTYPE html><html><head></head><body></body></html>');
-    doc.close();
-    const styleEl = doc.createElement('style');
-    styleEl.textContent = cssEditor.value;
-    doc.head.appendChild(styleEl);
-    doc.body.innerHTML = htmlEditor.value;
-    doc.addEventListener('keydown', function (e) {
-        const inputCol = e.target.closest('.input__col');
-        if (!inputCol) return;
-        if (e.key === 'Enter' || e.keyCode === 13) {
-            e.preventDefault();
-        }
-    });
+function buildSrcDoc() {
     const cacheBuster = Date.now();
-    const parentFA = document.getElementById('fa-css');
-    if (parentFA && !doc.getElementById('fa-css')) {
-        const faLink = parentFA.cloneNode(true);
-        doc.head.appendChild(faLink);
-    }
-    const jq = doc.createElement('script');
-    jq.src = window.$jqlibraryURL + `?v=${cacheBuster}`;
-    doc.head.appendChild(jq);
-    jq.onload = () => {
-        const scriptEl = doc.createElement('script');
-        scriptEl.textContent = jsEditor.value;
-        // doc.body.appendChild(scriptEl);
-        const pickerScripts = [
-            "js/datetimepicker.js",
-            "js/datepicker.js",
-            "js/monthyearpicker.js",
-            "js/timepicker.js",
-            "js/daterangepicker.js"
-        ];
-        let loadedCount = 0;
-        pickerScripts.forEach(src => {
-            const s = doc.createElement('script');
-            s.src = src + `?v=${cacheBuster}`;
-            s.onload = () => {
-                loadedCount++;
-                if (loadedCount === pickerScripts.length) {
-                    const initScript = doc.createElement('script');
-                    initScript.textContent = `
-                        if (typeof initVinDatePickers === 'function') {
-                            initVinDatePickers();
+    const css = cssEditor?.value ?? '';
+    const html = htmlEditor?.value ?? '';
+    const js = jsEditor?.value ?? '';
+    const faLinkEl = window.parent?.document?.getElementById('fa-css');
+    const faHref = faLinkEl?.href ? `<link id="fa-css" rel="stylesheet" href="${faLinkEl.href}">` : '';
+    const jq = window.$jqlibraryURL ? `<script src="${window.$jqlibraryURL}?v=${cacheBuster}"></script>` : '';
+    const INIT_CODE = `
+            window.componentFunctionMap = window.componentFunctionMap || {
+                '.vindatepicker': {
+                    func: 'showDatePicker',
+                    funccommon: 'initVinDatePickers',
+                    event: '$("body").on("click", ".vindatepicker input", function () {' +
+                        'let $input = $(this);' +
+                        'showDatePicker($input);' +
+                        '});'
+                },
+                '.vintimepicker': {
+                    func: 'showTimePicker',
+                    funccommon: 'initVinDatePickers',
+                    event: '$("body").on("click", ".vintimepicker input", function () {' +
+                        'let $input = $(this);' +
+                        'showTimePicker($input);' +
+                        '});'
+                },
+                '.vindatetimepicker': {
+                    func: 'showDateTimePicker',
+                    funccommon: 'initVinDatePickers',
+                    event: '$("body").on("click", ".vindatetimepicker input", function () {' +
+                        'let $input = $(this);' +
+                        'showDateTimePicker($input);' +
+                        '});'
+                },
+                '.vinmonthyearpicker': {
+                    func: 'showMonthYearPicker',
+                    funccommon: 'initVinDatePickers',
+                    event: '$("body").on("click", ".vinmonthyearpicker input", function () {' +
+                        'let $input = $(this);' +
+                        'showMonthYearPicker($input);' +
+                        '});'
+                },
+                '.vindaterangepicker': {
+                    func: 'showDateRangePicker',
+                    funccommon: 'initVinDatePickers',
+                    event: '$(".vindaterange--from__date, .vindaterange--to__date").on("focus", function () {' +
+                        'showDateRangePicker($(this));' +
+                        '});'
+                },
+            };
+            function getPickerCode(selector) {
+                const picker = window.componentFunctionMap[selector];
+                if (!picker) return '';
+                let code = '';
+                if (picker.func1) code += "func1: '" + picker.func1 + "', ";
+                if (picker.func) code += "func: '" + picker.func + "', ";
+                if (picker.event) code += "event: '" + picker.event + "'";
+                return code;
+            }
+            function highlightCopiedState(openContainer, pre) {
+                const activeTab = openContainer.querySelector('.tab-btn.active');
+                if (!activeTab) return;
+                const originalTabHTML = activeTab.innerHTML;
+                const originalTabBg = activeTab.style.background;
+                const originalTabColor = activeTab.style.color;
+                const originalPreBg = pre.style.background;
+                activeTab.innerHTML = '<i class="fa fa-check" style="color:#fff;"></i> Copied!';
+                activeTab.style.background = '#28a745';
+                activeTab.style.color = '#fff';
+                setTimeout(() => {
+                    activeTab.innerHTML = originalTabHTML;
+                    activeTab.style.background = originalTabBg;
+                    activeTab.style.color = originalTabColor;
+                    pre.style.background = originalPreBg;
+                }, 1500);
+            }
+            window.getFunctionText = window.getFunctionText || function(jsCode, funcName) {
+                const funcStart = jsCode.indexOf('function ' + funcName + '(');
+                if (funcStart === -1) return '';
+                let i = funcStart;
+                let braceCount = 0;
+                let inString = false;
+                let stringChar = '';
+                let escapeNext = false;
+                for (; i < jsCode.length; i++) {
+                    const char = jsCode[i];
+                    if (escapeNext) { escapeNext = false; continue; }
+                    if (inString) {
+                        if (char === '\\\\') escapeNext = true;
+                        else if (char === stringChar) inString = false;
+                    } else {
+                        if (char === '"' || char === "'" || char === '\\\`') {
+                            inString = true;
+                            stringChar = char;
+                        } else if (char === '{') braceCount++;
+                        else if (char === '}') {
+                            braceCount--;
+                            if (braceCount === 0) return jsCode.substring(funcStart, i + 1);
                         }
-                    `;
-                    doc.body.appendChild(initScript);
-                    const handlers = {
-                        ".vindatetimepicker input": "showDateTimePicker",
-                        ".vindatepicker input": "showDatePicker",
-                        ".vinmonthyearpicker input": "showMonthYearPicker",
-                        ".vintimepicker input": "showTimePicker",
-                        ".vindatepicker input": "showDatePicker"
-                    };
-                    let handlerCode = '';
-                    for (const selector in handlers) {
-                        const funcName = handlers[selector];
-                        handlerCode += `
-                            (function($){
-                                $("body").on("click", "${selector}", function () {
-                                    let $input = $(this);
-                                    if (typeof window["${funcName}"] === "function") {
-                                        window["${funcName}"]($input);
-                                    }
-                                });
-                            })(window.jQuery);
-                        `;
                     }
-                    handlerCode += `
-                        (function($){
-                            $("body").on("focus", ".vindaterange--from__date, .vindaterange--to__date", function () {
-                                let $input = $(this);
-                                if (typeof window["showDateRangePicker"] === "function") {
-                                    window["showDateRangePicker"]($input);
+                }
+                return '';
+            };
+            document.addEventListener('click', function (e) {
+                const target = e.target.closest('[data-target]');
+                const allContainers = document.querySelectorAll('.view-code-container');
+                const allViewCodeBtns = document.querySelectorAll('.view-code-btn');
+                if (
+                    !target &&
+                    !e.target.closest('.view-code-container') &&
+                    !e.target.closest('.editors') &&
+                    !e.target.closest('#html-editor') &&
+                    !e.target.closest('#css-editor') &&
+                    !e.target.closest('#js-editor')
+                ) {
+                    allContainers.forEach(c => {
+                        if (c.classList.contains('show')) {
+                            c.classList.remove('show');
+                            c.addEventListener('transitionend', function handler(ev) {
+                                if (ev.propertyName === 'transform') {
+                                    c.style.display = 'none';
+                                    c.removeEventListener('transitionend', handler);
                                 }
                             });
-                        })(window.jQuery);
-                    `;
-                    const clickScript = doc.createElement('script');
-                    clickScript.textContent = handlerCode;
-                    doc.body.appendChild(clickScript);
-                    const codeScript = doc.createElement('script');
-                    codeScript.textContent = `
-                        window.componentFunctionMap = window.componentFunctionMap || {
-                            '.vindatepicker': {
-                                func: 'showDatePicker',
-                                funccommon: 'initVinDatePickers',
-                                event: '$("body").on("click", ".vindatepicker input", function () {' +
-                                    'let $input = $(this);' +
-                                    'showDatePicker($input);' +
-                                    '});'
-                            },
-                            '.vintimepicker': {
-                                func: 'showTimePicker',
-                                funccommon: 'initVinDatePickers',
-                                event: '$("body").on("click", ".vintimepicker input", function () {' +
-                                    'let $input = $(this);' +
-                                    'showTimePicker($input);' +
-                                    '});'
-                            },
-                            '.vindatetimepicker': {
-                                func: 'showDateTimePicker',
-                                funccommon: 'initVinDatePickers',
-                                event: '$("body").on("click", ".vindatetimepicker input", function () {' +
-                                    'let $input = $(this);' +
-                                    'showDateTimePicker($input);' +
-                                    '});'
-                            },
-                            '.vinmonthyearpicker': {
-                                func: 'showMonthYearPicker',
-                                funccommon: 'initVinDatePickers',
-                                event: '$("body").on("click", ".vinmonthyearpicker input", function () {' +
-                                    'let $input = $(this);' +
-                                    'showMonthYearPicker($input);' +
-                                    '});'
-                            },
-                            '.vindaterangepicker': {
-                                func: 'showDateRangePicker',
-                                funccommon: 'initVinDatePickers',
-                                event: '$(".vindaterange--from__date, .vindaterange--to__date").on("focus", function () {' +
-                                    'showDateRangePicker($(this));' +
-                                    '});'
-                            },
-                        };
-
-                        function getPickerCode(selector) {
-                            const picker = window.componentFunctionMap[selector];
-                            if (!picker) return '';
-                            let code = '';
-                            if (picker.func1) code += "func1: '" + picker.func1 + "', ";
-                            if (picker.func) code += "func: '" + picker.func + "', ";
-                            if (picker.event) code += "event: '" + picker.event + "'";
-                            return code;
-                        }
-
-                        function highlightCopiedState(openContainer, pre) {
-                            const activeTab = openContainer.querySelector('.tab-btn.active');
-                            if (!activeTab) return;
-                            const originalTabHTML = activeTab.innerHTML;
-                            const originalTabBg = activeTab.style.background;
-                            const originalTabColor = activeTab.style.color;
-                            const originalPreBg = pre.style.background;
-                            activeTab.innerHTML = '<i class="fa fa-check" style="color:#fff;"></i> Copied!';
-                            activeTab.style.background = '#28a745';
-                            activeTab.style.color = '#fff';
-                            setTimeout(() => {
-                                activeTab.innerHTML = originalTabHTML;
-                                activeTab.style.background = originalTabBg;
-                                activeTab.style.color = originalTabColor;
-                                pre.style.background = originalPreBg;
-                            }, 1500);
-                        }
-
-                        window.getFunctionText = window.getFunctionText || function(jsCode, funcName) {
-                            const funcStart = jsCode.indexOf('function ' + funcName + '(');
-                            if (funcStart === -1) return '';
-                            let i = funcStart;
-                            let braceCount = 0;
-                            let inString = false;
-                            let stringChar = '';
-                            let escapeNext = false;
-                            for (; i < jsCode.length; i++) {
-                                const char = jsCode[i];
-                                if (escapeNext) { escapeNext = false; continue; }
-                                if (inString) {
-                                    if (char === '\\\\') escapeNext = true;
-                                    else if (char === stringChar) inString = false;
-                                } else {
-                                    if (char === '"' || char === "'" || char === '\\\`') {
-                                        inString = true;
-                                        stringChar = char;
-                                    } else if (char === '{') braceCount++;
-                                    else if (char === '}') {
-                                        braceCount--;
-                                        if (braceCount === 0) return jsCode.substring(funcStart, i + 1);
-                                    }
-                                }
-                            }
-                            return '';
-                        };
-
-                        document.addEventListener('click', function (e) {
-                        const target = e.target.closest('[data-target]');
-                        const allContainers = document.querySelectorAll('.view-code-container');
-                        const allViewCodeBtns = document.querySelectorAll('.view-code-btn');
-                        if (
-                            !target &&
-                            !e.target.closest('.view-code-container') &&
-                            !e.target.closest('.editors') &&
-                            !e.target.closest('#html-editor') &&
-                            !e.target.closest('#css-editor') &&
-                            !e.target.closest('#js-editor')
-                        ) {
-                            allContainers.forEach(c => {
-                                if (c.classList.contains('show')) {
-                                    c.classList.remove('show');
-                                    c.addEventListener('transitionend', function handler(ev) {
-                                        if (ev.propertyName === 'transform') {
-                                            c.style.display = 'none';
-                                            c.removeEventListener('transitionend', handler);
-                                        }
-                                    });
-                                }
-                            });
-                            allViewCodeBtns.forEach(btn => btn.setAttribute('data-tooltip', 'Get Code'));
-                            return;
-                        }
-                        if (target) {
-                            const selector = target.getAttribute('data-target');
-                            const container = target.closest('.input__col');
-                            if (!container) return;
-                            const codeDivClass = 'view-code-container';
-                            let codeContainer = container.querySelector('.' + codeDivClass);
-                            allContainers.forEach(c => {
-                                if (c !== codeContainer && c.classList.contains('show')) {
-                                    c.classList.remove('show');
-                                    c.addEventListener('transitionend', function handler(ev) {
-                                        if (ev.propertyName === 'transform') {
-                                            c.style.display = 'none';
-                                            c.removeEventListener('transitionend', handler);
-                                        }
-                                    });
-                                }
-                            });
-                            if (!codeContainer) {
-                                codeContainer = document.createElement('div');
-                                codeContainer.className = codeDivClass;
-                                codeContainer.style.display = 'block';
-                                const tabs = document.createElement('div');
-                                tabs.className = 'code-tabs';
-                                tabs.style.display = 'flex';
-                                tabs.style.borderBottom = '1px solid #ccc';
-                                tabs.style.marginBottom = '5px';
-                                tabs.style.position = 'relative';
-                                const htmlTab = document.createElement('button');
-                                htmlTab.textContent = 'HTML';
-                                htmlTab.className = 'tab-btn active';
-                                const cssTab = document.createElement('button');
-                                cssTab.textContent = 'CSS';
-                                cssTab.className = 'tab-btn';
-                                const jsTab = document.createElement('button');
-                                jsTab.textContent = 'JS';
-                                jsTab.className = 'tab-btn';
-                                tabs.appendChild(htmlTab);
-                                tabs.appendChild(cssTab);
-                                tabs.appendChild(jsTab);
-                                const indicator = document.createElement('div');
-                                indicator.className = 'tab-indicator';
-                                indicator.style.position = 'absolute';
-                                indicator.style.bottom = '0';
-                                indicator.style.transition = 'transform 0.3s ease, width 0.3s ease';
-                                tabs.appendChild(indicator);
-                                codeContainer.appendChild(tabs);
-                                function createTabWrapper(tabName, content, pickerSelector = '') {
-                                    const wrapper = document.createElement('div');
-                                    wrapper.style.display = tabName === 'HTML' ? 'block' : 'none';
-                                    wrapper.style.position = 'relative';
-                                    const pre = document.createElement('pre');
-                                    pre.style.whiteSpace = 'pre-wrap';
-                                    pre.style.fontFamily = 'monospace';
-                                    pre.style.padding = '10px';
-                                    pre.style.border = '1px solid #ccc';
-                                    if (tabName === 'JS' && pickerSelector) {
-                                        pre.textContent = getPickerCode(pickerSelector);
-                                    } else {
-                                        pre.textContent = content;
-                                    }
-                                    const copyBtn = document.createElement('button');
-                                    copyBtn.innerHTML = '<i class="fa fa-copy"></i> Copy Code';
-                                    Object.assign(copyBtn.style, {
-                                        position: 'absolute',
-                                        zIndex:'20',
-                                        top: '-13px',
-                                        right: '30px',
-                                        fontSize: '12px',
-                                        color: '#fff',
-                                        background: '#111',
-                                        border: 'none',
-                                        padding: '3px 15px',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '4px',
-                                        transition: 'background 0.3s'
-                                    });
-                                copyBtn.addEventListener('click', () => {
-                                    let codeToCopy = '';
-                                    if (tabName === 'HTML') codeToCopy = "\\x3C!-- HTML --\\x3E\\n" + pre.textContent;
-                                    if (tabName === 'CSS') codeToCopy = "/* CSS */\\n" + pre.textContent;
-                                    if (tabName === 'JS') codeToCopy = "// JS\\n" + pre.textContent;
-                                    navigator.clipboard.writeText(codeToCopy).then(() => {
-                                    const openContainer = copyBtn.closest('.view-code-container');
-                                    highlightCopiedState(openContainer, pre);
-                                    const originalHTML = copyBtn.innerHTML;
-                                    copyBtn.innerHTML = '<i class="fa fa-check" style="color:green;"></i> Copied!';
-                                    copyBtn.style.cursor = 'not-allowed';
-                                    copyBtn.style.pointerEvents = 'none';
-                                    setTimeout(() => {
-                                        copyBtn.innerHTML = originalHTML;
-                                        copyBtn.style.cursor = 'pointer';
-                                        copyBtn.style.pointerEvents = 'auto';
-                                        }, 2000);
-                                    });
-                                    });
-                                    wrapper.appendChild(pre);
-                                    wrapper.appendChild(copyBtn);
-                                    return wrapper;
-                                }
-                                const htmlContent = container.querySelector(selector)?.outerHTML || '';
-                                const cssContent = window.parent.document.getElementById('css-editor')?.value || '';
-                                const jsContent = '';
-                                const htmlTabContent = createTabWrapper('HTML', htmlContent);
-                                const cssTabContent = createTabWrapper('CSS', cssContent);
-                                const jsTabContent = createTabWrapper('JS', jsContent, selector);
-                                codeContainer.appendChild(htmlTabContent);
-                                codeContainer.appendChild(cssTabContent);
-                                codeContainer.appendChild(jsTabContent);
-                                function moveIndicator(activeBtn) {
-                                    const rect = activeBtn.getBoundingClientRect();
-                                    const parentRect = tabs.getBoundingClientRect();
-                                    const left = rect.left - parentRect.left;
-                                    indicator.style.width = rect.width + 'px';
-                                    indicator.style.transform = 'translateX(' + left + 'px)';
-                                }
-                                setTimeout(() => moveIndicator(htmlTab), 50);
-                                function activateTab(tab, targetWrapper, content) {
-                                    [htmlTab, cssTab, jsTab].forEach(btn => btn.classList.remove('active'));
-                                    tab.classList.add('active');
-                                    moveIndicator(tab);
-                                    [htmlTabContent, cssTabContent, jsTabContent].forEach(w => w.style.display = 'none');
-                                    targetWrapper.style.display = 'block';
-                                    targetWrapper.querySelector('pre').textContent = content;
-                                }
-                                    
-                                window.removeSearchUI = function () {
-                                    const existingHighlightDiv = document.querySelector(".highlight-div");
-                                    if (existingHighlightDiv) existingHighlightDiv.remove();
-
-                                    const existingOverlay = document.querySelector(".panel-search-overlay");
-                                    if (existingOverlay) existingOverlay.remove();
-                                };
-                                    
-                                htmlTab.addEventListener('click', () => {
-                                    removeSearchUI();
-                                    activateTab(htmlTab, htmlTabContent, htmlContent);
-                                });
-
-                                cssTab.addEventListener('click', () => {
-                                    removeSearchUI();
-                                    const cssEditorContent = window.parent.document.getElementById('css-editor')?.value || '';
-                                    activateTab(cssTab, cssTabContent, cssEditorContent);
-                                });
-                               jsTab.addEventListener('click', () => {
-                                removeSearchUI();
-                                    const comp = window.componentFunctionMap[selector] || {};
-                                    const jsEditorContent = window.parent.document.getElementById('js-editor')?.value || '';
-                                    let finalCode = '';
-                                    if (comp.func) {
-                                        const funcText = getFunctionText(jsEditorContent, comp.func);
-                                        if (funcText) finalCode += funcText + "\\n";
-                                        else finalCode += comp.func + "\\n";
-                                    }
-
-                                     if (comp.funccommon) {
-                                        const funccommonText = getFunctionText(jsEditorContent, comp.funccommon);
-                                        if (funccommonText) finalCode += funccommonText + "\\n";
-                                        else finalCode += comp.funccommon + "\\n";
-                                         finalCode += "$(document).ready(function() { " + comp.funccommon + "(); });\\n\\n";
-                                    }
-
-                                    if (comp.event) finalCode += comp.event + "\\n";
-                                    activateTab(jsTab, jsTabContent, finalCode);
-                                });
-                                container.appendChild(codeContainer);
-                                requestAnimationFrame(() => codeContainer.classList.add('show'));
-                                allViewCodeBtns.forEach(btn => btn.setAttribute('data-tooltip', 'Get Code'));
-                                target.setAttribute('data-tooltip', 'Hide Code');
-                            } else {
-                                if (codeContainer.classList.contains('show')) {
-                                    codeContainer.classList.remove('show');
-                                    allViewCodeBtns.forEach(btn => btn.setAttribute('data-tooltip', 'Get Code'));
-                                    codeContainer.addEventListener('transitionend', function handler(ev) {
-                                        if (ev.propertyName === 'transform') {
-                                            codeContainer.style.display = 'none';
-                                            codeContainer.removeEventListener('transitionend', handler);
-                                        }
-                                    });
-                                } else {
-                                    document.querySelectorAll('.view-code-container.show').forEach(c => {
-                                        c.classList.remove('show');
-                                        c.style.display = 'none';
-                                    });
-                                    codeContainer.style.display = 'block';
-                                    function removeSearchUII() {
-                                    const existingHighlightDiv = document.querySelector(".highlight-div");
-                                    if (existingHighlightDiv) existingHighlightDiv.remove();
-
-                                    const existingOverlay = document.querySelector(".panel-search-overlay");
-                                    if (existingOverlay) existingOverlay.remove();
-                                }
-                                    removeSearchUII();
-                                    requestAnimationFrame(() => codeContainer.classList.add('show'));
-                                    allViewCodeBtns.forEach(btn => btn.setAttribute('data-tooltip', 'Get Code'));
-                                    target.setAttribute('data-tooltip', 'Hide Code');
-                                }
-                            }
                         }
                     });
-                    document.addEventListener('keydown', function (e) {
-                            const openContainer = document.querySelector('.view-code-container.show');
-                            if (!openContainer) return;
-                            const activeTab = openContainer.querySelector('.tab-btn.active');
-                            if (!activeTab) return;
-                            const preBlocks = Array.from(openContainer.querySelectorAll('pre'));
-                            const activePre = preBlocks.find(p => p.offsetParent !== null);
-                            if (!activePre) return;
-                            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
-                                const range = document.createRange();
-                                range.selectNodeContents(activePre);
-                                const selection = window.getSelection();
-                                selection.removeAllRanges();
-                                selection.addRange(range);
-                                e.preventDefault();
-                            }
-                            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
-                                let codeToCopy = window.getSelection().toString();
-                                if (!codeToCopy.trim()) {
-                                    codeToCopy = activePre.textContent;
-                                }
-                                const tabName = activeTab.textContent.trim();
-                                if (tabName === 'HTML') {
-                                    codeToCopy = "<!-- HTML -->\\n" + codeToCopy;
-                                } else if (tabName === 'CSS') {
-                                    codeToCopy = "/* CSS */\\n" + codeToCopy;
-                                } else if (tabName === 'JS') {
-                                    codeToCopy = "// JS\\n" + codeToCopy;
-                                }
-                                navigator.clipboard.writeText(codeToCopy).then(() => {
-                                    highlightCopiedState(openContainer, activePre);
-                                });
-                                if (window.parent?.closePanelSearch) {
-                                    window.parent.closePanelSearch(openContainer, activePre);
-                                }
-                            }
-                            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") {
-                                e.preventDefault();
-                                if (window.parent?.openPanelSearchiframe) {
-                                    const existingOverlay = openContainer.querySelector(".panel-search-overlay");
-                                    if (existingOverlay) existingOverlay.remove();
-                                    const existingHighlightDiv = openContainer.querySelector(".highlight-div");
-                                    if (existingHighlightDiv) existingHighlightDiv.remove();
-                                    window.parent.openPanelSearchiframe(openContainer, activePre);
-                                }
-                            }
-                        });
-                    `;
-                    doc.body.appendChild(codeScript);
+                    allViewCodeBtns.forEach(btn => btn.setAttribute('data-tooltip', 'Get Code'));
+                    return;
                 }
-            };
-            doc.head.appendChild(s);
-        });
-    };
+                if (target) {
+                    const selector = target.getAttribute('data-target');
+                    const container = target.closest('.input__col');
+                    if (!container) return;
+                    const codeDivClass = 'view-code-container';
+                    let codeContainer = container.querySelector('.' + codeDivClass);
+                    allContainers.forEach(c => {
+                        if (c !== codeContainer && c.classList.contains('show')) {
+                            c.classList.remove('show');
+                            c.addEventListener('transitionend', function handler(ev) {
+                                if (ev.propertyName === 'transform') {
+                                    c.style.display = 'none';
+                                    c.removeEventListener('transitionend', handler);
+                                }
+                            });
+                        }
+                    });
+                    if (!codeContainer) {
+                        codeContainer = document.createElement('div');
+                        codeContainer.className = codeDivClass;
+                        codeContainer.style.display = 'block';
+                        const tabs = document.createElement('div');
+                        tabs.className = 'code-tabs';
+                        tabs.style.display = 'flex';
+                        tabs.style.borderBottom = '1px solid #ccc';
+                        tabs.style.marginBottom = '5px';
+                        tabs.style.position = 'relative';
+                        const htmlTab = document.createElement('button');
+                        htmlTab.textContent = 'HTML';
+                        htmlTab.className = 'tab-btn active';
+                        const cssTab = document.createElement('button');
+                        cssTab.textContent = 'CSS';
+                        cssTab.className = 'tab-btn';
+                        const jsTab = document.createElement('button');
+                        jsTab.textContent = 'JS';
+                        jsTab.className = 'tab-btn';
+                        tabs.appendChild(htmlTab);
+                        tabs.appendChild(cssTab);
+                        tabs.appendChild(jsTab);
+                        const indicator = document.createElement('div');
+                        indicator.className = 'tab-indicator';
+                        indicator.style.position = 'absolute';
+                        indicator.style.bottom = '0';
+                        indicator.style.transition = 'transform 0.3s ease, width 0.3s ease';
+                        tabs.appendChild(indicator);
+                        codeContainer.appendChild(tabs);
+                        function createTabWrapper(tabName, content, pickerSelector = '') {
+                            const wrapper = document.createElement('div');
+                            wrapper.style.display = tabName === 'HTML' ? 'block' : 'none';
+                            wrapper.style.position = 'relative';
+                            const pre = document.createElement('pre');
+                            pre.style.whiteSpace = 'pre-wrap';
+                            pre.style.fontFamily = 'monospace';
+                            pre.style.padding = '10px';
+                            pre.style.border = '1px solid #ccc';
+                            if (tabName === 'JS' && pickerSelector) {
+                                pre.textContent = getPickerCode(pickerSelector);
+                            } else {
+                                pre.textContent = content;
+                            }
+                            const copyBtn = document.createElement('button');
+                            copyBtn.innerHTML = '<i class="fa fa-copy"></i> Copy Code';
+                            Object.assign(copyBtn.style, {
+                                position: 'absolute',
+                                zIndex:'20',
+                                top: '-13px',
+                                right: '30px',
+                                fontSize: '12px',
+                                color: '#fff',
+                                background: '#111',
+                                border: 'none',
+                                padding: '3px 15px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                transition: 'background 0.3s'
+                            });
+                        copyBtn.addEventListener('click', () => {
+                            let codeToCopy = '';
+                            if (tabName === 'HTML') codeToCopy = "\\x3C!-- HTML --\\x3E\\n" + pre.textContent;
+                            if (tabName === 'CSS') codeToCopy = "/* CSS */\\n" + pre.textContent;
+                            if (tabName === 'JS') codeToCopy = "// JS\\n" + pre.textContent;
+                            navigator.clipboard.writeText(codeToCopy).then(() => {
+                            const openContainer = copyBtn.closest('.view-code-container');
+                            highlightCopiedState(openContainer, pre);
+                            const originalHTML = copyBtn.innerHTML;
+                            copyBtn.innerHTML = '<i class="fa fa-check" style="color:green;"></i> Copied!';
+                            copyBtn.style.cursor = 'not-allowed';
+                            copyBtn.style.pointerEvents = 'none';
+                            setTimeout(() => {
+                                copyBtn.innerHTML = originalHTML;
+                                copyBtn.style.cursor = 'pointer';
+                                copyBtn.style.pointerEvents = 'auto';
+                                }, 2000);
+                            });
+                            });
+                            wrapper.appendChild(pre);
+                            wrapper.appendChild(copyBtn);
+                            return wrapper;
+                        }
+                        const htmlContent = container.querySelector(selector)?.outerHTML || '';
+                        const cssContent = window.parent.document.getElementById('css-editor')?.value || '';
+                        const jsContent = '';
+                        const htmlTabContent = createTabWrapper('HTML', htmlContent);
+                        const cssTabContent = createTabWrapper('CSS', cssContent);
+                        const jsTabContent = createTabWrapper('JS', jsContent, selector);
+                        codeContainer.appendChild(htmlTabContent);
+                        codeContainer.appendChild(cssTabContent);
+                        codeContainer.appendChild(jsTabContent);
+                        function moveIndicator(activeBtn) {
+                            const rect = activeBtn.getBoundingClientRect();
+                            const parentRect = tabs.getBoundingClientRect();
+                            const left = rect.left - parentRect.left;
+                            indicator.style.width = rect.width + 'px';
+                            indicator.style.transform = 'translateX(' + left + 'px)';
+                        }
+                        setTimeout(() => moveIndicator(htmlTab), 50);
+                        function activateTab(tab, targetWrapper, content) {
+                            [htmlTab, cssTab, jsTab].forEach(btn => btn.classList.remove('active'));
+                            tab.classList.add('active');
+                            moveIndicator(tab);
+                            [htmlTabContent, cssTabContent, jsTabContent].forEach(w => w.style.display = 'none');
+                            targetWrapper.style.display = 'block';
+                            targetWrapper.querySelector('pre').textContent = content;
+                        }
+                            
+                        window.removeSearchUI = function () {
+                            const existingHighlightDiv = document.querySelector(".highlight-div");
+                            if (existingHighlightDiv) existingHighlightDiv.remove();
+
+                            const existingOverlay = document.querySelector(".panel-search-overlay");
+                            if (existingOverlay) existingOverlay.remove();
+                        };
+                            
+                        htmlTab.addEventListener('click', () => {
+                            removeSearchUI();
+                            activateTab(htmlTab, htmlTabContent, htmlContent);
+                        });
+
+                        cssTab.addEventListener('click', () => {
+                            removeSearchUI();
+                            const cssEditorContent = window.parent.document.getElementById('css-editor')?.value || '';
+                            activateTab(cssTab, cssTabContent, cssEditorContent);
+                        });
+                    jsTab.addEventListener('click', () => {
+                        removeSearchUI();
+                            const comp = window.componentFunctionMap[selector] || {};
+                            const jsEditorContent = window.parent.document.getElementById('js-editor')?.value || '';
+                            let finalCode = '';
+                            if (comp.func) {
+                                const funcText = getFunctionText(jsEditorContent, comp.func);
+                                if (funcText) finalCode += funcText + "\\n";
+                                else finalCode += comp.func + "\\n";
+                            }
+
+                            if (comp.funccommon) {
+                                const funccommonText = getFunctionText(jsEditorContent, comp.funccommon);
+                                if (funccommonText) finalCode += funccommonText + "\\n";
+                                else finalCode += comp.funccommon + "\\n";
+                                finalCode += "$(document).ready(function() { " + comp.funccommon + "(); });\\n\\n";
+                            }
+
+                            if (comp.event) finalCode += comp.event + "\\n";
+                            activateTab(jsTab, jsTabContent, finalCode);
+                        });
+                        container.appendChild(codeContainer);
+                        requestAnimationFrame(() => codeContainer.classList.add('show'));
+                        allViewCodeBtns.forEach(btn => btn.setAttribute('data-tooltip', 'Get Code'));
+                        target.setAttribute('data-tooltip', 'Hide Code');
+                    } else {
+                        if (codeContainer.classList.contains('show')) {
+                            codeContainer.classList.remove('show');
+                            allViewCodeBtns.forEach(btn => btn.setAttribute('data-tooltip', 'Get Code'));
+                            codeContainer.addEventListener('transitionend', function handler(ev) {
+                                if (ev.propertyName === 'transform') {
+                                    codeContainer.style.display = 'none';
+                                    codeContainer.removeEventListener('transitionend', handler);
+                                }
+                            });
+                        } else {
+                            document.querySelectorAll('.view-code-container.show').forEach(c => {
+                                c.classList.remove('show');
+                                c.style.display = 'none';
+                            });
+                            codeContainer.style.display = 'block';
+                            function removeSearchUII() {
+                            const existingHighlightDiv = document.querySelector(".highlight-div");
+                            if (existingHighlightDiv) existingHighlightDiv.remove();
+
+                            const existingOverlay = document.querySelector(".panel-search-overlay");
+                            if (existingOverlay) existingOverlay.remove();
+                        }
+                            removeSearchUII();
+                            requestAnimationFrame(() => codeContainer.classList.add('show'));
+                            allViewCodeBtns.forEach(btn => btn.setAttribute('data-tooltip', 'Get Code'));
+                            target.setAttribute('data-tooltip', 'Hide Code');
+                        }
+                    }
+                }
+            });
+            document.addEventListener('keydown', function (e) {
+                const openContainer = document.querySelector('.view-code-container.show');
+                if (!openContainer) return;
+                const activeTab = openContainer.querySelector('.tab-btn.active');
+                if (!activeTab) return;
+                const preBlocks = Array.from(openContainer.querySelectorAll('pre'));
+                const activePre = preBlocks.find(p => p.offsetParent !== null);
+                if (!activePre) return;
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+                    const range = document.createRange();
+                    range.selectNodeContents(activePre);
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    e.preventDefault();
+                }
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+                    let codeToCopy = window.getSelection().toString();
+                    if (!codeToCopy.trim()) {
+                        codeToCopy = activePre.textContent;
+                    }
+                    const tabName = activeTab.textContent.trim();
+                    if (tabName === 'HTML') {
+                        codeToCopy = "<!-- HTML -->\\n" + codeToCopy;
+                    } else if (tabName === 'CSS') {
+                        codeToCopy = "/* CSS */\\n" + codeToCopy;
+                    } else if (tabName === 'JS') {
+                        codeToCopy = "// JS\\n" + codeToCopy;
+                    }
+                    navigator.clipboard.writeText(codeToCopy).then(() => {
+                        highlightCopiedState(openContainer, activePre);
+                    });
+                    if (window.parent?.closePanelSearch) {
+                        window.parent.closePanelSearch(openContainer, activePre);
+                    }
+                }
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") {
+                    e.preventDefault();
+                    if (window.parent?.openPanelSearchiframe) {
+                        const existingOverlay = openContainer.querySelector(".panel-search-overlay");
+                        if (existingOverlay) existingOverlay.remove();
+                        const existingHighlightDiv = openContainer.querySelector(".highlight-div");
+                        if (existingHighlightDiv) existingHighlightDiv.remove();
+                        window.parent.openPanelSearchiframe(openContainer, activePre);
+                    }
+                }
+            });
+        `;
+    return `<!DOCTYPE html>
+<html>
+<head>
+  <base href="${location.origin}/">
+  <meta charset="utf-8">
+  ${faHref}
+  <style>${css}</style>
+</head>
+<body>
+  ${html}
+  ${jq}
+  <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/datetimepicker.js?v=${cacheBuster}"></script>
+  <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/datepicker.js?v=${cacheBuster}"></script>
+  <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/monthyearpicker.js?v=${cacheBuster}"></script>
+  <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/timepicker.js?v=${cacheBuster}"></script>
+  <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/daterangepicker.js?v=${cacheBuster}"></script>
+  <script>
+    try { ${js} } catch (e) { console.error(e); }
+    try {
+      ${INIT_CODE}
+    } catch (e) { console.error(e); }
+    if (typeof attachResize === 'function') { attachResize(); }
+  </script>
+</body>
+</html>`;
+}
+function updatePreview() {
+    livePreview.srcdoc = buildSrcDoc();
 }
 htmlEditor.addEventListener('input', updatePreview);
 cssEditor.addEventListener('input', updatePreview);
 jsEditor.addEventListener('input', updatePreview);
+livePreview.addEventListener('load', () => {
+    if (!livePreview.contentDocument?.body?.childElementCount) {
+        livePreview.srcdoc = buildSrcDoc();
+    }
+});
 updatePreview();
 function setupViewSwitcher() {
     const container = document.querySelector(".editor-container");
@@ -1682,9 +1620,8 @@ window.openPanelSearchiframe = function (panel, target) {
         });
 
         if (!isTextarea) {
-            target.innerHTML = html; // ✅ inject highlights into content
+            target.innerHTML = html;
         } else {
-            // ✅ fallback: use highlightDiv overlay for <textarea>
             let overlayHtml = "";
             let lastIndex = 0, match;
             regex.lastIndex = 0;
@@ -1713,21 +1650,14 @@ window.openPanelSearchiframe = function (panel, target) {
             counter.style.display = 'none';
             return;
         }
-
-        // clear previous
         (isTextarea ? highlightDiv : target)
             .querySelectorAll('.highlight-match.current-match')
             .forEach(el => el.classList.remove('current-match'));
-
-        // set current
         const spans = (isTextarea ? highlightDiv : target).querySelectorAll('.highlight-match');
         const span = spans[currentIndex];
         if (!span) return;
         span.classList.add('current-match');
-
-        // auto-scroll into view like VSCode
         span.scrollIntoView({ block: "center", behavior: "smooth" });
-
         counter.textContent = `${currentIndex + 1} / ${matches.length}`;
     }
     function nextMatch() {
@@ -1934,13 +1864,23 @@ async function loadAll() {
     const readyIconfirstContainer = document.createElement('div');
     readyIconfirstContainer.className = 'loader__second';
     readyIconfirstContainer.innerHTML = `
-    <ul class="c">
-  	<li></li>
-	<li></li>
-	<li></li>
-	<li></li>
-	<li></li>
-    </ul>
+    <div class="loading-calendar">
+  <div class="load__calmonth">Loading...</div>
+  <div class="load__caldays">
+    <div class="load__calday" style="--delay:0s">P</div>
+    <div class="load__calday" style="--delay:0.1s">l</div>
+    <div class="load__calday" style="--delay:0.2s">e</div>
+    <div class="load__calday" style="--delay:0.3s">a</div>
+    <div class="load__calday" style="--delay:0.4s">s</div>
+    <div class="load__calday" style="--delay:0.5s">e</div>
+    <div class="load__calday" style="--delay:0.6s">...</div>
+    <div class="load__calday" style="--delay:0.7s">w</div>
+    <div class="load__calday" style="--delay:0.8s">a</div>
+    <div class="load__calday" style="--delay:0.9s">i</div>
+    <div class="load__calday" style="--delay:1s">t</div>
+    <div class="load__calday" style="--delay:1.1s">...</div>
+  </div>
+</div>
 `;
     loadingMsg.appendChild(readyIconfirstContainer);
     typingText.textContent = '';
@@ -2025,15 +1965,41 @@ async function loadAll() {
     const readyIconContainer = document.createElement('div');
     readyIconContainer.className = 'loader__second';
     readyIconContainer.innerHTML = `
-    <ul class="c">
-  	<li></li>
-	<li></li>
-	<li></li>
-	<li></li>
-	<li></li>
-    </ul>
+   <div class="loader__calendar">
+  <div class="loader__month" id="loader__month-year"></div>
+  <div class="loader__days" id="loader__days"></div>
+</div>
 `;
     loadingMsg.appendChild(readyIconContainer);
+    const monthYearDiv = document.getElementById('loader__month-year');
+    const daysDiv = document.getElementById('loader__days');
+    const now = new Date();
+    const monthNames = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+    monthYearDiv.textContent = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+    for (let i = 1; i <= 28; i++) {
+        const day = document.createElement('div');
+        day.className = 'loader__day';
+        day.textContent = i;
+        daysDiv.appendChild(day);
+    }
+
+    const days = document.querySelectorAll('.loader__day');
+    let index = 0;
+
+    function pickNext() {
+        if (index < days.length) {
+            days.forEach(d => {
+                d.classList.remove('picked', 'hand');
+            });
+            days[index].classList.add('picked', 'hand');
+            index++;
+            setTimeout(pickNext, 1000);
+        }
+    }
+    setTimeout(pickNext, 1000);
     typingText.textContent = '';
     loadingMsg.appendChild(typingText);
     await typeOnce(typingText, "The content is ready for view, thanks for your patience", 50);
