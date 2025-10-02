@@ -1787,6 +1787,10 @@ $('body').on('click', '.editor-sidebar button', function () {
     container.find('.editor-panel').removeClass('active');
     container.find('#' + dataactive).addClass('active');
 });
+window.addEventListener("beforeunload", function (e) {
+    e.preventDefault();
+    e.returnValue = "Changes could not update if page get refresh.";
+});
 function loadScripts() {
     const editor = document.getElementById('js-editor');
     const functionsToInclude = [
