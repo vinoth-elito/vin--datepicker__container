@@ -392,14 +392,14 @@ function buildSrcDoc() {
 <body>
   ${html}
   ${jq}
-  <script src="https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/datetimepicker.js?v=${cacheBuster}"></script>
-  <script src="https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/datepicker.js?v=${cacheBuster}"></script>
-  <script src="https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/monthyearpicker.js?v=${cacheBuster}"></script>
-  <script src="https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/timepicker.js?v=${cacheBuster}"></script>
-  <script src="https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/daterangepicker.js?v=${cacheBuster}"></script>
+  <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/datetimepicker.js?v=${cacheBuster}"></script>
+  <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/datepicker.js?v=${cacheBuster}"></script>
+  <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/monthyearpicker.js?v=${cacheBuster}"></script>
+  <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/timepicker.js?v=${cacheBuster}"></script>
+  <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/daterangepicker.js?v=${cacheBuster}"></script>
   <script>
     try { ${js} } catch (e) { console.error(e); }
-    try {
+    try 
       ${INIT_CODE}
     } catch (e) { console.error(e); }
     if (typeof attachResize === 'function') { attachResize(); }
@@ -1894,7 +1894,7 @@ async function loadAll() {
         stopFlag
     );
     const cssEditor = document.getElementById('css-editor');
-    const cssUrl = `https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/css/preview.css?v=${cacheBuster}`;
+    const cssUrl = `https://vinoth-elito.github.io/vin--datepicker__container/css/preview.css?v=${cacheBuster}`;
     // const cssUrl = `css/preview.css?v=${cacheBuster}`;
     try {
         const res = await fetch(cssUrl, { cache: 'no-store' });
