@@ -409,7 +409,9 @@ function buildSrcDoc() {
   } catch (e) {
     console.error(e);
   }
-
+  if (typeof initVinDatePickers === 'function') {
+    initVinDatePickers();
+  }
 </script>
 </body>
 </html>`;
