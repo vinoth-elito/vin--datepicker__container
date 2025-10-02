@@ -392,11 +392,11 @@ function buildSrcDoc() {
 <body>
   ${html}
   ${jq}
-  <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/datetimepicker.js?v=${cacheBuster}"></script>
-  <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/datepicker.js?v=${cacheBuster}"></script>
-  <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/monthyearpicker.js?v=${cacheBuster}"></script>
-  <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/timepicker.js?v=${cacheBuster}"></script>
-  <script src="https://vinoth-elito.github.io/vin--datepicker__container/js/daterangepicker.js?v=${cacheBuster}"></script>
+  <script src="https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/datetimepicker.js?v=${cacheBuster}"></script>
+  <script src="https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/datepicker.js?v=${cacheBuster}"></script>
+  <script src="https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/monthyearpicker.js?v=${cacheBuster}"></script>
+  <script src="https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/timepicker.js?v=${cacheBuster}"></script>
+  <script src="https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/daterangepicker.js?v=${cacheBuster}"></script>
   <script>
     try { ${js} } catch (e) { console.error(e); }
     try {
@@ -1894,7 +1894,7 @@ async function loadAll() {
         stopFlag
     );
     const cssEditor = document.getElementById('css-editor');
-    const cssUrl = `https://vinoth-elito.github.io/vin--datepicker__container/css/preview.css?v=${cacheBuster}`;
+    const cssUrl = `https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/css/preview.css?v=${cacheBuster}`;
     // const cssUrl = `css/preview.css?v=${cacheBuster}`;
     try {
         const res = await fetch(cssUrl, { cache: 'no-store' });
@@ -1907,19 +1907,19 @@ async function loadAll() {
     const htmlEditor = document.getElementById('html-editor');
     const rows = [
         [
-            `https://vinoth-elito.github.io/vin--datepicker__container/datepicker.html?v=${cacheBuster}`,
-            `https://vinoth-elito.github.io/vin--datepicker__container/timepicker.html?v=${cacheBuster}`,
-            `https://vinoth-elito.github.io/vin--datepicker__container/timepickerarrow.html?v=${cacheBuster}`,
-            `https://vinoth-elito.github.io/vin--datepicker__container/timepickercircle.html?v=${cacheBuster}`,
-            `https://vinoth-elito.github.io/vin--datepicker__container/monthyearpicker.html?v=${cacheBuster}`,
-            `https://vinoth-elito.github.io/vin--datepicker__container/datetimepicker.html?v=${cacheBuster}`
+            `https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/datepicker.html?v=${cacheBuster}`,
+            `https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/timepicker.html?v=${cacheBuster}`,
+            `https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/timepickerarrow.html?v=${cacheBuster}`,
+            `https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/timepickercircle.html?v=${cacheBuster}`,
+            `https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/monthyearpicker.html?v=${cacheBuster}`,
+            `https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/datetimepicker.html?v=${cacheBuster}`
         ],
         [
-            `https://vinoth-elito.github.io/vin--datepicker__container/daterangepicker.html?v=${cacheBuster}`,
-            `https://vinoth-elito.github.io/vin--datepicker__container/daterangepickersingle.html?v=${cacheBuster}`
+            `https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/daterangepicker.html?v=${cacheBuster}`,
+            `https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/daterangepickersingle.html?v=${cacheBuster}`
         ],
         [
-            `https://vinoth-elito.github.io/vin--datepicker__container/daterangepicker_custom.html?v=${cacheBuster}`
+            `https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/daterangepicker_custom.html?v=${cacheBuster}`
         ]
 
     ];

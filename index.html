@@ -31,11 +31,12 @@
         href="https://cdn.jsdelivr.net/gh/vinoth-elito/vin--datepicker__container@main/favicon_io/favicon.ico">
     <link id="fa-css" rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
         as="style" onload="this.onload=null;this.rel='stylesheet';document.body.classList.add('css-ready')">
-    <link rel="preload" href="https://vinoth-elito.github.io/vin--datepicker__container/css/editor.css" as="style"
-        onload="this.onload=null;this.rel='stylesheet';document.body.classList.add('css-ready')">
+    <link rel="preload" href="https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/css/editor.css"
+        as="style" onload="this.onload=null;this.rel='stylesheet';document.body.classList.add('css-ready')">
     <noscript>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-        <link rel="stylesheet" href="https://vinoth-elito.github.io/vin--datepicker__container/css/editor.css">
+        <link rel="stylesheet"
+            href="https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/css/editor.css">
     </noscript>
     <style>
         body {
@@ -125,7 +126,7 @@
             script = document.createElement("script");
         script.src = window.$jqlibraryURL + "?v=" + cacheBuster;
         script.onload = function () {
-            ["js/editorpreview.js", "js/datetimepicker.js", "js/datepicker.js", "js/monthyearpicker.js", "js/timepicker.js", "js/daterangepicker.js"].forEach(src => {
+            ["https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/editorpreview.js", "https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/datetimepicker.js", "https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/datepicker.js", "https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/monthyearpicker.js", "https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/timepicker.js", "https://cdn.statically.io/gh/vinoth-elito/vin--datepicker__container/main/js/daterangepicker.js"].forEach(src => {
                 const s = document.createElement("script");
                 s.src = src + "?v=" + cacheBuster,
                     document.head.appendChild(s)
