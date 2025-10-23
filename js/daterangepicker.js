@@ -321,6 +321,7 @@ function showDateRangePicker($input) {
             if (selectedFrom && selectedTo) $applyBtn.prop("disabled", false);
             else $applyBtn.prop("disabled", true);
         }
+
         function attachEventListeners() {
             const now = new Date();
             if (typeof fromCalendarSide === "undefined") window.fromCalendarSide = null;
