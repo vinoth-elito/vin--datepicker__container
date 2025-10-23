@@ -1928,7 +1928,7 @@ async function loadAll() {
             `https://vinoth-elito.github.io/vin--datepicker__container/daterangepickersingle.html?v=${cacheBuster}`
         ],
         [
-            `https://vinoth-elito.github.io/vin--datepicker__container/daterangepicker_custom.html?v=${cacheBuster}`
+            `daterangepicker_custom.html?v=${cacheBuster}`
         ]
 
     ];
