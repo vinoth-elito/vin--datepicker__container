@@ -211,6 +211,14 @@ img {
     color: var(--white__bgrcolor);
 }
 
+.vindatepicker--dropdown__wrapp tbody td.vin__between__dates,
+.vindatepicker--dropdown__wrapp tbody td.between__days__new,
+.vindatepicker--dropdown__wrapp tbody td.vin__between__hover,
+.vindatepicker--dropdown__wrapp .vindatepicker--inrange {
+    background-color: var(--td__currentdate);
+    opacity: .7;
+}
+
 .vindatepicker--dropdown__wrapp tbody td.vindatepicker--current__date,
 .vindatepicker--dropdown__wrapp tbody td.vindatepicker--current__month,
 .vindatepicker--dropdown__wrapp tbody td:hover,
@@ -231,7 +239,15 @@ img {
 .vindatepicker--dropdown__wrapp tbody td.vindatepicker--selected__from:hover,
 .vindatepicker--dropdown__wrapp tbody td.vindatepicker--selected__to:hover,
 .vintimepicker--time__list .vindatepicker--selected__date,
-.vintimepicker--time__list .vindatepicker--selected__date:hover {
+.vintimepicker--time__list .vindatepicker--selected__date:hover,
+.vindatepicker--dropdown__wrapp tbody td.vin__start__date,
+.vindatepicker--dropdown__wrapp tbody td.vin__end__date,
+.vindatepicker--dropdown__wrapp tbody td.vin__start__date:hover,
+.vindatepicker--dropdown__wrapp tbody td.vin__end__date:hover,
+.vindatepicker--dropdown__wrapp tbody td.vin__between__dates.vin__end__date,
+.vindatepicker--dropdown__wrapp tbody td.vin__between__dates.vin__start__date,
+.vindatepicker--dropdown__wrapp tbody td.vin__between__dates.vin__end__date:hover,
+.vindatepicker--dropdown__wrapp tbody td.vin__between__dates.vin__start__date:hover {
     background: var(--td__selecteddate);
     color: var(--pure__blackcolor);
 }
@@ -249,7 +265,8 @@ img {
     cursor: not-allowed;
 }
 
-.vin--datepicker__container thead tr th {
+.vin--datepicker__container thead tr th,
+.vin--datepicker__container tbody tr th {
     font-family: var(--calendar__fontfamily);
     color: var(--white__bgrcolor);
 }
@@ -783,6 +800,10 @@ form#search__popupmain label {
 .vin__day__clmn,
 .vin__day__clmn button {
     color: var(--white__bgrcolor);
+}
+
+.vindaterangepicker--sidebar ul li.active {
+    color: red;
 }
 
 .vincustom__year__clmn {
