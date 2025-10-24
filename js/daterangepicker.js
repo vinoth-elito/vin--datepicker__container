@@ -233,12 +233,19 @@ function showDateRangePicker($input) {
         `;
         $popup.html(body);
         if (!activeRange) {
-            const $firstLi = $popup.find(".vindaterangepicker--sidebar li").first();
-            if ($firstLi.length) {
-                activeRange = $firstLi.data("range");
-                $firstLi.addClass("active");
+            // Use last active sidebar range if available
+            const lastActive = state.lastActiveSidebar;
+            const $targetLi = lastActive
+                ? $popup.find(`.vindaterangepicker--sidebar li[data-range="${lastActive}"]`)
+                : $popup.find(".vindaterangepicker--sidebar li").first();
+
+            if ($targetLi.length) {
+                activeRange = $targetLi.data("range");
+                $targetLi.addClass("active");
+
                 const now = new Date();
                 let start = new Date(now);
+
                 switch (activeRange) {
                     case "today": break;
                     case "weekly": start.setDate(now.getDate() - 7); break;
@@ -248,6 +255,7 @@ function showDateRangePicker($input) {
                     case "last3": start.setMonth(now.getMonth() - 3); break;
                     case "all": start = now; break;
                 }
+
                 state.left.year = start.getFullYear();
                 state.left.month = start.getMonth();
                 renderCalendarSide("left");
@@ -517,6 +525,7 @@ function showDateRangePicker($input) {
                 $container.find(".vindaterange--from__date").val(fromDateTime).trigger("change");
                 $container.find(".vindaterange--to__date").val(toDateTime).trigger("change");
                 if (isSingleInput) $input.val(`${fromDateTime} - ${toDateTime}`).trigger("change");
+                state.activeSidebar = $popup.find(".vindaterangepicker--sidebar li.active").data("range");
                 $popup.remove();
             });
         }
