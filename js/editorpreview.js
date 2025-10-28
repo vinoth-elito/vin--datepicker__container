@@ -2029,21 +2029,30 @@ function showOfflineMessage() {
     const existingMessage = document.getElementById('offline-message');
 
     if (!navigator.onLine) {
-        // If offline and message doesn’t exist, add it
         if (!existingMessage) {
             document.body.insertAdjacentHTML('beforeend', offlineMessageHTML);
         }
     } else {
-        // If online and message exists, remove it from DOM
         if (existingMessage) {
-            existingMessage.remove();
+            existingMessage.classList.add('fadeUp');
+            existingMessage.addEventListener('animationend', () => existingMessage.remove(), { once: true });
         }
     }
 }
 
-// Initial check
-showOfflineMessage();
-
-// Listen for changes
+window.addEventListener('DOMContentLoaded', showOfflineMessage);
 window.addEventListener('online', showOfflineMessage);
 window.addEventListener('offline', showOfflineMessage);
+
+setInterval(() => {
+    fetch('https://www.google.com/favicon.ico', { mode: 'no-cors' })
+        .then(() => {
+            if (!navigator.onLine) return;
+            showOfflineMessage();
+        })
+        .catch(() => {
+            if (!document.getElementById('offline-message')) {
+                document.body.insertAdjacentHTML('beforeend', offlineMessageHTML);
+            }
+        });
+}, 10000);
