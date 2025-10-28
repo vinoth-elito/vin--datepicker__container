@@ -2019,14 +2019,31 @@ async function loadAll() {
     siteHeader.style.pointerEvents = '';
 }
 window.onload = loadAll;
-const offlineScreen = document.getElementById('offline-message');
+const offlineMessageHTML = `
+  <div id="offline-message" class="offline-message">
+      ⚠️ Please connect to the internet
+  </div>
+`;
+
 function showOfflineMessage() {
-    if (navigator.onLine) {
-        offlineScreen.style.display = 'none';
+    const existingMessage = document.getElementById('offline-message');
+
+    if (!navigator.onLine) {
+        // If offline and message doesn’t exist, add it
+        if (!existingMessage) {
+            document.body.insertAdjacentHTML('beforeend', offlineMessageHTML);
+        }
     } else {
-        offlineScreen.style.display = 'block';
+        // If online and message exists, remove it from DOM
+        if (existingMessage) {
+            existingMessage.remove();
+        }
     }
 }
+
+// Initial check
 showOfflineMessage();
+
+// Listen for changes
 window.addEventListener('online', showOfflineMessage);
 window.addEventListener('offline', showOfflineMessage);
