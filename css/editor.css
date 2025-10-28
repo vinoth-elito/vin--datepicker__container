@@ -825,7 +825,6 @@ form#search__popupmain label {
 }
 
 .offline-message {
-    display: none;
     position: fixed;
     top: 0;
     left: 0;
