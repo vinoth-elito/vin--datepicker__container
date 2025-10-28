@@ -81,7 +81,6 @@ function showDateRangePicker($input) {
         if (otherSelectedDate && !(otherSelectedDate instanceof Date)) otherSelectedDate = new Date(otherSelectedDate);
         if (minDate && !(minDate instanceof Date)) minDate = new Date(minDate);
         if (maxDate && !(maxDate instanceof Date)) maxDate = new Date(maxDate);
-
         function isSameDate(d1, d2) {
             return d1 && d2 &&
                 d1.getFullYear() === d2.getFullYear() &&
@@ -205,7 +204,6 @@ function showDateRangePicker($input) {
                 leftMinute = parseInt(timeParts[1]);
                 leftAMPM = timeParts[2];
             }
-
             if (initialFromTime && fromCalendarSide === "right") {
                 const timeParts = initialFromTime.split(/[: ]/);
                 rightHour = parseInt(timeParts[0]);
@@ -262,6 +260,7 @@ function showDateRangePicker($input) {
         $popup.html(body);
         attachEventListeners();
         attachArrowHandlers();
+        updateSidebarByMonth();
     }
     function attachArrowHandlers() {
         $popup.find(".vin-day-up[data-side='left']").off("click").on("click", function () {
@@ -372,28 +371,26 @@ function showDateRangePicker($input) {
         const rightIsCurrentMonth = (state.right.year === currentYear && state.right.month === currentMonth);
         if (!rightIsCurrentMonth) {
             activeRange = null;
-        } else {
-            if (diffMonths === 0 && state.left.year === currentYear && state.left.month === currentMonth) {
-                activeRange = "today";
-            } else if (diffMonths === 1) {
-                let lastMonthYear = currentYear;
-                let lastMonth = currentMonth - 1;
-                if (lastMonth < 0) {
-                    lastMonth = 11;
-                    lastMonthYear--;
-                }
-                if (state.left.year === lastMonthYear && state.left.month === lastMonth) {
-                    activeRange = "last1";
-                } else {
-                    activeRange = null;
-                }
-            } else if (diffMonths === 2) {
-                activeRange = "last2";
-            } else if (diffMonths === 3) {
-                activeRange = "last3";
+        } else if (diffMonths === 0 && state.left.year === currentYear && state.left.month === currentMonth) {
+            activeRange = "today";
+        } else if (diffMonths === 1) {
+            let lastMonthYear = currentYear;
+            let lastMonth = currentMonth - 1;
+            if (lastMonth < 0) {
+                lastMonth = 11;
+                lastMonthYear--;
+            }
+            if (state.left.year === lastMonthYear && state.left.month === lastMonth) {
+                activeRange = "last1";
             } else {
                 activeRange = null;
             }
+        } else if (diffMonths === 2) {
+            activeRange = "last2";
+        } else if (diffMonths === 3) {
+            activeRange = "last3";
+        } else {
+            activeRange = null;
         }
         $popup.find(".vindaterangepicker--sidebar li").removeClass("active");
         if (activeRange) {
@@ -586,12 +583,19 @@ function showDateRangePicker($input) {
         }
         state.left.year = prevYear;
         state.left.month = prevMonth;
+        state.right.year = today.getFullYear();
+        state.right.month = today.getMonth();
     } else {
         activeRange = window.lastActiveSidebarRange;
     }
     if (window.lastLeftCalendar) {
         state.left.year = window.lastLeftCalendar.year;
         state.left.month = window.lastLeftCalendar.month;
+        const now = new Date();
+        const rightIsCurrentMonth = (state.right.year === now.getFullYear() && state.right.month === now.getMonth());
+        if (!rightIsCurrentMonth) {
+            activeRange = null;
+        }
     }
     if (window.lastRightCalendar) {
         state.right.year = window.lastRightCalendar.year;
@@ -647,4 +651,3 @@ function showDateRangePicker($input) {
         });
     });
 })();
-
