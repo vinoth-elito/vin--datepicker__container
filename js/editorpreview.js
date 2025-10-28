@@ -398,7 +398,7 @@ function buildSrcDoc() {
   <script defer src="https://vinoth-elito.github.io/vin--datepicker__container/js/timepicker.js?v=${cacheBuster}"></script>
   <script defer src="https://vinoth-elito.github.io/vin--datepicker__container/js/daterangepicker.js?v=${cacheBuster}"></script>
   
-  <script>
+  <scrip>
   try {
     ${js}
   } catch (e) {
@@ -2021,12 +2021,21 @@ async function loadAll() {
     siteHeader.style.pointerEvents = '';
 }
 window.onload = loadAll;
-const offlineScreen = document.getElementById('offline-message');
+const offlineMessageHTML = `
+    <div id="offline-message" class="offline-message">
+        ⚠️ Please connect to the internet
+    </div>
+`;
 function showOfflineMessage() {
-    if (navigator.onLine) {
-        offlineScreen.style.display = 'none';
+    const existingMessage = document.getElementById('offline-message');
+    if (!navigator.onLine) {
+        if (!existingMessage) {
+            document.body.insertAdjacentHTML('beforeend', offlineMessageHTML);
+        }
     } else {
-        offlineScreen.style.display = 'block';
+        if (existingMessage) {
+            existingMessage.remove();
+        }
     }
 }
 showOfflineMessage();
