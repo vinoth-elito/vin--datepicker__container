@@ -1983,6 +1983,7 @@ async function loadAll() {
     const monthYearDiv = document.getElementById('loader__month-year');
     const daysDiv = document.getElementById('loader__days');
     const now = new Date();
+
     const monthNames = [
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
