@@ -11,22 +11,26 @@ function showDateRangePicker($input) {
     let selectedTo = isSingleInput
         ? ($input.val().split(" - ")[1] || null)
         : $container.find(".vindaterange--to__date").val() || null;
+
+    // Extract only date part if datetime exists (remove time)
     let initialFromTime = null;
     let initialToTime = null;
+
     if (selectedFrom && selectedFrom.includes(" ")) {
         const parts = selectedFrom.split(" ");
-        selectedFrom = parts[0];
+        selectedFrom = parts[0]; // Get only YYYY-MM-DD
         if (parts.length >= 3) {
-            initialFromTime = `${parts[1]} ${parts[2]}`;
+            initialFromTime = `${parts[1]} ${parts[2]}`; // HH:MM AM/PM
         }
     }
     if (selectedTo && selectedTo.includes(" ")) {
         const parts = selectedTo.split(" ");
-        selectedTo = parts[0];
+        selectedTo = parts[0]; // Get only YYYY-MM-DD
         if (parts.length >= 3) {
-            initialToTime = `${parts[1]} ${parts[2]}`;
+            initialToTime = `${parts[1]} ${parts[2]}`; // HH:MM AM/PM
         }
     }
+
     let fromDate = selectedFrom ? new Date(selectedFrom) : null;
     let toDate = selectedTo ? new Date(selectedTo) : null;
     let state = {
@@ -71,7 +75,7 @@ function showDateRangePicker($input) {
             <div class="vindatepicker--dropdown__wrapp__headernav vinflex vinflex--spacebetween vinflex--alignitemscenter vin__range__header">
                 <div class="vincustom__year__clmn vinflex vinflex--1 vin--textcenter">${months[state[side].month]} ${state[side].year}</div>
                 <div class="vin__day__clmn vinflex vinflex--1 vinflex--justifyend vinflex--alignitemscenter">
-                    ${side === 'Today' ? 'Today' : 'Today'} <button class="vin-day-up" data-side="${side}">▲</button><button class="vin-day-down" data-side="${side}">▼</button>
+                    ${side === 'left' ? 'Left' : 'Right'} <button class="vin-day-up" data-side="${side}">▲</button><button class="vin-day-down" data-side="${side}">▼</button>
                 </div>
             </div>`;
         }
@@ -127,13 +131,20 @@ function showDateRangePicker($input) {
                 if (isEqualFrom || isEqualTo) {
                     classes.push("vin__equal__date");
                 } else {
+                    // Disable dates greater than today
                     if (dateObj > today) classes.push("disabled");
+
+                    // For right calendar: disable dates before selectedFrom
                     if (calendarSide === "right" && minDate && dateObj < minDate) {
                         classes.push("vindatepicker--less__date", "disabled");
                     }
+
+                    // For left calendar: disable dates after selectedTo
                     if (calendarSide === "left" && maxDate && dateObj > maxDate) {
                         classes.push("vindatepicker--greater__date", "disabled");
                     }
+
+                    // Show between dates highlighting
                     if (selectedFrom && selectedTo) {
                         const startTime = startDateObj.getTime();
                         const endTime = endDateObj.getTime();
@@ -204,8 +215,11 @@ function showDateRangePicker($input) {
             let hour12 = now.getHours() % 12 || 12;
             let currentAMPM = now.getHours() >= 12 ? "PM" : "AM";
             let currentMinute = now.getMinutes();
+
+            // Use initial time if available, otherwise use current time
             let leftHour = hour12, leftMinute = currentMinute, leftAMPM = currentAMPM;
             let rightHour = hour12, rightMinute = currentMinute, rightAMPM = currentAMPM;
+
             if (initialFromTime && fromCalendarSide === "left") {
                 const timeParts = initialFromTime.split(/[: ]/);
                 leftHour = parseInt(timeParts[0]);
@@ -217,6 +231,7 @@ function showDateRangePicker($input) {
                 leftMinute = parseInt(timeParts[1]);
                 leftAMPM = timeParts[2];
             }
+
             if (initialFromTime && fromCalendarSide === "right") {
                 const timeParts = initialFromTime.split(/[: ]/);
                 rightHour = parseInt(timeParts[0]);
@@ -228,6 +243,7 @@ function showDateRangePicker($input) {
                 rightMinute = parseInt(timeParts[1]);
                 rightAMPM = timeParts[2];
             }
+
             timeHTMLLeft = `
                 <div class="vin--time__picker vin--time__picker-left vinflex vinflex--justifycenter">
                     <form class="vin__range__time" aria-label="Select time range">
@@ -275,79 +291,111 @@ function showDateRangePicker($input) {
         attachEventListeners();
         attachArrowHandlers();
     }
+
+    // Separate function to attach arrow handlers
     function attachArrowHandlers() {
+        // Left calendar up arrow
         $popup.find(".vin-day-up[data-side='left']").off("click").on("click", function () {
             let newMonth = state.left.month - 1;
             let newYear = state.left.year;
+
             if (newMonth < 0) {
                 newYear--;
                 newMonth = 11;
             }
+
+            // Don't allow left calendar to go beyond right calendar
             if (newYear > state.right.year ||
                 (newYear === state.right.year && newMonth > state.right.month)) {
+                console.log("⚠️ Cannot navigate: Left calendar cannot be after right calendar");
                 return;
             }
+
+            // If there's a selected "to" date, don't allow going beyond it
             if (selectedTo) {
                 const toDate = new Date(selectedTo);
                 const targetDate = new Date(newYear, newMonth, 1);
                 if (targetDate > toDate) {
+                    console.log("⚠️ Cannot navigate: Would exceed 'to' date");
                     return;
                 }
             }
+
             state.left.year = newYear;
             state.left.month = newMonth;
             console.log("⬆️ LEFT UP →", state.left.year, state.left.month + 1);
             renderCalendarSide("left");
             updateSidebarByMonth();
         });
+
+        // Left calendar down arrow
         $popup.find(".vin-day-down[data-side='left']").off("click").on("click", function () {
             let newMonth = state.left.month + 1;
             let newYear = state.left.year;
+
             if (newMonth > 11) {
                 newYear++;
                 newMonth = 0;
             }
+
+            // Don't allow going beyond today
             if (newYear > today.getFullYear() ||
                 (newYear === today.getFullYear() && newMonth > today.getMonth())) {
                 console.log("⚠️ Cannot navigate: Cannot go beyond current month");
                 return;
             }
+
             state.left.year = newYear;
             state.left.month = newMonth;
             console.log("⬇️ LEFT DOWN →", state.left.year, state.left.month + 1);
             renderCalendarSide("left");
             updateSidebarByMonth();
         });
+
+        // Right calendar up arrow
         $popup.find(".vin-day-up[data-side='right']").off("click").on("click", function () {
             let newMonth = state.right.month - 1;
             let newYear = state.right.year;
+
             if (newMonth < 0) {
                 newYear--;
                 newMonth = 11;
             }
+
+            // Don't allow right calendar to go before left calendar
             if (newYear < state.left.year ||
                 (newYear === state.left.year && newMonth < state.left.month)) {
+                console.log("⚠️ Cannot navigate: Right calendar cannot be before left calendar");
                 return;
             }
+
+            // If there's a selected "from" date, don't allow going before it
             if (selectedFrom) {
                 const fromDate = new Date(selectedFrom);
                 const lastDayOfMonth = new Date(newYear, newMonth + 1, 0);
                 if (lastDayOfMonth < fromDate) {
+                    console.log("⚠️ Cannot navigate: Would be before 'from' date");
                     return;
                 }
             }
+
             state.right.year = newYear;
             state.right.month = newMonth;
             console.log("⬆️ RIGHT UP →", state.right.year, state.right.month + 1);
             renderCalendarSide("right");
         });
+
+        // Right calendar down arrow
         $popup.find(".vin-day-down[data-side='right']").off("click").on("click", function () {
             let newMonth = state.right.month + 1;
             let newYear = state.right.year;
+
             if (newMonth > 11) {
                 newYear++;
                 newMonth = 0;
             }
+
+            // Don't allow right calendar to go beyond today
             if (newYear > today.getFullYear() ||
                 (newYear === today.getFullYear() && newMonth > today.getMonth())) {
                 state.right.year = today.getFullYear();
@@ -355,12 +403,14 @@ function showDateRangePicker($input) {
                 console.log("⚠️ Cannot navigate: Cannot go beyond current month");
                 return;
             }
+
             state.right.year = newYear;
             state.right.month = newMonth;
             console.log("⬇️ RIGHT DOWN →", state.right.year, state.right.month + 1);
             renderCalendarSide("right");
         });
     }
+
     function renderCalendarSide(side) {
         const year = state[side].year;
         const month = state[side].month;
@@ -368,6 +418,7 @@ function showDateRangePicker($input) {
         const otherSelectedDate = side === "left" ? selectedTo : selectedFrom;
         const minDate = side === "right" && selectedFrom ? parseDate(selectedFrom) : null;
         const maxDate = side === "left" && selectedTo ? parseDate(selectedTo) : null;
+
         const html = renderCalendar(
             year,
             month,
@@ -377,30 +428,71 @@ function showDateRangePicker($input) {
             otherSelectedDate,
             side
         );
+
+        // Update header
         $popup.find(`.vindaterangepicker--calendar${side} .vincustom__year__clmn`).text(`${months[month]} ${year}`);
+
+        // Update calendar table
         $popup.find(`.vindaterangepicker--calendar${side} table`).replaceWith(html);
+
+        // Re-attach click and hover events for the updated calendar
         attachDateClickEvents();
         attachHoverEvents();
     }
+
     function updateSidebarByMonth() {
         const now = new Date();
-        const diffMonths =
-            (now.getFullYear() - state.left.year) * 12 + (now.getMonth() - state.left.month);
-        if (diffMonths === 0) activeRange = "today";
-        else if (diffMonths === 1) activeRange = "last1";
-        else if (diffMonths === 2) activeRange = "last2";
-        else if (diffMonths === 3) activeRange = "last3";
-        else activeRange = null;
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth();
+
+        // Calculate the difference in months from current date
+        const diffMonths = (currentYear - state.left.year) * 12 + (currentMonth - state.left.month);
+
+        // Check if right calendar is showing current month
+        const rightIsCurrentMonth = (state.right.year === currentYear && state.right.month === currentMonth);
+
+        // Only set active range if both calendars are in the correct position
+        if (!rightIsCurrentMonth) {
+            // If right calendar is not current month, clear active
+            activeRange = null;
+        } else {
+            // Right calendar is current month, check left calendar position
+            if (diffMonths === 0 && state.left.year === currentYear && state.left.month === currentMonth) {
+                activeRange = "today";
+            } else if (diffMonths === 1) {
+                // Verify it's exactly last month
+                let lastMonthYear = currentYear;
+                let lastMonth = currentMonth - 1;
+                if (lastMonth < 0) {
+                    lastMonth = 11;
+                    lastMonthYear--;
+                }
+                if (state.left.year === lastMonthYear && state.left.month === lastMonth) {
+                    activeRange = "last1";
+                } else {
+                    activeRange = null;
+                }
+            } else if (diffMonths === 2) {
+                activeRange = "last2";
+            } else if (diffMonths === 3) {
+                activeRange = "last3";
+            } else {
+                activeRange = null;
+            }
+        }
+
         $popup.find(".vindaterangepicker--sidebar li").removeClass("active");
         if (activeRange) {
             $popup.find(`.vindaterangepicker--sidebar li[data-range="${activeRange}"]`).addClass("active");
         }
     }
+
     function updateApplyButton() {
         const $applyBtn = $popup.find(".vin-btn-apply");
         if (selectedFrom && selectedTo) $applyBtn.prop("disabled", false);
         else $applyBtn.prop("disabled", true);
     }
+
     function attachHoverEvents() {
         $popup.find("td").off("mouseenter mouseleave").on("mouseenter", function () {
             if (selectedFrom && !selectedTo) {
@@ -418,37 +510,49 @@ function showDateRangePicker($input) {
             if (!selectedTo) $popup.find("td").removeClass("vin__between__hover");
         });
     }
+
     function attachDateClickEvents() {
         $popup.find("td").off("click").on("click", function () {
             const $td = $(this);
             if ($td.hasClass("disabled") || !$td.data("date")) return;
             const calendarSide = $td.closest(".vin--daterange__calendar").hasClass("vindaterangepicker--calendarleft") ? "left" : "right";
             const clickedDate = new Date($td.data("date"));
+
+            // Check if user is clicking on right calendar without selecting from date first
             if (!selectedFrom && calendarSide === "right") {
                 alert("Please select 'From' date first from the left calendar");
                 return;
             }
+
             if (!selectedFrom || (selectedFrom && selectedTo)) {
+                // First selection or reset
                 selectedFrom = $td.data("date");
                 selectedTo = null;
                 fromCalendarSide = calendarSide;
                 toCalendarSide = null;
             } else {
+                // Second selection
                 const fromDate = new Date(selectedFrom);
+
+                // Check if clicked date is before from date
                 if (clickedDate < fromDate) {
+                    // Swap: make clicked date the "from" and previous "from" the "to"
                     selectedTo = selectedFrom;
                     selectedFrom = $td.data("date");
                     toCalendarSide = fromCalendarSide;
                     fromCalendarSide = calendarSide;
                 } else {
+                    // Normal case: clicked date is after from date
                     selectedTo = $td.data("date");
                     toCalendarSide = calendarSide;
                 }
             }
+
             window.lastSelectedFrom = selectedFrom;
             window.lastSelectedTo = selectedTo;
             window.lastFromCalendarSide = fromCalendarSide;
             window.lastToCalendarSide = toCalendarSide;
+
             $popup.find("td").removeClass("vin__start__date vin__end__date vin__between__hover vin__between__dates vin__equal__date");
             $popup.find("td").each(function () {
                 const cellDate = new Date($(this).data("date"));
@@ -463,6 +567,8 @@ function showDateRangePicker($input) {
                     if (cellDate.getTime() === from.getTime()) $(this).addClass("vin__start__date");
                 }
             });
+
+            // For non-custom mode: auto-apply when both dates selected
             if (!isCustom && selectedFrom && selectedTo) {
                 $container.find(".vindaterange--from__date").val(selectedFrom).trigger("change");
                 $container.find(".vindaterange--to__date").val(selectedTo).trigger("change");
@@ -473,13 +579,18 @@ function showDateRangePicker($input) {
             }
         });
     }
+
     function attachEventListeners() {
         $popup.find(".vindaterangepicker--sidebar li").off("click").on("click", function () {
             const $li = $(this);
+
+            // Remove active from all, add to clicked
             $popup.find(".vindaterangepicker--sidebar li").removeClass("active");
             $li.addClass("active");
+
             activeRange = $li.data("range");
             window.lastActiveRange = activeRange;
+
             selectedFrom = null;
             selectedTo = null;
             fromCalendarSide = null;
@@ -505,12 +616,18 @@ function showDateRangePicker($input) {
             renderCalendarSide("left");
             renderCalendarSide("right");
         });
+
         attachHoverEvents();
         attachDateClickEvents();
+
+        // Only add Cancel and Apply buttons for custom mode
         if (isCustom) {
             $popup.find(".vin-btn-cancel").off("click").on("click", () => {
+                // Reset to "Last Month" default
                 activeRange = "last1";
                 window.lastActiveSidebarRange = "last1";
+
+                // Reset calendar to last month
                 let prevMonth = today.getMonth() - 1;
                 let prevYear = today.getFullYear();
                 if (prevMonth < 0) {
@@ -528,6 +645,7 @@ function showDateRangePicker($input) {
 
                 $popup.remove();
             });
+
             $popup.find(".vin-btn-apply").off("click").on("click", () => {
                 if (!selectedFrom || !selectedTo) {
                     alert("Please select From and To date");
@@ -535,16 +653,23 @@ function showDateRangePicker($input) {
                 }
                 const fromSide = fromCalendarSide;
                 const toSide = toCalendarSide || (fromSide === "left" ? "right" : "left");
+
+                // Get time values
                 const fromHour = $popup.find(`.vin-time-hour-${fromSide}`).val();
                 const fromMinute = $popup.find(`.vin-time-minute-${fromSide}`).val();
                 const fromAMPM = $popup.find(`.vin-time-ampm-${fromSide}`).val();
                 const toHour = $popup.find(`.vin-time-hour-${toSide}`).val();
                 const toMinute = $popup.find(`.vin-time-minute-${toSide}`).val();
                 const toAMPM = $popup.find(`.vin-time-ampm-${toSide}`).val();
+
+                // Extract only date part (YYYY-MM-DD) in case it has time already
                 const cleanFromDate = selectedFrom.split(" ")[0];
                 const cleanToDate = selectedTo.split(" ")[0];
+
+                // Append fresh time
                 const fromDateTime = `${cleanFromDate} ${fromHour.padStart(2, "0")}:${fromMinute.padStart(2, "0")} ${fromAMPM}`;
                 const toDateTime = `${cleanToDate} ${toHour.padStart(2, "0")}:${toMinute.padStart(2, "0")} ${toAMPM}`;
+
                 $container.find(".vindaterange--from__date").val(fromDateTime).trigger("change");
                 $container.find(".vindaterange--to__date").val(toDateTime).trigger("change");
                 if (isSingleInput) $input.val(`${fromDateTime} - ${toDateTime}`).trigger("change");
@@ -561,6 +686,7 @@ function showDateRangePicker($input) {
             });
         }
     }
+
     function formatRangeLabel(range) {
         switch (range) {
             case "all": return "All";
@@ -572,9 +698,12 @@ function showDateRangePicker($input) {
             case "today": return "Today";
         }
     }
+
+    // Initialize - Set "Last Month" as default
     if (!window.lastActiveSidebarRange) {
         activeRange = "last1";
         window.lastActiveSidebarRange = "last1";
+        // Set left calendar to last month by default
         let prevMonth = today.getMonth() - 1;
         let prevYear = today.getFullYear();
         if (prevMonth < 0) {
@@ -586,6 +715,7 @@ function showDateRangePicker($input) {
     } else {
         activeRange = window.lastActiveSidebarRange;
     }
+
     if (window.lastLeftCalendar) {
         state.left.year = window.lastLeftCalendar.year;
         state.left.month = window.lastLeftCalendar.month;
@@ -594,50 +724,20 @@ function showDateRangePicker($input) {
         state.right.year = window.lastRightCalendar.year;
         state.right.month = window.lastRightCalendar.month;
     }
+
     render();
+
     $(document).on("mousedown.cuzpicker", function (e) {
         if (!$popup.is(e.target) && $popup.has(e.target).length === 0 && !$input.is(e.target)) {
             $popup.remove();
             $(document).off("mousedown.cuzpicker");
         }
     });
-    $(".vin--datepicker__container").each(function () {
-        const $container = $(this);
 
-        $container.find(".clear__selected__month").off("click").on("click", function () {
-            $container.find(".vindaterange--from__date").val("").trigger("change");
-            $container.find(".vindaterange--to__date").val("").trigger("change");
-            const today = new Date();
-            let prevMonth = today.getMonth() - 1;
-            let prevYear = today.getFullYear();
-            if (prevMonth < 0) {
-                prevMonth = 11;
-                prevYear--;
-            }
-            window.lastActiveSidebarRange = "last1";
-            window.lastLeftCalendar = {
-                year: prevYear,
-                month: prevMonth
-            };
-            window.lastRightCalendar = {
-                year: today.getFullYear(),
-                month: today.getMonth()
-            };
-            window.lastSelectedFrom = null;
-            window.lastSelectedTo = null;
-            window.lastFromCalendarSide = null;
-            window.lastToCalendarSide = null;
-            const $popup = $container.find(".vindatepicker--dropdown__wrapp");
-            if ($popup.length) {
-                $popup.find(".vindaterangepicker--sidebar li").removeClass("active");
-                $popup.find('.vindaterangepicker--sidebar li[data-range="last1"]').addClass("active");
-                $popup.find("td").removeClass("vin__start__date vin__end__date vin__between__hover vin__between__dates vin__equal__date");
-            }
-        });
-    });
     return $popup;
-
 }
+
+// Initialize date range inputs
 (() => {
     const dateRangeInputs = document.querySelectorAll(".vindaterange--from__date, .vindaterange--to__date");
     dateRangeInputs.forEach(input => {
@@ -646,3 +746,48 @@ function showDateRangePicker($input) {
         });
     });
 })();
+
+// Clear button handler
+$(".vin--datepicker__container").each(function () {
+    const $container = $(this);
+
+    $container.find(".clear__selected__month").off("click").on("click", function () {
+        // Clear date fields
+        $container.find(".vindaterange--from__date").val("").trigger("change");
+        $container.find(".vindaterange--to__date").val("").trigger("change");
+
+        // Reset to "Last Month" default
+        const today = new Date();
+        let prevMonth = today.getMonth() - 1;
+        let prevYear = today.getFullYear();
+        if (prevMonth < 0) {
+            prevMonth = 11;
+            prevYear--;
+        }
+
+        // Store default state
+        window.lastActiveSidebarRange = "last1";
+        window.lastLeftCalendar = {
+            year: prevYear,
+            month: prevMonth
+        };
+        window.lastRightCalendar = {
+            year: today.getFullYear(),
+            month: today.getMonth()
+        };
+
+        // Clear selection state
+        window.lastSelectedFrom = null;
+        window.lastSelectedTo = null;
+        window.lastFromCalendarSide = null;
+        window.lastToCalendarSide = null;
+
+        // If picker is open, update it immediately
+        const $popup = $container.find(".vindatepicker--dropdown__wrapp");
+        if ($popup.length) {
+            $popup.find(".vindaterangepicker--sidebar li").removeClass("active");
+            $popup.find('.vindaterangepicker--sidebar li[data-range="last1"]').addClass("active");
+            $popup.find("td").removeClass("vin__start__date vin__end__date vin__between__hover vin__between__dates vin__equal__date");
+        }
+    });
+});
