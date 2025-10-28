@@ -67,7 +67,7 @@ function showDateRangePicker($input) {
             <div class="vindatepicker--dropdown__wrapp__headernav vinflex vinflex--spacebetween vinflex--alignitemscenter vin__range__header">
                 <div class="vincustom__year__clmn vinflex vinflex--1 vin--textcenter">${months[state[side].month]} ${state[side].year}</div>
                 <div class="vin__day__clmn vinflex vinflex--1 vinflex--justifyend vinflex--alignitemscenter">
-                    ${side === 'left' ? 'Left' : 'Right'} <button class="vin-day-up" data-side="${side}">▲</button><button class="vin-day-down" data-side="${side}">▼</button>
+                    ${side === 'Today' ? 'Today' : 'Today'} <button class="vin-day-up" data-side="${side}">▲</button><button class="vin-day-down" data-side="${side}">▼</button>
                 </div>
             </div>`;
         }
