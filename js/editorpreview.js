@@ -397,8 +397,7 @@ function buildSrcDoc() {
   <script defer src="https://vinoth-elito.github.io/vin--datepicker__container/js/monthyearpicker.js?v=${cacheBuster}"></script>
   <script defer src="https://vinoth-elito.github.io/vin--datepicker__container/js/timepicker.js?v=${cacheBuster}"></script>
   <script defer src="https://vinoth-elito.github.io/vin--datepicker__container/js/daterangepicker.js?v=${cacheBuster}"></script>
-  
-  <scrip>
+  <script>
   try {
     ${js}
   } catch (e) {
@@ -1984,7 +1983,6 @@ async function loadAll() {
     const monthYearDiv = document.getElementById('loader__month-year');
     const daysDiv = document.getElementById('loader__days');
     const now = new Date();
-
     const monthNames = [
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -2021,21 +2019,12 @@ async function loadAll() {
     siteHeader.style.pointerEvents = '';
 }
 window.onload = loadAll;
-const offlineMessageHTML = `
-    <div id="offline-message" class="offline-message">
-        ⚠️ Please connect to the internet
-    </div>
-`;
+const offlineScreen = document.getElementById('offline-message');
 function showOfflineMessage() {
-    const existingMessage = document.getElementById('offline-message');
-    if (!navigator.onLine) {
-        if (!existingMessage) {
-            document.body.insertAdjacentHTML('beforeend', offlineMessageHTML);
-        }
+    if (navigator.onLine) {
+        offlineScreen.style.display = 'none';
     } else {
-        if (existingMessage) {
-            existingMessage.remove();
-        }
+        offlineScreen.style.display = 'block';
     }
 }
 showOfflineMessage();
