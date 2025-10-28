@@ -2024,10 +2024,8 @@ const offlineMessageHTML = `
       ⚠️ Please connect to the internet
   </div>
 `;
-
 function showOfflineMessage() {
     const existingMessage = document.getElementById('offline-message');
-
     if (!navigator.onLine) {
         if (!existingMessage) {
             document.body.insertAdjacentHTML('beforeend', offlineMessageHTML);
@@ -2039,11 +2037,9 @@ function showOfflineMessage() {
         }
     }
 }
-
 window.addEventListener('DOMContentLoaded', showOfflineMessage);
 window.addEventListener('online', showOfflineMessage);
 window.addEventListener('offline', showOfflineMessage);
-
 setInterval(() => {
     fetch('https://www.google.com/favicon.ico', { mode: 'no-cors' })
         .then(() => {

@@ -27,8 +27,8 @@ body {
 
 .vintimepicker--circle__timeinputs input[type="number"] {
     -moz-appearance: textfield;
-    appearance: textfield;
     -webkit-appearance: textfield;
+    appearance: textfield;
 }
 
 .sr-only {
@@ -501,6 +501,9 @@ img {
 .vintimepicker--circle__minute {
     cursor: pointer;
     pointer-events: all;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
     fill: transparent;
     font-size: 18px;
