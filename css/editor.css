@@ -826,22 +826,33 @@ form#search__popupmain label {
 
 .offline-message {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: #ff4d4d;
+    inset: 0;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000000d6;
     color: white;
     text-align: center;
-    padding: 10px;
     font-weight: bold;
     z-index: 9999;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: progress;
     opacity: 0;
-    transform: translateY(-100%);
-    animation: fadeDown 0.4s forwards;
+    transform: translateY(-20px);
+    animation: fadeDown 0.4s forwards ease;
 }
 
 @keyframes fadeDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -849,12 +860,17 @@ form#search__popupmain label {
 }
 
 .fadeUp {
-    animation: fadeUp 0.4s forwards;
+    animation: fadeUp 0.4s forwards ease;
 }
 
 @keyframes fadeUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
     to {
         opacity: 0;
-        transform: translateY(-100%);
+        transform: translateY(-20px);
     }
 }
